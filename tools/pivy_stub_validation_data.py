@@ -1623,6 +1623,44 @@ PYTHON_HELPER_METHOD_CHECKS = {
 EXTEND_HELPER_METHOD_CHECKS = {
     "coin.pyi": (
         ("SoEngine", "getByName", {"name": "SbName"}, "SoEngine | None"),
+        ("SoNode", "getByName", {"name": "SbName | str"}, "SoNode | None"),
+        (
+            "SoNode",
+            "getByName",
+            {"name": "SbName | str", "l": "SoNodeList"},
+            "int",
+        ),
+        ("SoPath", "getByName", {"name": "str"}, "SoPath | None"),
+        (
+            "SoPath",
+            "getByName",
+            {"name": "str", "l": "SoPathList"},
+            "int",
+        ),
+        (
+            "SoBase",
+            "getNamedBase",
+            {"name": "SbName | str", "type": "SoType"},
+            "SoBase | None",
+        ),
+        (
+            "SoFieldContainer",
+            "getField",
+            {"name": "SbName | str"},
+            "SoField | None",
+        ),
+        (
+            "SoFieldContainer",
+            "getEventIn",
+            {"name": "SbName | str"},
+            "SoField | None",
+        ),
+        (
+            "SoFieldContainer",
+            "getEventOut",
+            {"name": "SbName | str"},
+            "SoField | None",
+        ),
         (
             "SoCallbackAction",
             "getMaterial",
@@ -1692,6 +1730,13 @@ EXTEND_HELPER_METHOD_CHECKS = {
 }
 METHOD_RETURN_TYPE_CHECKS = {
     "coin.pyi": (
+        ("SoBase", "getNamedBase", "SoBase | None"),
+        ("SoFieldContainer", "getField", "SoField | None"),
+        ("SoFieldContainer", "getEventIn", "SoField | None"),
+        ("SoFieldContainer", "getEventOut", "SoField | None"),
+        ("SoNode", "getChildren", "SoChildList | None"),
+        ("SoPath", "getHead", "SoNode | None"),
+        ("SoPath", "getTail", "SoNode | None"),
         ("SoInput", "findProto", "SoProto | None"),
         ("SoInput", "getCurrentProto", "SoProto | None"),
         ("SoInput", "getCurFileName", "str | None"),

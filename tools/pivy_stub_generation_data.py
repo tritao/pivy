@@ -161,11 +161,50 @@ METHOD_RETURN_TYPE_OVERRIDES = {
     ("SoInput", "getCurFileName"): "str | None",
     ("SoInput", "findReference"): "SoBase | None",
     ("SoOutput", "getCurrentProto"): "SoProto | None",
+    ("SoBase", "getNamedBase"): "SoBase | None",
+    ("SoFieldContainer", "getField"): "SoField | None",
+    ("SoFieldContainer", "getEventIn"): "SoField | None",
+    ("SoFieldContainer", "getEventOut"): "SoField | None",
+    ("SoNode", "getChildren"): "SoChildList | None",
+    ("SoPath", "getHead"): "SoNode | None",
+    ("SoPath", "getTail"): "SoNode | None",
 }
 EXTEND_HELPER_METHOD_TYPES = {
     ("SoEngine", "getByName", "name: SbName"): (
         "name: SbName",
         "SoEngine | None",
+    ),
+    ("SoNode", "getByName", "name: SbName"): (
+        "name: SbName | str",
+        "SoNode | None",
+    ),
+    ("SoNode", "getByName", "name: SbName, l: SoNodeList"): (
+        "name: SbName | str, l: SoNodeList",
+        "int",
+    ),
+    ("SoPath", "getByName", "name: SbName"): (
+        "name: str",
+        "SoPath | None",
+    ),
+    ("SoPath", "getByName", "name: SbName, l: SoPathList"): (
+        "name: str, l: SoPathList",
+        "int",
+    ),
+    ("SoBase", "getNamedBase", "name: SbName, type: SoType"): (
+        "name: SbName | str, type: SoType",
+        "SoBase | None",
+    ),
+    ("SoFieldContainer", "getField", "self, name: SbName"): (
+        "self, name: SbName | str",
+        "SoField | None",
+    ),
+    ("SoFieldContainer", "getEventIn", "self, name: SbName"): (
+        "self, name: SbName | str",
+        "SoField | None",
+    ),
+    ("SoFieldContainer", "getEventOut", "self, name: SbName"): (
+        "self, name: SbName | str",
+        "SoField | None",
     ),
     ("SoCallbackAction", "getMaterial", "self, index: int = ..."): (
         "self, index: int = ...",

@@ -93,8 +93,8 @@ def check_paths() -> None:
     path.append(root)
     path.append(0)
 
-    assert_type(path.getHead(), coin.SoNode)
-    assert_type(path.getTail(), coin.SoNode)
+    assert_type(path.getHead(), coin.SoNode | None)
+    assert_type(path.getTail(), coin.SoNode | None)
     assert_type(path.getNode(0), coin.SoNode)
     assert_type(path.getNodeFromTail(0), coin.SoNode)
     assert_type(path.getIndex(0), int)

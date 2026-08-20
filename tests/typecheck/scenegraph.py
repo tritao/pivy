@@ -1,0 +1,50 @@
+# pyright: reportMissingModuleSource=false
+
+from typing import Iterator, assert_type
+
+from pivy import coin
+
+
+def check_group_and_node_contract() -> None:
+    root = coin.SoSeparator()
+    cube = coin.SoCube()
+    root.addChild(cube)
+
+    assert_type(root.getChild(0), coin.SoNode)
+    assert_type(root.getChildren(), coin.SoChildList)
+    assert_type(root.getByName("missing"), coin.SoNode | None)
+    assert_type(iter(root), Iterator[coin.SoNode])
+    assert_type(cube.getChildren(), coin.SoChildList | None)
+    assert_type(coin.SoNode.getByName("missing"), coin.SoNode | None)
+    assert_type(
+        coin.SoNode.getByName("missing", coin.SoNodeList()), int
+    )
+
+
+def check_path_contract() -> None:
+    empty = coin.SoPath()
+    assert_type(empty.getHead(), coin.SoNode | None)
+    assert_type(empty.getTail(), coin.SoNode | None)
+    assert_type(coin.SoPath.getByName("missing"), coin.SoPath | None)
+
+    root = coin.SoSeparator()
+    root.addChild(coin.SoCube())
+    path = coin.SoPath(root)
+    path.append(0)
+    assert_type(path.getHead(), coin.SoNode | None)
+    assert_type(path.getTail(), coin.SoNode | None)
+    assert_type(path.getNode(0), coin.SoNode)
+    assert_type(path.getNodeFromTail(0), coin.SoNode)
+    assert_type(iter(path), Iterator[coin.SoNode])
+    assert_type(path.index(), Iterator[int])
+
+
+def check_field_and_name_lookups() -> None:
+    cube = coin.SoCube()
+    assert_type(cube.getField("missing"), coin.SoField | None)
+    assert_type(cube.getEventIn("missing"), coin.SoField | None)
+    assert_type(cube.getEventOut("missing"), coin.SoField | None)
+    assert_type(
+        coin.SoBase.getNamedBase("missing", coin.SoType.badType()),
+        coin.SoBase | None,
+    )

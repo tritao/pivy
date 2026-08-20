@@ -1111,6 +1111,18 @@ class SoGroupMethods(unittest.TestCase):
         d = SoCube()
         g += [c, [g]]
 
+    def testChildrenAndNameLookup(self):
+        leaf = SoCube()
+        self.assertIsNone(leaf.getChildren())
+
+        group = SoGroup()
+        child = SoCube()
+        child.setName(SbName("namedCube"))
+        group.addChild(child)
+        self.assertIsNotNone(group.getChildren())
+        self.assertEqual(group.getByName("namedCube"), child)
+        self.assertIsNone(group.getByName("missing"))
+
 class SbBaseClasses(unittest.TestCase):
     """checks methods and operators of and between various Sb* classes"""
     def testConstructors(self):
@@ -1207,6 +1219,24 @@ class SoPathTests(unittest.TestCase):
             index += 1
         for i in path.index():
             self.assertEqual(i, 0)
+
+    def testEmptyPathLookups(self):
+        empty = SoPath()
+        self.assertIsNone(empty.getHead())
+        self.assertIsNone(empty.getTail())
+        self.assertIsNone(SoPath.getByName("missing"))
+
+    def testNodeAndFieldLookups(self):
+        self.assertIsNone(SoNode.getByName("missing"))
+        self.assertIsNone(
+            SoBase.getNamedBase("missing", SoType.badType())
+        )
+
+        cube = SoCube()
+        self.assertIsNotNone(cube.getField("width"))
+        self.assertIsNone(cube.getField("missing"))
+        self.assertIsNone(cube.getEventIn("missing"))
+        self.assertIsNone(cube.getEventOut("missing"))
 
 class SoInputTests(unittest.TestCase):
     """check method SoInput.setBuffer"""
