@@ -152,6 +152,42 @@ EXTEND_HELPER_METHOD_TYPES = {
         "self, center: SbVec3f",
         "tuple[SbVec3f, SbRotation, SbVec3f, SbRotation]",
     ),
+    ("SbMatrix", "multMatrixVec", "self, src: SbVec3f"): (
+        "self, src: SbVec3f",
+        "SbVec3f",
+    ),
+    ("SbMatrix", "multDirMatrix", "self, src: SbVec3f"): (
+        "self, src: SbVec3f",
+        "SbVec3f",
+    ),
+    ("SbMatrix", "multVecMatrix", "self, src: SbVec3f"): (
+        "self, src: SbVec3f",
+        "SbVec3f",
+    ),
+    ("SbMatrix", "multVecMatrix", "self, src: SbVec4f"): (
+        "self, src: SbVec4f",
+        "SbVec4f",
+    ),
+    ("SbRotation", "getAxisAngle", "self"): (
+        "self",
+        "tuple[SbVec3f, float]",
+    ),
+    ("SbRotation", "getMatrix", "self"): (
+        "self",
+        "SbMatrix",
+    ),
+    ("SbRotation", "multVec", "self, src: SbVec3f"): (
+        "self, src: SbVec3f",
+        "SbVec3f",
+    ),
+    ("SbDPRotation", "getAxisAngle", "self"): (
+        "self",
+        "tuple[SbVec3d, float]",
+    ),
+    ("SbDPRotation", "getMatrix", "self"): (
+        "self",
+        "SbDPMatrix",
+    ),
     ("SbViewVolume", "projectPointToLine", "self, SbVec3f: Incomplete"): (
         "self, pt: SbVec2f",
         "tuple[SbVec3f, SbVec3f]",
