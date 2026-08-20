@@ -112,6 +112,15 @@ except ImportError:
     )
 
 
+try:
+    from tools.pivy_stub_typing_policy import field_method_type_overrides
+except ImportError:
+    from pivy_stub_typing_policy import field_method_type_overrides
+
+
+FIELD_METHOD_TYPE_OVERRIDES = field_method_type_overrides()
+
+
 def stub_path(output_dir, module):
     return os.path.join(output_dir, *module.split(".")) + ".pyi"
 
@@ -1530,7 +1539,7 @@ def normalize_extend_helpers(text):
             current_class = None
 
         match = DEF_RE.match(line)
-        signature = EXTEND_HELPER_METHOD_TYPES.get(
+        signature = FIELD_METHOD_TYPE_OVERRIDES.get(
             (
                 current_class,
                 match.group("name"),
@@ -1539,6 +1548,16 @@ def normalize_extend_helpers(text):
             if match
             else None
         )
+        if signature is None:
+            signature = EXTEND_HELPER_METHOD_TYPES.get(
+                (
+                    current_class,
+                    match.group("name"),
+                    match.group("args").strip(),
+                )
+                if match
+                else None
+            )
         if signature is not None:
             args, return_type = signature
             updated.append(
