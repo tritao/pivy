@@ -58,6 +58,7 @@ try:
         INPLACE_DIVISION_METHODS,
         INT_TYPES,
         KNOWN_ITER_ELEMENT_TYPES,
+        METHOD_RETURN_TYPE_OVERRIDES,
         MATRIX_CPP_TYPES,
         MATRIX_ROW_RETURN_TYPES,
         MATRIX_SEQUENCE_PARAMETERS,
@@ -91,6 +92,7 @@ except ImportError:
         INPLACE_DIVISION_METHODS,
         INT_TYPES,
         KNOWN_ITER_ELEMENT_TYPES,
+        METHOD_RETURN_TYPE_OVERRIDES,
         MATRIX_CPP_TYPES,
         MATRIX_ROW_RETURN_TYPES,
         MATRIX_SEQUENCE_PARAMETERS,
@@ -650,6 +652,8 @@ def render_python_signature(
             return_type = MATRIX_VALUE_RETURN_TYPES[class_name]
         elif name == "__getitem__" and class_name in MATRIX_ROW_RETURN_TYPES:
             return_type = MATRIX_ROW_RETURN_TYPES[class_name]
+        elif (class_name, name) in METHOD_RETURN_TYPE_OVERRIDES:
+            return_type = METHOD_RETURN_TYPE_OVERRIDES[(class_name, name)]
         elif cpp_return and name == "addEventCallback" and callback_types:
             return_type = "tuple[%s, Any]" % next(iter(callback_types.values()))
         elif cpp_return:

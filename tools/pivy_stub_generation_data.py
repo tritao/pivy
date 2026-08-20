@@ -128,6 +128,20 @@ PYTHON_HELPER_METHOD_TYPES = {
     ("SoNodeKitPath", "index"): ("self", "Iterator[int]"),
     ("SoPath", "index"): ("self", "Iterator[int]"),
 }
+METHOD_RETURN_TYPE_OVERRIDES = {
+    ("SoAction", "getNodeAppliedTo"): "SoNode | None",
+    ("SoAction", "getPathAppliedTo"): "SoPath | None",
+    ("SoAction", "getPathListAppliedTo"): "SoPathList | None",
+    ("SoAction", "getOriginalPathListAppliedTo"): "SoPathList | None",
+    ("SoHandleEventAction", "getEvent"): "SoEvent | None",
+    ("SoHandleEventAction", "getGrabber"): "SoNode | None",
+    ("SoHandleEventAction", "getPickRoot"): "SoNode | None",
+    ("SoHandleEventAction", "getPickedPoint"): "SoPickedPoint | None",
+    ("SoGetBoundingBoxAction", "getResetPath"): "SoPath | None",
+    ("SoRayPickAction", "getPickedPoint"): "SoPickedPoint | None",
+    ("SoSearchAction", "getNode"): "SoNode | None",
+    ("SoSearchAction", "getPath"): "SoPath | None",
+}
 EXTEND_HELPER_METHOD_TYPES = {
     ("SoCallbackAction", "getMaterial", "self, index: int = ..."): (
         "self, index: int = ...",

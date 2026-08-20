@@ -17,6 +17,7 @@ from tools.pivy_stub_validation_data import (
     EXTEND_HELPER_METHOD_CHECKS,
     GENERATED_HEADER,
     ITER_CONTAINER_TYPES,
+    METHOD_RETURN_TYPE_CHECKS,
     MULTIFIELD_METHOD_CHECKS,
     MYPY_SNIPPET,
     OPERATOR_METHOD_CHECKS,
@@ -415,6 +416,12 @@ def assert_extend_helpers(path, tree, checks):
         )
 
 
+def assert_method_return_types(path, tree, checks):
+    classes = class_map(tree)
+    for class_name, method_name, return_type in checks:
+        assert_method_signature(path, classes, class_name, method_name, {}, return_type)
+
+
 def assert_property_attributes(path, tree, checks):
     classes = class_map(tree)
     for class_name, attribute_name, attribute_type in checks:
@@ -590,6 +597,9 @@ def validate_stub_files(package_dir):
                 )
                 assert_extend_helpers(
                     path, tree, EXTEND_HELPER_METHOD_CHECKS.get(relative, ())
+                )
+                assert_method_return_types(
+                    path, tree, METHOD_RETURN_TYPE_CHECKS.get(relative, ())
                 )
                 assert_property_attributes(
                     path, tree, PROPERTY_ATTRIBUTE_CHECKS.get(relative, ())

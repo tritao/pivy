@@ -1689,6 +1689,22 @@ EXTEND_HELPER_METHOD_CHECKS = {
         ),
     ),
 }
+METHOD_RETURN_TYPE_CHECKS = {
+    "coin.pyi": (
+        ("SoAction", "getNodeAppliedTo", "SoNode | None"),
+        ("SoAction", "getPathAppliedTo", "SoPath | None"),
+        ("SoAction", "getPathListAppliedTo", "SoPathList | None"),
+        ("SoAction", "getOriginalPathListAppliedTo", "SoPathList | None"),
+        ("SoGetBoundingBoxAction", "getResetPath", "SoPath | None"),
+        ("SoHandleEventAction", "getEvent", "SoEvent | None"),
+        ("SoHandleEventAction", "getGrabber", "SoNode | None"),
+        ("SoHandleEventAction", "getPickRoot", "SoNode | None"),
+        ("SoHandleEventAction", "getPickedPoint", "SoPickedPoint | None"),
+        ("SoRayPickAction", "getPickedPoint", "SoPickedPoint | None"),
+        ("SoSearchAction", "getNode", "SoNode | None"),
+        ("SoSearchAction", "getPath", "SoPath | None"),
+    ),
+}
 PROPERTY_ATTRIBUTE_CHECKS = {
     "coin.pyi": (
         ("SoCube", "width", "SoSFFloat"),
