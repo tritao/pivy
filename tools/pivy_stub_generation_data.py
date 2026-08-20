@@ -150,8 +150,18 @@ METHOD_RETURN_TYPE_OVERRIDES = {
     ("SoRayPickAction", "getPickedPoint"): "SoPickedPoint | None",
     ("SoSearchAction", "getNode"): "SoNode | None",
     ("SoSearchAction", "getPath"): "SoPath | None",
+    ("SoEngine", "getOutput"): "SoEngineOutput | None",
+    ("SoNodeEngine", "getOutput"): "SoEngineOutput | None",
+    ("SoEngineOutput", "getContainer"): "SoEngine | None",
+    ("SoEngineOutput", "getNodeContainer"): "SoNodeEngine | None",
+    ("SoEngineOutput", "getFieldContainer"): "SoFieldContainer | None",
+    ("SoEngineOutputData", "getOutput"): "SoEngineOutput | None",
 }
 EXTEND_HELPER_METHOD_TYPES = {
+    ("SoEngine", "getByName", "name: SbName"): (
+        "name: SbName",
+        "SoEngine | None",
+    ),
     ("SoCallbackAction", "getMaterial", "self, index: int = ..."): (
         "self, index: int = ...",
         "tuple[SbColor, SbColor, SbColor, SbColor, float, float]",

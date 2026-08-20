@@ -1622,6 +1622,7 @@ PYTHON_HELPER_METHOD_CHECKS = {
 }
 EXTEND_HELPER_METHOD_CHECKS = {
     "coin.pyi": (
+        ("SoEngine", "getByName", {"name": "SbName"}, "SoEngine | None"),
         (
             "SoCallbackAction",
             "getMaterial",
@@ -1691,6 +1692,12 @@ EXTEND_HELPER_METHOD_CHECKS = {
 }
 METHOD_RETURN_TYPE_CHECKS = {
     "coin.pyi": (
+        ("SoEngine", "getOutput", "SoEngineOutput | None"),
+        ("SoEngineOutput", "getContainer", "SoEngine | None"),
+        ("SoEngineOutput", "getFieldContainer", "SoFieldContainer | None"),
+        ("SoEngineOutput", "getNodeContainer", "SoNodeEngine | None"),
+        ("SoEngineOutputData", "getOutput", "SoEngineOutput | None"),
+        ("SoNodeEngine", "getOutput", "SoEngineOutput | None"),
         ("SoAction", "getNodeAppliedTo", "SoNode | None"),
         ("SoAction", "getPathAppliedTo", "SoPath | None"),
         ("SoAction", "getPathListAppliedTo", "SoPathList | None"),
@@ -1716,6 +1723,11 @@ METHOD_RETURN_TYPE_CHECKS = {
 }
 PROPERTY_ATTRIBUTE_CHECKS = {
     "coin.pyi": (
+        ("SoBoolOperation", "inverse", "SoEngineOutput"),
+        ("SoBoolOperation", "output", "SoEngineOutput"),
+        ("SoComposeVec3f", "vector", "SoEngineOutput"),
+        ("SoDecomposeVec3f", "x", "SoEngineOutput"),
+        ("SoDecomposeVec3f", "vector", "SoMFVec3f"),
         ("SoCube", "width", "SoSFFloat"),
         ("SoCube", "height", "SoSFFloat"),
         ("SoCube", "depth", "SoSFFloat"),

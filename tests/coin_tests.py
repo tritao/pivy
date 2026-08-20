@@ -71,6 +71,29 @@ class Autocasting(unittest.TestCase):
         m = SoMaterial()
         self.assertTrue(isinstance(m.diffuseColor.getContainer(), SoMaterial),
                         'SoField.getContainer is not casted correctly')
+
+
+class EngineOutputTests(unittest.TestCase):
+    def testEngineOutputContract(self):
+        engine = SoBoolOperation()
+        output = engine.output
+
+        self.assertIsNone(engine.getOutput(SbName("missing")))
+        self.assertIsNone(SoEngine.getByName(SbName("missing")))
+        self.assertTrue(isinstance(output.getContainer(), SoBoolOperation))
+        self.assertIsNone(output.getNodeContainer())
+        self.assertTrue(isinstance(output.getFieldContainer(), SoFieldContainer))
+
+        outputs = SoEngineOutputList()
+        self.assertEqual(engine.getOutputs(outputs), 2)
+        self.assertEqual(outputs.getLength(), 2)
+        self.assertTrue(isinstance(outputs.get(0), SoEngineOutput))
+
+        node_engine = SoVRMLTimeSensor()
+        node_output = node_engine.getOutput(SbName("time"))
+        self.assertTrue(isinstance(node_output, SoEngineOutput))
+        self.assertTrue(isinstance(node_output.getNodeContainer(), SoNodeEngine))
+        self.assertTrue(isinstance(node_output.getFieldContainer(), SoVRMLTimeSensor))
                         
 class FieldSetValue(unittest.TestCase):
     """checks various setValue(s) calls for fields"""
