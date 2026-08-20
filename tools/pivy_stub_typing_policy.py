@@ -131,7 +131,7 @@ PYTHON_HELPER_METHOD_TYPES = {
     ("SoEngine", "__getattr__"): ("self, name: str", "Any"),
     ("SoEngine", "__setattr__"): ("self, name: str, value: Any", "None"),
     ("SoFieldContainer", "__dir__"): ("self", "list[str]"),
-    ("SoFieldContainer", "__getattr__"): ("self, name: str", "Any"),
+    ("SoFieldContainer", "__getattr__"): ("self, name: str", "SoField"),
     ("SoFieldContainer", "__setattr__"): (
         "self, name: str, value: Any",
         "None",
@@ -142,6 +142,7 @@ PYTHON_HELPER_METHOD_TYPES = {
     ("SoGroup", "getByName"): ("self, name: SbName | str", "SoNode | None"),
     ("SoNodeKitPath", "index"): ("self", "Iterator[int]"),
     ("SoPath", "index"): ("self", "Iterator[int]"),
+    ("SoType", "fromName"): ("name: SbName | str", "SoType"),
 }
 METHOD_RETURN_TYPE_OVERRIDES = {
     ("SoAction", "getNodeAppliedTo"): "SoNode | None",

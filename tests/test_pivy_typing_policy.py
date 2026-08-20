@@ -33,6 +33,16 @@ class FieldTypePolicyTests(unittest.TestCase):
             ("self, newvalue: SoPath | None", "None"),
         )
 
+    def test_reflection_helpers_are_derived_from_policy(self):
+        self.assertEqual(
+            policy.PYTHON_HELPER_METHOD_TYPES[("SoFieldContainer", "__getattr__")],
+            ("self, name: str", "SoField"),
+        )
+        self.assertEqual(
+            policy.PYTHON_HELPER_METHOD_TYPES[("SoType", "fromName")],
+            ("name: SbName | str", "SoType"),
+        )
+
 
 class MultifieldTypePolicyTests(unittest.TestCase):
     def test_multifield_element_types_cover_sequence_fields(self):

@@ -473,7 +473,7 @@ def assert_soqt_coin_duplicate_classes(path, tree):
         )
 
     checks = (
-        ("SoType", "fromName", {"name": "SbName"}, "SoType"),
+        ("SoType", "fromName", {"name": "SbName | str"}, "SoType"),
         ("SbString", "getString", {}, "str"),
         ("SbName", "getString", {}, "str"),
         ("SoEvent", "getPosition", {}, "SbVec2s"),

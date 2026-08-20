@@ -1233,10 +1233,24 @@ class SoPathTests(unittest.TestCase):
         )
 
         cube = SoCube()
+        self.assertIsInstance(cube.width, SoSFFloat)
+        self.assertIsInstance(cube.__getattr__("width"), SoField)
+        self.assertIn("width", cube.__dir__())
+        self.assertEqual(cube.getFieldName(cube.width), "width")
+        fields = SoFieldList()
+        self.assertGreater(cube.getAllFields(fields), 0)
         self.assertIsNotNone(cube.getField("width"))
         self.assertIsNone(cube.getField("missing"))
         self.assertIsNone(cube.getEventIn("missing"))
         self.assertIsNone(cube.getEventOut("missing"))
+
+    def testReflectionFactories(self):
+        cube_type = SoType.fromName("SoCube")
+        self.assertFalse(cube_type.isBad())
+        self.assertTrue(cube_type.isDerivedFrom(SoType.fromName("SoNode")))
+        self.assertIsInstance(cube_type.createInstance(), SoCube)
+        self.assertIsInstance(SoType.fromName("SoSFBool").createInstance(), SoSFBool)
+        self.assertIsNone(SoType.badType().createInstance())
 
 class SoInputTests(unittest.TestCase):
     """check method SoInput.setBuffer"""

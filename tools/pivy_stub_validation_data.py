@@ -1536,7 +1536,7 @@ PYTHON_HELPER_METHOD_CHECKS = {
             "SoFieldContainer",
             "__getattr__",
             {"name": "str"},
-            "Any",
+            "SoField",
         ),
         (
             "SoFieldContainer",
@@ -1549,6 +1549,12 @@ PYTHON_HELPER_METHOD_CHECKS = {
             "__dir__",
             {},
             "list[str]",
+        ),
+        (
+            "SoType",
+            "fromName",
+            {"name": "SbName | str"},
+            "SoType",
         ),
         (
             "SoBaseKit",
@@ -2063,7 +2069,7 @@ named_child: SoNode | None = group.getByName("child")
 named_child_by_name: SoNode | None = group.getByName(SbName("child"))
 
 field_container = SoFieldContainer()
-field_value: Any = field_container.__getattr__("field")
+field_value: SoField = field_container.__getattr__("field")
 field_container.__setattr__("field", object())
 field_names: list[str] = field_container.__dir__()
 field_name: str | None = field_container.getFieldName(SoField())

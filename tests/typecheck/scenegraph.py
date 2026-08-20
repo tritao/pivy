@@ -41,10 +41,23 @@ def check_path_contract() -> None:
 
 def check_field_and_name_lookups() -> None:
     cube = coin.SoCube()
+    assert_type(cube.width, coin.SoSFFloat)
+    assert_type(cube.__getattr__("width"), coin.SoField)
+    assert_type(cube.__dir__(), list[str])
     assert_type(cube.getField("missing"), coin.SoField | None)
     assert_type(cube.getEventIn("missing"), coin.SoField | None)
     assert_type(cube.getEventOut("missing"), coin.SoField | None)
+    assert_type(cube.getFieldName(cube.width), str | None)
+    assert_type(cube.getAllFields(coin.SoFieldList()), int)
     assert_type(
         coin.SoBase.getNamedBase("missing", coin.SoType.badType()),
         coin.SoBase | None,
     )
+
+
+def check_reflection_contract() -> None:
+    cube_type = coin.SoType.fromName("SoCube")
+    assert_type(cube_type, coin.SoType)
+    assert_type(cube_type.isBad(), bool)
+    assert_type(cube_type.isDerivedFrom(coin.SoType.fromName("SoNode")), bool)
+    assert_type(cube_type.createInstance(), coin.SoBase | coin.SoField | coin.SoPath | None)
