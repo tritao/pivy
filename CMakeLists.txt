@@ -144,27 +144,13 @@ if(PIVY_GENERATE_PYI)
             )
         endforeach()
 
-        set(PIVY_STUBGEN_OUTPUT_DIR
-            "${PROJECT_BINARY_DIR}/pivy-stubgen"
-        )
-        set(PIVY_STUB_PREPARE_COMMANDS
-            COMMAND ${CMAKE_COMMAND} -E remove_directory
-                ${PIVY_STUBGEN_OUTPUT_DIR}
-            COMMAND ${CMAKE_COMMAND} -E make_directory
-                ${PIVY_STUBGEN_OUTPUT_DIR}
-            COMMAND ${CMAKE_COMMAND} -E copy_directory
-                ${PIVY_PACKAGE_OUTPUT_DIR}
-                ${PIVY_STUBGEN_OUTPUT_DIR}/pivy
-        )
         add_custom_command(
             OUTPUT ${PIVY_PACKAGE_OUTPUT_DIR}/.pyi-stamp
             BYPRODUCTS ${PIVY_STUB_OUTPUTS}
-            ${PIVY_STUB_PREPARE_COMMANDS}
             COMMAND ${Python_EXECUTABLE}
                 ${CMAKE_SOURCE_DIR}/tools/generate_pivy_stubs.py
                 --stubgen ${PIVY_STUBGEN_EXECUTABLE}
                 --output ${PIVY_PACKAGE_PARENT_DIR}
-                --import-path ${PIVY_STUBGEN_OUTPUT_DIR}
                 --stamp ${PIVY_PACKAGE_OUTPUT_DIR}/.pyi-stamp
                 ${PIVY_STUBGEN_ARGS}
             DEPENDS ${CMAKE_SOURCE_DIR}/tools/generate_pivy_stubs.py

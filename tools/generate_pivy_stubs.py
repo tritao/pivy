@@ -1798,10 +1798,6 @@ def main():
     parser = argparse.ArgumentParser(description="Generate Pivy .pyi stubs")
     parser.add_argument("--stubgen")
     parser.add_argument("--output", required=True)
-    parser.add_argument(
-        "--import-path",
-        help="path containing the built runtime package used by stubgen",
-    )
     parser.add_argument("--stamp", required=True)
     parser.add_argument("--module", action="append", required=True)
     args = parser.parse_args()
@@ -1810,12 +1806,11 @@ def main():
     output_dir = os.path.abspath(args.output)
     stamp = os.path.abspath(args.stamp)
     package_dir = os.path.join(output_dir, "pivy")
-    import_path = os.path.abspath(args.import_path or args.output)
 
     env = os.environ.copy()
     pythonpath = env.get("PYTHONPATH")
     env["PYTHONPATH"] = (
-        import_path if not pythonpath else import_path + os.pathsep + pythonpath
+        output_dir if not pythonpath else output_dir + os.pathsep + pythonpath
     )
     env["PYTHONDONTWRITEBYTECODE"] = "1"
 
