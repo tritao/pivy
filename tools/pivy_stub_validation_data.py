@@ -1600,6 +1600,12 @@ PYTHON_HELPER_METHOD_CHECKS = {
         ),
         (
             "SoGroup",
+            "__contains__",
+            {"node": "SoNode"},
+            "bool",
+        ),
+        (
+            "SoGroup",
             "getByName",
             {"name": "SbName | str"},
             "SoNode | None",

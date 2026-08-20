@@ -123,6 +123,7 @@ PYTHON_HELPER_METHOD_TYPES = {
     ("SoFieldContainer", "__setattr__"): ("self, name: str, value: Any", "None"),
     ("SoGroup", "__iadd__"): ("self, other: SoNode | Sequence[SoNode]", "SoGroup"),
     ("SoGroup", "__isub__"): ("self, other: SoNode | Sequence[SoNode]", "SoGroup"),
+    ("SoGroup", "__contains__"): ("self, node: SoNode", "bool"),
     ("SoGroup", "getByName"): ("self, name: SbName | str", "SoNode | None"),
     ("SoNodeKitPath", "index"): ("self", "Iterator[int]"),
     ("SoPath", "index"): ("self", "Iterator[int]"),

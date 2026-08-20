@@ -1519,7 +1519,8 @@ def normalize_python_helpers(text):
             current_class = None
 
         match = re.match(
-            r"(?P<indent>\s*)def (?P<name>[A-Za-z_]\w*)\([^)]*\): \.\.\.$",
+            r"(?P<indent>\s*)def (?P<name>[A-Za-z_]\w*)\([^)]*\)"
+            r"(?: -> [^:]+)?: \.\.\.$",
             line,
         )
         signature = PYTHON_HELPER_METHOD_TYPES.get(
