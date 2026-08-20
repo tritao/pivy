@@ -1807,6 +1807,9 @@ class SoComplexity(SoNode):
     OBJECT_SPACE: ClassVar[int] = ...
     SCREEN_SPACE: ClassVar[int] = ...
     BOUNDING_BOX: ClassVar[int] = ...
+    textureQuality: SoSFFloat
+    type: SoSFEnum
+    value: SoSFFloat
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -1898,6 +1901,11 @@ class SoDrawStyle(SoNode):
     LINES: ClassVar[int] = ...
     POINTS: ClassVar[int] = ...
     INVISIBLE: ClassVar[int] = ...
+    linePattern: SoSFUShort
+    linePatternScaleFactor: SoSFInt32
+    lineWidth: SoSFFloat
+    pointSize: SoSFFloat
+    style: SoSFEnum
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -2209,6 +2217,7 @@ class SoLightModel(SoNode):
     """Proxy of C++ SoLightModel class."""
     BASE_COLOR: ClassVar[int] = ...
     PHONG: ClassVar[int] = ...
+    model: SoSFEnum
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -2263,6 +2272,7 @@ class SoMaterialBinding(SoNode):
     PER_VERTEX_INDEXED: ClassVar[int] = ...
     DEFAULT: ClassVar[int] = ...
     NONE: ClassVar[int] = ...
+    value: SoSFEnum
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -2319,6 +2329,7 @@ class SoNormalBinding(SoNode):
     PER_VERTEX_INDEXED: ClassVar[int] = ...
     DEFAULT: ClassVar[int] = ...
     NONE: ClassVar[int] = ...
+    value: SoSFEnum
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -2369,6 +2380,7 @@ class SoPickStyle(SoNode):
     SHAPE_ON_TOP: ClassVar[int] = ...
     BOUNDING_BOX_ON_TOP: ClassVar[int] = ...
     SHAPE_FRONTFACES: ClassVar[int] = ...
+    style: SoSFEnum
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -2460,6 +2472,12 @@ class SoShapeHints(SoNode):
     UNKNOWN_FACE_TYPE: ClassVar[int] = ...
     CONVEX: ClassVar[int] = ...
     NO_WINDING_TYPE: ClassVar[int] = ...
+    creaseAngle: SoSFFloat
+    faceType: SoSFEnum
+    shapeType: SoSFEnum
+    useVBO: SoSFBool
+    vertexOrdering: SoSFEnum
+    windingType: SoSFEnum
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -2762,6 +2780,13 @@ class SoTexture2(SoTexture):
     REPLACE: ClassVar[int] = ...
     REPEAT: ClassVar[int] = ...
     CLAMP: ClassVar[int] = ...
+    blendColor: SoSFColor
+    enableCompressedTexture: SoSFBool
+    filename: SoSFString
+    image: SoSFImage
+    model: SoSFEnum
+    wrapS: SoSFEnum
+    wrapT: SoSFEnum
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -2806,6 +2831,7 @@ class SoTextureCoordinateBinding(SoNode):
     PER_VERTEX: ClassVar[int] = ...
     PER_VERTEX_INDEXED: ClassVar[int] = ...
     DEFAULT: ClassVar[int] = ...
+    value: SoSFEnum
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -2842,6 +2868,7 @@ class SoUnits(SoTransformation):
     YARDS: ClassVar[int] = ...
     MILES: ClassVar[int] = ...
     NAUTICAL_MILES: ClassVar[int] = ...
+    units: SoSFEnum
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -4106,6 +4133,12 @@ class SoImage(SoShape):
     LEFT: ClassVar[int] = ...
     CENTER: ClassVar[int] = ...
     RIGHT: ClassVar[int] = ...
+    filename: SoSFString
+    height: SoSFInt32
+    horAlignment: SoSFEnum
+    image: SoSFImage
+    vertAlignment: SoSFEnum
+    width: SoSFInt32
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -4641,7 +4674,7 @@ class SoSFNode(SoSField):
     def getTypeId(self) -> SoType: ...
     def copyFrom(self, field: SoField) -> None: ...
     def isSame(self, field: SoField) -> bool: ...
-    def getValue(self) -> SoNode: ...
+    def getValue(self) -> SoNode | None: ...
     def __eq__(self, field: SoSFNode) -> bool: ...
     def __ne__(self, field: SoSFNode) -> bool: ...
     @staticmethod
@@ -4649,7 +4682,7 @@ class SoSFNode(SoSField):
     def fixCopy(self, copyconnections: bool) -> None: ...
     def referencesCopy(self) -> bool: ...
     @overload
-    def setValue(self, newvalue: SoNode) -> None: ...
+    def setValue(self, newvalue: SoNode | None) -> None: ...
     @overload
     def setValue(self, other: SoSFNode) -> None: ...
 SO_CATALOG_NAME_NOT_FOUND: int
@@ -4988,6 +5021,10 @@ class SoInteractionKit(SoBaseKit):
     OFF: ClassVar[int] = ...
     ON: ClassVar[int] = ...
     AUTO: ClassVar[int] = ...
+    boundingBoxCaching: SoSFEnum
+    pickCulling: SoSFEnum
+    renderCaching: SoSFEnum
+    renderCulling: SoSFEnum
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -5226,6 +5263,7 @@ class SoSFVec3f(SoSField):
 
 class SoScale(SoTransformation):
     """Proxy of C++ SoScale class."""
+    scaleFactor: SoSFVec3f
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -5245,6 +5283,7 @@ class SoDragger(SoInteractionKit):
     FRONT: ClassVar[int] = ...
     BACK: ClassVar[int] = ...
     USE_PICK: ClassVar[int] = ...
+    isActive: SoSFBool
     def __init__(self, *args, **kwargs) -> None: ...
     @staticmethod
     def getClassTypeId() -> SoType: ...
@@ -5369,6 +5408,8 @@ class SoSFRotation(SoSField):
 
 class SoCenterballDragger(SoDragger):
     """Proxy of C++ SoCenterballDragger class."""
+    center: SoSFVec3f
+    rotation: SoSFRotation
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -5382,6 +5423,8 @@ class SoCenterballDragger(SoDragger):
 
 class SoDirectionalLightDragger(SoDragger):
     """Proxy of C++ SoDirectionalLightDragger class."""
+    rotation: SoSFRotation
+    translation: SoSFVec3f
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -5394,6 +5437,7 @@ class SoDirectionalLightDragger(SoDragger):
 
 class SoDragPointDragger(SoDragger):
     """Proxy of C++ SoDragPointDragger class."""
+    translation: SoSFVec3f
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -5409,6 +5453,8 @@ class SoDragPointDragger(SoDragger):
 
 class SoHandleBoxDragger(SoDragger):
     """Proxy of C++ SoHandleBoxDragger class."""
+    scaleFactor: SoSFVec3f
+    translation: SoSFVec3f
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -5421,6 +5467,9 @@ class SoHandleBoxDragger(SoDragger):
 
 class SoJackDragger(SoDragger):
     """Proxy of C++ SoJackDragger class."""
+    rotation: SoSFRotation
+    scaleFactor: SoSFVec3f
+    translation: SoSFVec3f
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -5433,6 +5482,7 @@ class SoJackDragger(SoDragger):
 
 class SoPointLightDragger(SoDragger):
     """Proxy of C++ SoPointLightDragger class."""
+    translation: SoSFVec3f
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -5445,6 +5495,7 @@ class SoPointLightDragger(SoDragger):
 
 class SoRotateCylindricalDragger(SoDragger):
     """Proxy of C++ SoRotateCylindricalDragger class."""
+    rotation: SoSFRotation
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -5459,6 +5510,7 @@ class SoRotateCylindricalDragger(SoDragger):
 
 class SoRotateDiscDragger(SoDragger):
     """Proxy of C++ SoRotateDiscDragger class."""
+    rotation: SoSFRotation
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -5471,6 +5523,7 @@ class SoRotateDiscDragger(SoDragger):
 
 class SoRotateSphericalDragger(SoDragger):
     """Proxy of C++ SoRotateSphericalDragger class."""
+    rotation: SoSFRotation
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -5485,6 +5538,7 @@ class SoRotateSphericalDragger(SoDragger):
 
 class SoScale1Dragger(SoDragger):
     """Proxy of C++ SoScale1Dragger class."""
+    scaleFactor: SoSFVec3f
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -5497,6 +5551,7 @@ class SoScale1Dragger(SoDragger):
 
 class SoScale2Dragger(SoDragger):
     """Proxy of C++ SoScale2Dragger class."""
+    scaleFactor: SoSFVec3f
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -5509,6 +5564,7 @@ class SoScale2Dragger(SoDragger):
 
 class SoScale2UniformDragger(SoDragger):
     """Proxy of C++ SoScale2UniformDragger class."""
+    scaleFactor: SoSFVec3f
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -5521,6 +5577,7 @@ class SoScale2UniformDragger(SoDragger):
 
 class SoScaleUniformDragger(SoDragger):
     """Proxy of C++ SoScaleUniformDragger class."""
+    scaleFactor: SoSFVec3f
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -5533,6 +5590,9 @@ class SoScaleUniformDragger(SoDragger):
 
 class SoSpotLightDragger(SoDragger):
     """Proxy of C++ SoSpotLightDragger class."""
+    angle: SoSFFloat
+    rotation: SoSFRotation
+    translation: SoSFVec3f
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -5545,6 +5605,8 @@ class SoSpotLightDragger(SoDragger):
 
 class SoTabBoxDragger(SoDragger):
     """Proxy of C++ SoTabBoxDragger class."""
+    scaleFactor: SoSFVec3f
+    translation: SoSFVec3f
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -5558,6 +5620,8 @@ class SoTabBoxDragger(SoDragger):
 
 class SoTabPlaneDragger(SoDragger):
     """Proxy of C++ SoTabPlaneDragger class."""
+    scaleFactor: SoSFVec3f
+    translation: SoSFVec3f
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -5571,6 +5635,8 @@ class SoTabPlaneDragger(SoDragger):
 
 class SoTrackballDragger(SoDragger):
     """Proxy of C++ SoTrackballDragger class."""
+    rotation: SoSFRotation
+    scaleFactor: SoSFVec3f
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -5585,6 +5651,9 @@ class SoTrackballDragger(SoDragger):
 
 class SoTransformBoxDragger(SoDragger):
     """Proxy of C++ SoTransformBoxDragger class."""
+    rotation: SoSFRotation
+    scaleFactor: SoSFVec3f
+    translation: SoSFVec3f
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -5618,6 +5687,10 @@ class SoTransformerDragger(SoDragger):
     LFT_TRANSLATE: ClassVar[int] = ...
     BOT_TRANSLATE: ClassVar[int] = ...
     BAK_TRANSLATE: ClassVar[int] = ...
+    minDiscRotDot: SoSFFloat
+    rotation: SoSFRotation
+    scaleFactor: SoSFVec3f
+    translation: SoSFVec3f
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -5643,6 +5716,9 @@ class SoTransformerDragger(SoDragger):
 
 class SoTranslate1Dragger(SoDragger):
     """Proxy of C++ SoTranslate1Dragger class."""
+    maxTranslation: SoSFFloat
+    minTranslation: SoSFFloat
+    translation: SoSFVec3f
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -5681,6 +5757,9 @@ class SoSFVec2f(SoSField):
 
 class SoTranslate2Dragger(SoDragger):
     """Proxy of C++ SoTranslate2Dragger class."""
+    maxTranslation: SoSFVec2f
+    minTranslation: SoSFVec2f
+    translation: SoSFVec3f
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -8203,6 +8282,11 @@ class SoBoolOperation(SoEngine):
     NOT_A_AND_NOT_B: ClassVar[int] = ...
     A_EQUALS_B: ClassVar[int] = ...
     A_NOT_EQUALS_B: ClassVar[int] = ...
+    a: SoMFBool
+    b: SoMFBool
+    inverse: SoEngineOutput
+    operation: SoMFEnum
+    output: SoEngineOutput
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -8323,6 +8407,31 @@ class SoMFString(SoMField):
 
 class SoCalculator(SoEngine):
     """Proxy of C++ SoCalculator class."""
+    A: SoMFVec3f
+    B: SoMFVec3f
+    C: SoMFVec3f
+    D: SoMFVec3f
+    E: SoMFVec3f
+    F: SoMFVec3f
+    G: SoMFVec3f
+    H: SoMFVec3f
+    a: SoMFFloat
+    b: SoMFFloat
+    c: SoMFFloat
+    d: SoMFFloat
+    e: SoMFFloat
+    expression: SoMFString
+    f: SoMFFloat
+    g: SoMFFloat
+    h: SoMFFloat
+    oA: SoEngineOutput
+    oB: SoEngineOutput
+    oC: SoEngineOutput
+    oD: SoEngineOutput
+    oa: SoEngineOutput
+    ob: SoEngineOutput
+    oc: SoEngineOutput
+    od: SoEngineOutput
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -8381,6 +8490,9 @@ class SoMFVec2f(SoMField):
 
 class SoComposeVec2f(SoEngine):
     """Proxy of C++ SoComposeVec2f class."""
+    vector: SoEngineOutput
+    x: SoMFFloat
+    y: SoMFFloat
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -8394,6 +8506,10 @@ class SoComposeVec2f(SoEngine):
 
 class SoComposeVec3f(SoEngine):
     """Proxy of C++ SoComposeVec3f class."""
+    vector: SoEngineOutput
+    x: SoMFFloat
+    y: SoMFFloat
+    z: SoMFFloat
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -8452,6 +8568,11 @@ class SoMFVec4f(SoMField):
 
 class SoComposeVec4f(SoEngine):
     """Proxy of C++ SoComposeVec4f class."""
+    vector: SoEngineOutput
+    w: SoMFFloat
+    x: SoMFFloat
+    y: SoMFFloat
+    z: SoMFFloat
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -8465,6 +8586,9 @@ class SoComposeVec4f(SoEngine):
 
 class SoDecomposeVec2f(SoEngine):
     """Proxy of C++ SoDecomposeVec2f class."""
+    vector: SoMFVec2f
+    x: SoEngineOutput
+    y: SoEngineOutput
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -8478,6 +8602,10 @@ class SoDecomposeVec2f(SoEngine):
 
 class SoDecomposeVec3f(SoEngine):
     """Proxy of C++ SoDecomposeVec3f class."""
+    vector: SoMFVec3f
+    x: SoEngineOutput
+    y: SoEngineOutput
+    z: SoEngineOutput
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -8491,6 +8619,11 @@ class SoDecomposeVec3f(SoEngine):
 
 class SoDecomposeVec4f(SoEngine):
     """Proxy of C++ SoDecomposeVec4f class."""
+    vector: SoMFVec4f
+    w: SoEngineOutput
+    x: SoEngineOutput
+    y: SoEngineOutput
+    z: SoEngineOutput
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -8504,6 +8637,9 @@ class SoDecomposeVec4f(SoEngine):
 
 class SoComposeRotation(SoEngine):
     """Proxy of C++ SoComposeRotation class."""
+    angle: SoMFFloat
+    axis: SoMFVec3f
+    rotation: SoEngineOutput
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -8562,6 +8698,9 @@ class SoMFRotation(SoMField):
 
 class SoDecomposeRotation(SoEngine):
     """Proxy of C++ SoDecomposeRotation class."""
+    angle: SoEngineOutput
+    axis: SoEngineOutput
+    rotation: SoMFRotation
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -8575,6 +8714,12 @@ class SoDecomposeRotation(SoEngine):
 
 class SoComposeMatrix(SoEngine):
     """Proxy of C++ SoComposeMatrix class."""
+    center: SoMFVec3f
+    matrix: SoEngineOutput
+    rotation: SoMFRotation
+    scaleFactor: SoMFVec3f
+    scaleOrientation: SoMFRotation
+    translation: SoMFVec3f
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -8619,6 +8764,12 @@ class SoMFMatrix(SoMField):
 
 class SoDecomposeMatrix(SoEngine):
     """Proxy of C++ SoDecomposeMatrix class."""
+    center: SoMFVec3f
+    matrix: SoMFMatrix
+    rotation: SoEngineOutput
+    scaleFactor: SoEngineOutput
+    scaleOrientation: SoEngineOutput
+    translation: SoEngineOutput
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -8632,6 +8783,9 @@ class SoDecomposeMatrix(SoEngine):
 
 class SoComposeRotationFromTo(SoEngine):
     """Proxy of C++ SoComposeRotationFromTo class."""
+    destTo: SoMFVec3f
+    rotation: SoEngineOutput
+    srcFrom: SoMFVec3f
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -8655,7 +8809,7 @@ class SoSFPath(SoSField):
     def getTypeId(self) -> SoType: ...
     def copyFrom(self, field: SoField) -> None: ...
     def isSame(self, field: SoField) -> bool: ...
-    def getValue(self) -> SoPath: ...
+    def getValue(self) -> SoPath | None: ...
     def __eq__(self, field: SoSFPath) -> bool: ...
     def __ne__(self, field: SoSFPath) -> bool: ...
     @staticmethod
@@ -8664,12 +8818,18 @@ class SoSFPath(SoSField):
     def fixCopy(self, copyconnections: bool) -> None: ...
     def referencesCopy(self) -> bool: ...
     @overload
-    def setValue(self, newvalue: SoPath) -> None: ...
+    def setValue(self, newvalue: SoPath | None) -> None: ...
     @overload
     def setValue(self, other: SoSFPath) -> None: ...
 
 class SoComputeBoundingBox(SoEngine):
     """Proxy of C++ SoComputeBoundingBox class."""
+    boxCenter: SoEngineOutput
+    max: SoEngineOutput
+    min: SoEngineOutput
+    node: SoSFNode
+    objectCenter: SoEngineOutput
+    path: SoSFPath
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -8686,6 +8846,8 @@ class SoComputeBoundingBox(SoEngine):
 class SoConcatenate(SoEngine):
     """Proxy of C++ SoConcatenate class."""
     NUMINPUTS: ClassVar[int] = ...
+    input: int
+    output: SoEngineOutput | None
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -8746,6 +8908,13 @@ class SoSFShort(SoSField):
 
 class SoCounter(SoEngine):
     """Proxy of C++ SoCounter class."""
+    max: SoSFShort
+    min: SoSFShort
+    output: SoEngineOutput
+    reset: SoSFShort
+    step: SoSFShort
+    syncOut: SoEngineOutput
+    trigger: SoSFTrigger
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -8783,6 +8952,12 @@ class SoSFTime(SoSField):
 
 class SoElapsedTime(SoEngine):
     """Proxy of C++ SoElapsedTime class."""
+    on: SoSFBool
+    pause: SoSFBool
+    reset: SoSFTrigger
+    speed: SoSFFloat
+    timeIn: SoSFTime
+    timeOut: SoEngineOutput
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -8813,6 +8988,10 @@ class SoFieldConverter(SoEngine):
 
 class SoGate(SoEngine):
     """Proxy of C++ SoGate class."""
+    enable: SoSFBool
+    input: SoMField | None
+    output: SoEngineOutput | None
+    trigger: SoSFTrigger
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -8826,6 +9005,8 @@ class SoGate(SoEngine):
 
 class SoInterpolate(SoEngine):
     """Proxy of C++ SoInterpolate class."""
+    alpha: SoSFFloat
+    output: SoEngineOutput
     def __init__(self, *args, **kwargs) -> None: ...
     @staticmethod
     def getClassTypeId() -> SoType: ...
@@ -8839,6 +9020,8 @@ class SoInterpolate(SoEngine):
 
 class SoInterpolateFloat(SoInterpolate):
     """Proxy of C++ SoInterpolateFloat class."""
+    input0: SoMFFloat
+    input1: SoMFFloat
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -8852,6 +9035,8 @@ class SoInterpolateFloat(SoInterpolate):
 
 class SoInterpolateVec2f(SoInterpolate):
     """Proxy of C++ SoInterpolateVec2f class."""
+    input0: SoMFVec2f
+    input1: SoMFVec2f
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -8865,6 +9050,8 @@ class SoInterpolateVec2f(SoInterpolate):
 
 class SoInterpolateVec3f(SoInterpolate):
     """Proxy of C++ SoInterpolateVec3f class."""
+    input0: SoMFVec3f
+    input1: SoMFVec3f
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -8878,6 +9065,8 @@ class SoInterpolateVec3f(SoInterpolate):
 
 class SoInterpolateVec4f(SoInterpolate):
     """Proxy of C++ SoInterpolateVec4f class."""
+    input0: SoMFVec4f
+    input1: SoMFVec4f
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -8891,6 +9080,8 @@ class SoInterpolateVec4f(SoInterpolate):
 
 class SoInterpolateRotation(SoInterpolate):
     """Proxy of C++ SoInterpolateRotation class."""
+    input0: SoMFRotation
+    input1: SoMFRotation
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -8904,6 +9095,11 @@ class SoInterpolateRotation(SoInterpolate):
 
 class SoOnOff(SoEngine):
     """Proxy of C++ SoOnOff class."""
+    isOff: SoEngineOutput
+    isOn: SoEngineOutput
+    off: SoSFTrigger
+    on: SoSFTrigger
+    toggle: SoSFTrigger
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -8934,6 +9130,14 @@ class SoOneShot(SoEngine):
     """Proxy of C++ SoOneShot class."""
     RETRIGGERABLE: ClassVar[int] = ...
     HOLD_FINAL: ClassVar[int] = ...
+    disable: SoSFBool
+    duration: SoSFTime
+    flags: SoSFBitMask
+    isActive: SoEngineOutput
+    ramp: SoEngineOutput
+    timeIn: SoSFTime
+    timeOut: SoEngineOutput
+    trigger: SoSFTrigger
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -8947,6 +9151,9 @@ class SoOneShot(SoEngine):
 
 class SoSelectOne(SoEngine):
     """Proxy of C++ SoSelectOne class."""
+    index: SoSFInt32
+    input: SoMField | None
+    output: SoEngineOutput | None
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -8960,6 +9167,17 @@ class SoSelectOne(SoEngine):
 
 class SoTimeCounter(SoEngine):
     """Proxy of C++ SoTimeCounter class."""
+    duty: SoMFFloat
+    frequency: SoSFFloat
+    max: SoSFShort
+    min: SoSFShort
+    on: SoSFBool
+    output: SoEngineOutput
+    reset: SoSFShort
+    step: SoSFShort
+    syncIn: SoSFTrigger
+    syncOut: SoEngineOutput
+    timeIn: SoSFTime
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -8973,6 +9191,11 @@ class SoTimeCounter(SoEngine):
 
 class SoTransformVec3f(SoEngine):
     """Proxy of C++ SoTransformVec3f class."""
+    direction: SoEngineOutput
+    matrix: SoMFMatrix
+    normalDirection: SoEngineOutput
+    point: SoEngineOutput
+    vector: SoMFVec3f
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -8986,6 +9209,17 @@ class SoTransformVec3f(SoEngine):
 
 class SoTriggerAny(SoEngine):
     """Proxy of C++ SoTriggerAny class."""
+    input0: SoSFTrigger
+    input1: SoSFTrigger
+    input2: SoSFTrigger
+    input3: SoSFTrigger
+    input4: SoSFTrigger
+    input5: SoSFTrigger
+    input6: SoSFTrigger
+    input7: SoSFTrigger
+    input8: SoSFTrigger
+    input9: SoSFTrigger
+    output: SoEngineOutput
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -9000,6 +9234,8 @@ class SoTriggerAny(SoEngine):
 class SoTexture2Convert(SoEngine):
     """Proxy of C++ SoTexture2Convert class."""
     __swig_destroy__: ClassVar[builtin_function_or_method] = ...
+    image: SoEngineOutput
+    sourceImage: SoSFImage
     def __init__(self, *args, **kwargs) -> None: ...
     @staticmethod
     def getClassTypeId() -> SoType: ...
@@ -9013,6 +9249,7 @@ class SoHeightMapToNormalMap(SoTexture2Convert):
     """Proxy of C++ SoHeightMapToNormalMap class."""
     INT8: ClassVar[int] = ...
     __swig_destroy__: ClassVar[builtin_function_or_method] = ...
+    format: SoSFEnum
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -12161,6 +12398,11 @@ class SoLockManager:
 
 class SoTransform(SoTransformation):
     """Proxy of C++ SoTransform class."""
+    center: SoSFVec3f
+    rotation: SoSFRotation
+    scaleFactor: SoSFVec3f
+    scaleOrientation: SoSFRotation
+    translation: SoSFVec3f
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -12217,6 +12459,8 @@ class SoCenterballManip(SoTransformManip):
 
 class SoClipPlane(SoNode):
     """Proxy of C++ SoClipPlane class."""
+    on: SoSFBool
+    plane: SoSFPlane
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -12230,6 +12474,7 @@ class SoClipPlane(SoNode):
 
 class SoClipPlaneManip(SoClipPlane):
     """Proxy of C++ SoClipPlaneManip class."""
+    draggerPosition: SoSFVec3f
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -12252,6 +12497,9 @@ class SoClipPlaneManip(SoClipPlane):
 
 class SoLight(SoNode):
     """Proxy of C++ SoLight class."""
+    color: SoSFColor
+    intensity: SoSFFloat
+    on: SoSFBool
     def __init__(self, *args, **kwargs) -> None: ...
     @staticmethod
     def getClassTypeId() -> SoType: ...
@@ -12262,6 +12510,7 @@ class SoLight(SoNode):
 
 class SoDirectionalLight(SoLight):
     """Proxy of C++ SoDirectionalLight class."""
+    direction: SoSFVec3f
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -12311,6 +12560,7 @@ class SoJackManip(SoTransformManip):
 
 class SoPointLight(SoLight):
     """Proxy of C++ SoPointLight class."""
+    location: SoSFVec3f
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -12342,6 +12592,10 @@ class SoPointLightManip(SoPointLight):
 
 class SoSpotLight(SoLight):
     """Proxy of C++ SoSpotLight class."""
+    cutOffAngle: SoSFFloat
+    direction: SoSFVec3f
+    dropOffRate: SoSFFloat
+    location: SoSFVec3f
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -12784,6 +13038,10 @@ class SoSeparatorKit(SoBaseKit):
     OFF: ClassVar[int] = ...
     ON: ClassVar[int] = ...
     AUTO: ClassVar[int] = ...
+    boundingBoxCaching: SoSFEnum
+    pickCulling: SoSFEnum
+    renderCaching: SoSFEnum
+    renderCulling: SoSFEnum
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -12870,6 +13128,10 @@ class SoSeparator(SoGroup):
     OFF: ClassVar[int] = ...
     ON: ClassVar[int] = ...
     AUTO: ClassVar[int] = ...
+    boundingBoxCaching: SoSFEnum
+    pickCulling: SoSFEnum
+    renderCaching: SoSFEnum
+    renderCulling: SoSFEnum
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -12921,6 +13183,8 @@ class SoAntiSquish(SoTransformation):
     BIGGEST_DIMENSION: ClassVar[int] = ...
     SMALLEST_DIMENSION: ClassVar[int] = ...
     LONGEST_DIAGONAL: ClassVar[int] = ...
+    recalcAlways: SoSFBool
+    sizing: SoSFEnum
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -12935,6 +13199,13 @@ class SoArray(SoGroup):
     FIRST: ClassVar[int] = ...
     CENTER: ClassVar[int] = ...
     LAST: ClassVar[int] = ...
+    numElements1: SoSFShort
+    numElements2: SoSFShort
+    numElements3: SoSFShort
+    origin: SoSFEnum
+    separation1: SoSFVec3f
+    separation2: SoSFVec3f
+    separation3: SoSFVec3f
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -12958,6 +13229,10 @@ class SoAsciiText(SoShape):
     LEFT: ClassVar[int] = ...
     RIGHT: ClassVar[int] = ...
     CENTER: ClassVar[int] = ...
+    justification: SoSFEnum
+    spacing: SoSFFloat
+    string: SoMFString
+    width: SoMFFloat
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -12969,6 +13244,7 @@ class SoAsciiText(SoShape):
 
 class SoBaseColor(SoNode):
     """Proxy of C++ SoBaseColor class."""
+    rgb: SoMFColor
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -12984,6 +13260,7 @@ SO_SWITCH_ALL: int
 
 class SoSwitch(SoGroup):
     """Proxy of C++ SoSwitch class."""
+    whichChild: SoSFInt32
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -13009,6 +13286,8 @@ class SoSwitch(SoGroup):
 
 class SoBlinker(SoSwitch):
     """Proxy of C++ SoBlinker class."""
+    on: SoSFBool
+    speed: SoSFFloat
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -13020,6 +13299,7 @@ class SoBlinker(SoSwitch):
 
 class SoBumpMapCoordinate(SoNode):
     """Proxy of C++ SoBumpMapCoordinate class."""
+    point: SoMFVec2f
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -13035,6 +13315,10 @@ class SoBumpMap(SoNode):
     """Proxy of C++ SoBumpMap class."""
     REPEAT: ClassVar[int] = ...
     CLAMP: ClassVar[int] = ...
+    filename: SoSFString
+    image: SoSFImage
+    wrapS: SoSFEnum
+    wrapT: SoSFEnum
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -13048,6 +13332,10 @@ class SoBumpMap(SoNode):
 
 class SoBumpMapTransform(SoNode):
     """Proxy of C++ SoBumpMapTransform class."""
+    center: SoSFVec2f
+    rotation: SoSFFloat
+    scaleFactor: SoSFVec2f
+    translation: SoSFVec2f
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -13101,6 +13389,13 @@ class SoCamera(SoNode):
     MONOSCOPIC: ClassVar[int] = ...
     LEFT_VIEW: ClassVar[int] = ...
     RIGHT_VIEW: ClassVar[int] = ...
+    aspectRatio: SoSFFloat
+    farDistance: SoSFFloat
+    focalDistance: SoSFFloat
+    nearDistance: SoSFFloat
+    orientation: SoSFRotation
+    position: SoSFVec3f
+    viewportMapping: SoSFEnum
     def __init__(self, *args, **kwargs) -> None: ...
     @staticmethod
     def getClassTypeId() -> SoType: ...
@@ -13140,6 +13435,7 @@ class SoCamera(SoNode):
 
 class SoColorIndex(SoNode):
     """Proxy of C++ SoColorIndex class."""
+    index: SoMFInt32
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -13153,6 +13449,9 @@ class SoCone(SoShape):
     SIDES: ClassVar[int] = ...
     BOTTOM: ClassVar[int] = ...
     ALL: ClassVar[int] = ...
+    bottomRadius: SoSFFloat
+    height: SoSFFloat
+    parts: SoSFBitMask
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -13168,6 +13467,7 @@ class SoCone(SoShape):
 
 class SoCoordinate3(SoNode):
     """Proxy of C++ SoCoordinate3 class."""
+    point: SoMFVec3f
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -13183,6 +13483,7 @@ class SoCoordinate3(SoNode):
 
 class SoCoordinate4(SoNode):
     """Proxy of C++ SoCoordinate4 class."""
+    point: SoMFVec4f
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -13198,6 +13499,9 @@ class SoCoordinate4(SoNode):
 
 class SoCube(SoShape):
     """Proxy of C++ SoCube class."""
+    depth: SoSFFloat
+    height: SoSFFloat
+    width: SoSFFloat
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -13214,6 +13518,9 @@ class SoCylinder(SoShape):
     TOP: ClassVar[int] = ...
     BOTTOM: ClassVar[int] = ...
     ALL: ClassVar[int] = ...
+    height: SoSFFloat
+    parts: SoSFBitMask
+    radius: SoSFFloat
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -13233,6 +13540,12 @@ class SoEnvironment(SoNode):
     HAZE: ClassVar[int] = ...
     FOG: ClassVar[int] = ...
     SMOKE: ClassVar[int] = ...
+    ambientColor: SoSFColor
+    ambientIntensity: SoSFFloat
+    attenuation: SoSFVec3f
+    fogColor: SoSFColor
+    fogType: SoSFEnum
+    fogVisibility: SoSFFloat
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -13268,6 +13581,7 @@ class SoSelection(SoSeparator):
     TOGGLE: ClassVar[int] = ...
     SHIFT: ClassVar[int] = ...
     DISABLE: ClassVar[int] = ...
+    policy: SoSFEnum
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -13325,6 +13639,9 @@ class SoExtSelection(SoSelection):
     PART: ClassVar[int] = ...
     ALL_SHAPES: ClassVar[int] = ...
     VISIBLE_SHAPES: ClassVar[int] = ...
+    lassoMode: SoSFEnum
+    lassoPolicy: SoSFEnum
+    lassoType: SoSFEnum
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -13368,6 +13685,14 @@ class SoVertexProperty(SoNode):
     PER_FACE_INDEXED: ClassVar[int] = ...
     PER_VERTEX: ClassVar[int] = ...
     PER_VERTEX_INDEXED: ClassVar[int] = ...
+    materialBinding: SoSFEnum
+    normal: SoMFVec3f
+    normalBinding: SoSFEnum
+    orderedRGBA: SoMFUInt32
+    texCoord: SoMFVec2f
+    texCoord3: SoMFVec3f
+    textureUnit: SoMFInt32
+    vertex: SoMFVec3f
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -13383,6 +13708,7 @@ class SoVertexProperty(SoNode):
 
 class SoVertexShape(SoShape):
     """Proxy of C++ SoVertexShape class."""
+    vertexProperty: SoSFNode
     def __init__(self, *args, **kwargs) -> None: ...
     @staticmethod
     def getClassTypeId() -> SoType: ...
@@ -13398,6 +13724,7 @@ class SoVertexShape(SoShape):
 
 class SoNonIndexedShape(SoVertexShape):
     """Proxy of C++ SoNonIndexedShape class."""
+    startIndex: SoSFInt32
     def __init__(self, *args, **kwargs) -> None: ...
     @staticmethod
     def getClassTypeId() -> SoType: ...
@@ -13407,6 +13734,7 @@ class SoNonIndexedShape(SoVertexShape):
 
 class SoFaceSet(SoNonIndexedShape):
     """Proxy of C++ SoFaceSet class."""
+    numVertices: SoMFInt32
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -13419,6 +13747,7 @@ class SoFaceSet(SoNonIndexedShape):
 
 class SoFile(SoNode):
     """Proxy of C++ SoFile class."""
+    name: SoSFString
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -13446,6 +13775,8 @@ class SoFile(SoNode):
 
 class SoFont(SoNode):
     """Proxy of C++ SoFont class."""
+    name: SoSFName
+    size: SoSFFloat
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -13467,6 +13798,8 @@ class SoFontStyle(SoFont):
     NONE: ClassVar[int] = ...
     BOLD: ClassVar[int] = ...
     ITALIC: ClassVar[int] = ...
+    family: SoSFEnum
+    style: SoSFBitMask
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -13483,6 +13816,8 @@ class SoFontStyle(SoFont):
 
 class SoGeoCoordinate(SoNode):
     """Proxy of C++ SoGeoCoordinate class."""
+    geoSystem: SoMFString
+    point: SoMFVec3d
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -13498,6 +13833,8 @@ class SoGeoCoordinate(SoNode):
 
 class SoGeoLocation(SoTransformation):
     """Proxy of C++ SoGeoLocation class."""
+    geoCoords: SoSFVec3d
+    geoSystem: SoMFString
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -13514,6 +13851,8 @@ class SoGeoLocation(SoTransformation):
 
 class SoGeoOrigin(SoNode):
     """Proxy of C++ SoGeoOrigin class."""
+    geoCoords: SoSFVec3d
+    geoSystem: SoMFString
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -13530,6 +13869,8 @@ class SoGeoOrigin(SoNode):
 
 class SoGeoSeparator(SoSeparator):
     """Proxy of C++ SoGeoSeparator class."""
+    geoCoords: SoSFVec3d
+    geoSystem: SoMFString
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -13546,6 +13887,10 @@ class SoGeoSeparator(SoSeparator):
 
 class SoIndexedShape(SoVertexShape):
     """Proxy of C++ SoIndexedShape class."""
+    coordIndex: SoMFInt32
+    materialIndex: SoMFInt32
+    normalIndex: SoMFInt32
+    textureCoordIndex: SoMFInt32
     def __init__(self, *args, **kwargs) -> None: ...
     @staticmethod
     def getClassTypeId() -> SoType: ...
@@ -13584,6 +13929,9 @@ class SoIndexedLineSet(SoIndexedShape):
 
 class SoIndexedNurbsCurve(SoShape):
     """Proxy of C++ SoIndexedNurbsCurve class."""
+    coordIndex: SoMFInt32
+    knotVector: SoMFFloat
+    numControlPoints: SoSFInt32
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -13598,6 +13946,16 @@ class SoIndexedNurbsCurve(SoShape):
 
 class SoIndexedNurbsSurface(SoShape):
     """Proxy of C++ SoIndexedNurbsSurface class."""
+    coordIndex: SoMFInt32
+    numSControlPoints: SoSFInt32
+    numTControlPoints: SoSFInt32
+    numUControlPoints: SoSFInt32
+    numVControlPoints: SoSFInt32
+    sKnotVector: SoMFFloat
+    tKnotVector: SoMFFloat
+    textureCoordIndex: SoMFInt32
+    uKnotVector: SoMFFloat
+    vKnotVector: SoMFFloat
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -13624,6 +13982,7 @@ class SoIndexedTriangleStripSet(SoIndexedShape):
 
 class SoInfo(SoNode):
     """Proxy of C++ SoInfo class."""
+    string: SoSFString
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -13633,6 +13992,7 @@ class SoInfo(SoNode):
 
 class SoLabel(SoNode):
     """Proxy of C++ SoLabel class."""
+    label: SoSFName
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -13642,6 +14002,7 @@ class SoLabel(SoNode):
 
 class SoLevelOfDetail(SoGroup):
     """Proxy of C++ SoLevelOfDetail class."""
+    screenArea: SoMFFloat
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -13664,6 +14025,8 @@ class SoProfile(SoNode):
     START_FIRST: ClassVar[int] = ...
     START_NEW: ClassVar[int] = ...
     ADD_TO_CURRENT: ClassVar[int] = ...
+    index: SoMFInt32
+    linkage: SoSFEnum
     def __init__(self, *args, **kwargs) -> None: ...
     @staticmethod
     def getClassTypeId() -> SoType: ...
@@ -13692,6 +14055,7 @@ class SoLinearProfile(SoProfile):
 
 class SoLineSet(SoNonIndexedShape):
     """Proxy of C++ SoLineSet class."""
+    numVertices: SoMFInt32
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -13704,6 +14068,11 @@ class SoLineSet(SoNonIndexedShape):
 
 class SoListener(SoNode):
     """Proxy of C++ SoListener class."""
+    dopplerFactor: SoSFFloat
+    dopplerVelocity: SoSFVec3f
+    gain: SoSFFloat
+    orientation: SoSFRotation
+    position: SoSFVec3f
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -13718,6 +14087,9 @@ class SoLocateHighlight(SoSeparator):
     OFF: ClassVar[int] = ...
     EMISSIVE: ClassVar[int] = ...
     EMISSIVE_DIFFUSE: ClassVar[int] = ...
+    color: SoSFColor
+    mode: SoSFEnum
+    style: SoSFEnum
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -13732,6 +14104,8 @@ class SoLocateHighlight(SoSeparator):
 
 class SoLOD(SoGroup):
     """Proxy of C++ SoLOD class."""
+    center: SoSFVec3f
+    range: SoMFFloat
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -13755,6 +14129,7 @@ class SoLOD(SoGroup):
 
 class SoPointSet(SoNonIndexedShape):
     """Proxy of C++ SoPointSet class."""
+    numPoints: SoSFInt32
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -13859,6 +14234,7 @@ class SoMarkerSet(SoPointSet):
     CAUTION_FILLED_9_9: ClassVar[int] = ...
     SHIP_FILLED_9_9: ClassVar[int] = ...
     NUM_MARKERS: ClassVar[int] = ...
+    markerIndex: SoMFInt32
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -13884,6 +14260,12 @@ class SoMarkerSet(SoPointSet):
 
 class SoMaterial(SoNode):
     """Proxy of C++ SoMaterial class."""
+    ambientColor: SoMFColor
+    diffuseColor: SoMFColor
+    emissiveColor: SoMFColor
+    shininess: SoMFFloat
+    specularColor: SoMFColor
+    transparency: SoMFFloat
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -13896,6 +14278,7 @@ class SoMaterial(SoNode):
 
 class SoMatrixTransform(SoTransformation):
     """Proxy of C++ SoMatrixTransform class."""
+    matrix: SoSFMatrix
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -13912,6 +14295,7 @@ class SoMatrixTransform(SoTransformation):
 
 class SoMultipleCopy(SoGroup):
     """Proxy of C++ SoMultipleCopy class."""
+    matrix: SoMFMatrix
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -13932,6 +14316,7 @@ class SoMultipleCopy(SoGroup):
 
 class SoPerspectiveCamera(SoCamera):
     """Proxy of C++ SoPerspectiveCamera class."""
+    heightAngle: SoSFFloat
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -13953,6 +14338,7 @@ class SoReversePerspectiveCamera(SoPerspectiveCamera):
 
 class SoOrthographicCamera(SoCamera):
     """Proxy of C++ SoOrthographicCamera class."""
+    height: SoSFFloat
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -13965,6 +14351,10 @@ class SoOrthographicCamera(SoCamera):
 
 class SoFrustumCamera(SoCamera):
     """Proxy of C++ SoFrustumCamera class."""
+    bottom: SoSFFloat
+    left: SoSFFloat
+    right: SoSFFloat
+    top: SoSFFloat
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -13976,6 +14366,8 @@ class SoFrustumCamera(SoCamera):
 
 class SoQuadMesh(SoNonIndexedShape):
     """Proxy of C++ SoQuadMesh class."""
+    verticesPerColumn: SoSFInt32
+    verticesPerRow: SoSFInt32
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -13988,6 +14380,7 @@ class SoQuadMesh(SoNonIndexedShape):
 
 class SoTriangleStripSet(SoNonIndexedShape):
     """Proxy of C++ SoTriangleStripSet class."""
+    numVertices: SoMFInt32
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -14013,6 +14406,7 @@ class SoIndexedPointSet(SoIndexedShape):
 
 class SoIndexedMarkerSet(SoIndexedPointSet):
     """Proxy of C++ SoIndexedMarkerSet class."""
+    markerIndex: SoMFInt32
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -14023,6 +14417,8 @@ class SoIndexedMarkerSet(SoIndexedPointSet):
 
 class SoNurbsCurve(SoShape):
     """Proxy of C++ SoNurbsCurve class."""
+    knotVector: SoMFFloat
+    numControlPoints: SoSFInt32
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -14037,6 +14433,14 @@ class SoNurbsCurve(SoShape):
 
 class SoNurbsSurface(SoShape):
     """Proxy of C++ SoNurbsSurface class."""
+    numSControlPoints: SoSFInt32
+    numTControlPoints: SoSFInt32
+    numUControlPoints: SoSFInt32
+    numVControlPoints: SoSFInt32
+    sKnotVector: SoMFFloat
+    tKnotVector: SoMFFloat
+    uKnotVector: SoMFFloat
+    vKnotVector: SoMFFloat
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -14050,6 +14454,7 @@ class SoNurbsSurface(SoShape):
 
 class SoSphere(SoShape):
     """Proxy of C++ SoSphere class."""
+    radius: SoSFFloat
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -14065,6 +14470,9 @@ class SoText2(SoShape):
     LEFT: ClassVar[int] = ...
     RIGHT: ClassVar[int] = ...
     CENTER: ClassVar[int] = ...
+    justification: SoSFEnum
+    spacing: SoSFFloat
+    string: SoMFString
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -14084,6 +14492,10 @@ class SoText3(SoShape):
     LEFT: ClassVar[int] = ...
     RIGHT: ClassVar[int] = ...
     CENTER: ClassVar[int] = ...
+    justification: SoSFEnum
+    parts: SoSFBitMask
+    spacing: SoSFFloat
+    string: SoMFString
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -14098,6 +14510,9 @@ class SoWWWAnchor(SoLocateHighlight):
     """Proxy of C++ SoWWWAnchor class."""
     NONE: ClassVar[int] = ...
     POINT: ClassVar[int] = ...
+    description: SoSFString
+    map: SoSFEnum
+    name: SoSFString
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -14114,6 +14529,7 @@ class SoWWWAnchor(SoLocateHighlight):
 
 class SoPathSwitch(SoGroup):
     """Proxy of C++ SoPathSwitch class."""
+    path: SoSFPath
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -14156,6 +14572,7 @@ class SoTransformSeparator(SoGroup):
 
 class SoRotation(SoTransformation):
     """Proxy of C++ SoRotation class."""
+    rotation: SoSFRotation
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -14172,6 +14589,10 @@ class SoRotation(SoTransformation):
 
 class SoPendulum(SoRotation):
     """Proxy of C++ SoPendulum class."""
+    on: SoSFBool
+    rotation0: SoSFRotation
+    rotation1: SoSFRotation
+    speed: SoSFFloat
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -14182,6 +14603,8 @@ class SoPendulum(SoRotation):
 
 class SoRotor(SoRotation):
     """Proxy of C++ SoRotor class."""
+    on: SoSFBool
+    speed: SoSFFloat
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -14193,6 +14616,7 @@ class SoResetTransform(SoTransformation):
     """Proxy of C++ SoResetTransform class."""
     TRANSFORM: ClassVar[int] = ...
     BBOX: ClassVar[int] = ...
+    whatToReset: SoSFBitMask
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -14212,6 +14636,8 @@ class SoRotationXYZ(SoTransformation):
     X: ClassVar[int] = ...
     Y: ClassVar[int] = ...
     Z: ClassVar[int] = ...
+    angle: SoSFFloat
+    axis: SoSFEnum
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -14229,6 +14655,7 @@ class SoRotationXYZ(SoTransformation):
 
 class SoTranslation(SoTransformation):
     """Proxy of C++ SoTranslation class."""
+    translation: SoSFVec3f
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -14245,6 +14672,10 @@ class SoTranslation(SoTransformation):
 
 class SoShuttle(SoTranslation):
     """Proxy of C++ SoShuttle class."""
+    on: SoSFBool
+    speed: SoSFFloat
+    translation0: SoSFVec3f
+    translation1: SoSFVec3f
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -14255,6 +14686,8 @@ class SoShuttle(SoTranslation):
 
 class SoSurroundScale(SoTransformation):
     """Proxy of C++ SoSurroundScale class."""
+    numNodesUpToContainer: SoSFInt32
+    numNodesUpToReset: SoSFInt32
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -14268,6 +14701,7 @@ class SoSurroundScale(SoTransformation):
 
 class SoNurbsProfile(SoProfile):
     """Proxy of C++ SoNurbsProfile class."""
+    knotVector: SoMFFloat
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -14279,6 +14713,8 @@ class SoNurbsProfile(SoProfile):
 
 class SoVertexAttribute(SoNode):
     """Proxy of C++ SoVertexAttribute class."""
+    name: SoSFName
+    typeName: SoSFName
     def __init__(self) -> None: ...
     @staticmethod
     def initClass() -> None: ...
@@ -14298,6 +14734,7 @@ class SoVertexAttributeBinding(SoNode):
     PER_VERTEX: ClassVar[int] = ...
     PER_VERTEX_INDEXED: ClassVar[int] = ...
     DEFAULT: ClassVar[int] = ...
+    value: SoSFEnum
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -14312,6 +14749,7 @@ class SoVertexAttributeBinding(SoNode):
 
 class SoNormal(SoNode):
     """Proxy of C++ SoNormal class."""
+    vector: SoMFVec3f
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -14326,6 +14764,7 @@ class SoNormal(SoNode):
 
 class SoPackedColor(SoNode):
     """Proxy of C++ SoPackedColor class."""
+    orderedRGBA: SoMFUInt32
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -14342,6 +14781,10 @@ class SoPolygonOffset(SoNode):
     FILLED: ClassVar[int] = ...
     LINES: ClassVar[int] = ...
     POINTS: ClassVar[int] = ...
+    factor: SoSFFloat
+    on: SoSFBool
+    styles: SoSFBitMask
+    units: SoSFFloat
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -14354,6 +14797,7 @@ class SoPolygonOffset(SoNode):
 
 class SoProfileCoordinate2(SoNode):
     """Proxy of C++ SoProfileCoordinate2 class."""
+    point: SoMFVec2f
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -14369,6 +14813,7 @@ class SoProfileCoordinate2(SoNode):
 
 class SoProfileCoordinate3(SoNode):
     """Proxy of C++ SoProfileCoordinate3 class."""
+    point: SoMFVec3f
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -14389,6 +14834,14 @@ class SoTexture3(SoTexture):
     BLEND: ClassVar[int] = ...
     REPEAT: ClassVar[int] = ...
     CLAMP: ClassVar[int] = ...
+    blendColor: SoSFColor
+    enableCompressedTexture: SoSFBool
+    filenames: SoMFString
+    images: SoSFImage3
+    model: SoSFEnum
+    wrapR: SoSFEnum
+    wrapS: SoSFEnum
+    wrapT: SoSFEnum
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -14401,6 +14854,10 @@ class SoTexture3(SoTexture):
 
 class SoTexture2Transform(SoNode):
     """Proxy of C++ SoTexture2Transform class."""
+    center: SoSFVec2f
+    rotation: SoSFFloat
+    scaleFactor: SoSFVec2f
+    translation: SoSFVec2f
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -14415,6 +14872,11 @@ class SoTexture2Transform(SoNode):
 
 class SoTexture3Transform(SoNode):
     """Proxy of C++ SoTexture3Transform class."""
+    center: SoSFVec3f
+    rotation: SoSFRotation
+    scaleFactor: SoSFVec3f
+    scaleOrientation: SoSFRotation
+    translation: SoSFVec3f
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -14429,6 +14891,7 @@ class SoTexture3Transform(SoNode):
 
 class SoTextureCoordinate2(SoNode):
     """Proxy of C++ SoTextureCoordinate2 class."""
+    point: SoMFVec2f
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -14442,6 +14905,7 @@ class SoTextureCoordinate2(SoNode):
 
 class SoTextureCoordinate3(SoNode):
     """Proxy of C++ SoTextureCoordinate3 class."""
+    point: SoMFVec3f
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -14490,6 +14954,9 @@ class SoTextureCoordinateEnvironment(SoTextureCoordinateFunction):
 
 class SoTextureCoordinatePlane(SoTextureCoordinateFunction):
     """Proxy of C++ SoTextureCoordinatePlane class."""
+    directionR: SoSFVec3f
+    directionS: SoSFVec3f
+    directionT: SoSFVec3f
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -14503,6 +14970,7 @@ class SoTextureCoordinatePlane(SoTextureCoordinateFunction):
 
 class SoTextureMatrixTransform(SoNode):
     """Proxy of C++ SoTextureMatrixTransform class."""
+    matrix: SoSFMatrix
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -14520,6 +14988,10 @@ class SoWWWInline(SoNode):
     NEVER: ClassVar[int] = ...
     UNTIL_LOADED: ClassVar[int] = ...
     ALWAYS: ClassVar[int] = ...
+    alternateRep: SoSFNode
+    bboxCenter: SoSFVec3f
+    bboxSize: SoSFVec3f
+    name: SoSFString
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -14574,6 +15046,7 @@ class SoTransparencyType(SoNode):
     SORTED_OBJECT_SORTED_TRIANGLE_ADD: ClassVar[int] = ...
     SORTED_OBJECT_SORTED_TRIANGLE_BLEND: ClassVar[int] = ...
     NONE: ClassVar[int] = ...
+    value: SoSFEnum
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -14631,6 +15104,17 @@ class SoTextureCubeMap(SoTexture):
     REPLACE: ClassVar[int] = ...
     REPEAT: ClassVar[int] = ...
     CLAMP: ClassVar[int] = ...
+    blendColor: SoSFColor
+    filenames: SoMFString
+    imageNegX: SoSFImage
+    imageNegY: SoSFImage
+    imageNegZ: SoSFImage
+    imagePosX: SoSFImage
+    imagePosY: SoSFImage
+    imagePosZ: SoSFImage
+    model: SoSFEnum
+    wrapS: SoSFEnum
+    wrapT: SoSFEnum
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -14650,6 +15134,10 @@ class SoShaderObject(SoNode):
     CG_PROGRAM: ClassVar[int] = ...
     GLSL_PROGRAM: ClassVar[int] = ...
     FILENAME: ClassVar[int] = ...
+    isActive: SoSFBool
+    parameter: SoMFNode
+    sourceProgram: SoSFString
+    sourceType: SoSFEnum
     def __init__(self, *args, **kwargs) -> None: ...
     @staticmethod
     def getClassTypeId() -> SoType: ...
@@ -14664,6 +15152,8 @@ class SoShaderObject(SoNode):
 
 class SoShaderParameter(SoNode):
     """Proxy of C++ SoShaderParameter class."""
+    identifier: SoSFInt32
+    name: SoSFString
     def __init__(self, *args, **kwargs) -> None: ...
     @staticmethod
     def getClassTypeId() -> SoType: ...
@@ -14683,6 +15173,7 @@ class SoUniformShaderParameter(SoShaderParameter):
 
 class SoShaderParameter1f(SoUniformShaderParameter):
     """Proxy of C++ SoShaderParameter1f class."""
+    value: SoSFFloat
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -14693,6 +15184,7 @@ class SoShaderParameter1f(SoUniformShaderParameter):
 
 class SoShaderParameter1i(SoUniformShaderParameter):
     """Proxy of C++ SoShaderParameter1i class."""
+    value: SoSFInt32
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -14703,6 +15195,7 @@ class SoShaderParameter1i(SoUniformShaderParameter):
 
 class SoShaderParameter2f(SoUniformShaderParameter):
     """Proxy of C++ SoShaderParameter2f class."""
+    value: SoSFVec2f
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -14713,6 +15206,7 @@ class SoShaderParameter2f(SoUniformShaderParameter):
 
 class SoShaderParameter2i(SoUniformShaderParameter):
     """Proxy of C++ SoShaderParameter2i class."""
+    value: SoSFVec2i32
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -14723,6 +15217,7 @@ class SoShaderParameter2i(SoUniformShaderParameter):
 
 class SoShaderParameter3f(SoUniformShaderParameter):
     """Proxy of C++ SoShaderParameter3f class."""
+    value: SoSFVec3f
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -14733,6 +15228,7 @@ class SoShaderParameter3f(SoUniformShaderParameter):
 
 class SoShaderParameter3i(SoUniformShaderParameter):
     """Proxy of C++ SoShaderParameter3i class."""
+    value: SoSFVec3i32
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -14743,6 +15239,7 @@ class SoShaderParameter3i(SoUniformShaderParameter):
 
 class SoShaderParameter4f(SoUniformShaderParameter):
     """Proxy of C++ SoShaderParameter4f class."""
+    value: SoSFVec4f
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -14753,6 +15250,7 @@ class SoShaderParameter4f(SoUniformShaderParameter):
 
 class SoShaderParameter4i(SoUniformShaderParameter):
     """Proxy of C++ SoShaderParameter4i class."""
+    value: SoSFVec4i32
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -14763,6 +15261,7 @@ class SoShaderParameter4i(SoUniformShaderParameter):
 
 class SoShaderParameterArray1f(SoUniformShaderParameter):
     """Proxy of C++ SoShaderParameterArray1f class."""
+    value: SoMFFloat
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -14773,6 +15272,7 @@ class SoShaderParameterArray1f(SoUniformShaderParameter):
 
 class SoShaderParameterArray1i(SoUniformShaderParameter):
     """Proxy of C++ SoShaderParameterArray1i class."""
+    value: SoMFInt32
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -14783,6 +15283,7 @@ class SoShaderParameterArray1i(SoUniformShaderParameter):
 
 class SoShaderParameterArray2f(SoUniformShaderParameter):
     """Proxy of C++ SoShaderParameterArray2f class."""
+    value: SoMFVec2f
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -14793,6 +15294,7 @@ class SoShaderParameterArray2f(SoUniformShaderParameter):
 
 class SoShaderParameterArray2i(SoUniformShaderParameter):
     """Proxy of C++ SoShaderParameterArray2i class."""
+    value: SoMFVec2i32
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -14803,6 +15305,7 @@ class SoShaderParameterArray2i(SoUniformShaderParameter):
 
 class SoShaderParameterArray3f(SoUniformShaderParameter):
     """Proxy of C++ SoShaderParameterArray3f class."""
+    value: SoMFVec3f
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -14813,6 +15316,7 @@ class SoShaderParameterArray3f(SoUniformShaderParameter):
 
 class SoShaderParameterArray3i(SoUniformShaderParameter):
     """Proxy of C++ SoShaderParameterArray3i class."""
+    value: SoMFVec3i32
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -14823,6 +15327,7 @@ class SoShaderParameterArray3i(SoUniformShaderParameter):
 
 class SoShaderParameterArray4f(SoUniformShaderParameter):
     """Proxy of C++ SoShaderParameterArray4f class."""
+    value: SoMFVec4f
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -14833,6 +15338,7 @@ class SoShaderParameterArray4f(SoUniformShaderParameter):
 
 class SoShaderParameterArray4i(SoUniformShaderParameter):
     """Proxy of C++ SoShaderParameterArray4i class."""
+    value: SoMFVec4i32
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -14843,6 +15349,7 @@ class SoShaderParameterArray4i(SoUniformShaderParameter):
 
 class SoShaderParameterMatrix(SoUniformShaderParameter):
     """Proxy of C++ SoShaderParameterMatrix class."""
+    value: SoSFMatrix
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -14853,6 +15360,7 @@ class SoShaderParameterMatrix(SoUniformShaderParameter):
 
 class SoShaderParameterMatrixArray(SoUniformShaderParameter):
     """Proxy of C++ SoShaderParameterMatrixArray class."""
+    value: SoMFMatrix
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -14872,6 +15380,8 @@ class SoShaderStateMatrixParameter(SoUniformShaderParameter):
     INVERSE: ClassVar[int] = ...
     INVERSE_TRANSPOSE: ClassVar[int] = ...
     __swig_destroy__: ClassVar[builtin_function_or_method] = ...
+    matrixTransform: SoSFEnum
+    matrixType: SoSFEnum
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -14883,6 +15393,7 @@ class SoShaderStateMatrixParameter(SoUniformShaderParameter):
 
 class SoShaderProgram(SoNode):
     """Proxy of C++ SoShaderProgram class."""
+    shaderObject: SoMFNode
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -14945,6 +15456,10 @@ class SoTextureCoordinateReflectionMap(SoTextureCoordinateFunction):
 
 class SoTextureCoordinateObject(SoTextureCoordinateFunction):
     """Proxy of C++ SoTextureCoordinateObject class."""
+    factorQ: SoSFVec4f
+    factorR: SoSFVec4f
+    factorS: SoSFVec4f
+    factorT: SoSFVec4f
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -14962,6 +15477,8 @@ class SoTextureScalePolicy(SoNode):
     SCALE_DOWN: ClassVar[int] = ...
     SCALE_UP: ClassVar[int] = ...
     FRACTURE: ClassVar[int] = ...
+    policy: SoSFEnum
+    quality: SoSFFloat
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -14974,6 +15491,8 @@ class SoTextureUnit(SoNode):
     """Proxy of C++ SoTextureUnit class."""
     BUMP_MAPPING: ClassVar[int] = ...
     IMAGE_MAPPING: ClassVar[int] = ...
+    mappingMethod: SoSFEnum
+    unit: SoSFInt32
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -15007,6 +15526,15 @@ class SoTextureCombine(SoNode):
     INTERPOLATE: ClassVar[int] = ...
     DOT3_RGB: ClassVar[int] = ...
     DOT3_RGBA: ClassVar[int] = ...
+    alphaOperand: SoMFEnum
+    alphaOperation: SoSFEnum
+    alphaScale: SoSFFloat
+    alphaSource: SoMFEnum
+    constantColor: SoSFVec4f
+    rgbOperand: SoMFEnum
+    rgbOperation: SoSFEnum
+    rgbScale: SoSFFloat
+    rgbSource: SoMFEnum
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -15051,6 +15579,16 @@ class SoSceneTexture2(SoNode):
     RGB10_A2: ClassVar[int] = ...
     RGBA12: ClassVar[int] = ...
     RGBA16: ClassVar[int] = ...
+    backgroundColor: SoSFVec4f
+    blendColor: SoSFColor
+    model: SoSFEnum
+    scene: SoSFNode
+    sceneTransparencyType: SoSFNode
+    size: SoSFVec2s
+    transparencyFunction: SoSFEnum
+    type: SoSFEnum
+    wrapS: SoSFEnum
+    wrapT: SoSFEnum
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -15075,6 +15613,15 @@ class SoSceneTextureCubeMap(SoNode):
     NONE: ClassVar[int] = ...
     ALPHA_BLEND: ClassVar[int] = ...
     ALPHA_TEST: ClassVar[int] = ...
+    backgroundColor: SoSFColor
+    blendColor: SoSFColor
+    model: SoSFEnum
+    scene: SoSFNode
+    size: SoSFVec2s
+    transparencyFunction: SoSFEnum
+    wrapR: SoSFEnum
+    wrapS: SoSFEnum
+    wrapT: SoSFEnum
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -15110,6 +15657,8 @@ class SoCacheHintElement(SoElement):
 
 class SoCacheHint(SoNode):
     """Proxy of C++ SoCacheHint class."""
+    gfxValue: SoSFFloat
+    memValue: SoSFFloat
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -15132,6 +15681,10 @@ class SoDepthBuffer(SoNode):
     GEQUAL: ClassVar[int] = ...
     GREATER: ClassVar[int] = ...
     NOTEQUAL: ClassVar[int] = ...
+    function: SoSFEnum
+    range: SoSFVec2f
+    test: SoSFBool
+    write: SoSFBool
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -15151,6 +15704,8 @@ class SoAlphaTest(SoNode):
     GEQUAL: ClassVar[int] = ...
     GREATER: ClassVar[int] = ...
     NOTEQUAL: ClassVar[int] = ...
+    function: SoSFEnum
+    value: SoSFFloat
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -16628,6 +17183,7 @@ class SbThread:
 
 class SoVRMLParent(SoGroup):
     """Proxy of C++ SoVRMLParent class."""
+    children: SoMFNode
     def __init__(self, *args, **kwargs) -> None: ...
     @staticmethod
     def getClassTypeId() -> SoType: ...
@@ -16663,6 +17219,11 @@ class SoVRMLParent(SoGroup):
 
 class SoVRMLAnchor(SoVRMLParent):
     """Proxy of C++ SoVRMLAnchor class."""
+    bboxCenter: SoSFVec3f
+    bboxSize: SoSFVec3f
+    description: SoSFString
+    parameter: SoMFString
+    url: SoMFString
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -16675,6 +17236,9 @@ class SoVRMLAnchor(SoVRMLParent):
 
 class SoVRMLAppearance(SoNode):
     """Proxy of C++ SoVRMLAppearance class."""
+    material: SoSFNode
+    texture: SoSFNode
+    textureTransform: SoSFNode
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -16691,6 +17255,12 @@ class SoVRMLAppearance(SoNode):
 
 class SoVRMLAudioClip(SoNode):
     """Proxy of C++ SoVRMLAudioClip class."""
+    description: SoSFString
+    loop: SoSFBool
+    pitch: SoSFFloat
+    startTime: SoSFTime
+    stopTime: SoSFTime
+    url: SoMFString
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -16727,6 +17297,16 @@ class SoVRMLAudioClip(SoNode):
 
 class SoVRMLBackground(SoNode):
     """Proxy of C++ SoVRMLBackground class."""
+    backUrl: SoMFString
+    bottomUrl: SoMFString
+    frontUrl: SoMFString
+    groundAngle: SoMFFloat
+    groundColor: SoMFColor
+    leftUrl: SoMFString
+    rightUrl: SoMFString
+    skyAngle: SoMFFloat
+    skyColor: SoMFColor
+    topUrl: SoMFString
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -16737,6 +17317,9 @@ class SoVRMLBackground(SoNode):
 
 class SoVRMLBillboard(SoVRMLParent):
     """Proxy of C++ SoVRMLBillboard class."""
+    axisOfRotation: SoSFVec3f
+    bboxCenter: SoSFVec3f
+    bboxSize: SoSFVec3f
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -16771,6 +17354,7 @@ class SoVRMLGeometry(SoShape):
 
 class SoVRMLBox(SoVRMLGeometry):
     """Proxy of C++ SoVRMLBox class."""
+    size: SoSFVec3f
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -16786,6 +17370,12 @@ class SoVRMLGroup(SoVRMLParent):
     OFF: ClassVar[int] = ...
     ON: ClassVar[int] = ...
     AUTO: ClassVar[int] = ...
+    bboxCenter: SoSFVec3f
+    bboxSize: SoSFVec3f
+    boundingBoxCaching: SoSFEnum
+    pickCulling: SoSFEnum
+    renderCaching: SoSFEnum
+    renderCulling: SoSFEnum
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -16816,6 +17406,9 @@ class SoVRMLGroup(SoVRMLParent):
 
 class SoVRMLCollision(SoVRMLGroup):
     """Proxy of C++ SoVRMLCollision class."""
+    collide: SoSFBool
+    collideTime: SoSFTime
+    proxy: SoSFNode
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -16830,6 +17423,7 @@ class SoVRMLCollision(SoVRMLGroup):
 
 class SoVRMLColor(SoNode):
     """Proxy of C++ SoVRMLColor class."""
+    color: SoMFColor
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -16842,6 +17436,8 @@ class SoVRMLColor(SoNode):
 
 class SoVRMLInterpolator(SoNodeEngine):
     """Proxy of C++ SoVRMLInterpolator class."""
+    key: SoMFFloat
+    set_fraction: SoSFFloat
     def __init__(self, *args, **kwargs) -> None: ...
     @staticmethod
     def getClassTypeId() -> SoType: ...
@@ -16852,6 +17448,8 @@ class SoVRMLInterpolator(SoNodeEngine):
 
 class SoVRMLColorInterpolator(SoVRMLInterpolator):
     """Proxy of C++ SoVRMLColorInterpolator class."""
+    keyValue: SoMFColor
+    value_changed: SoEngineOutput
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -16864,6 +17462,10 @@ class SoVRMLColorInterpolator(SoVRMLInterpolator):
 
 class SoVRMLCone(SoVRMLGeometry):
     """Proxy of C++ SoVRMLCone class."""
+    bottom: SoSFBool
+    bottomRadius: SoSFFloat
+    height: SoSFFloat
+    side: SoSFBool
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -16876,6 +17478,7 @@ class SoVRMLCone(SoVRMLGeometry):
 
 class SoVRMLCoordinate(SoNode):
     """Proxy of C++ SoVRMLCoordinate class."""
+    point: SoMFVec3f
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -16890,6 +17493,8 @@ class SoVRMLCoordinate(SoNode):
 
 class SoVRMLCoordinateInterpolator(SoVRMLInterpolator):
     """Proxy of C++ SoVRMLCoordinateInterpolator class."""
+    keyValue: SoMFVec3f
+    value_changed: SoEngineOutput
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -16902,6 +17507,11 @@ class SoVRMLCoordinateInterpolator(SoVRMLInterpolator):
 
 class SoVRMLCylinder(SoVRMLGeometry):
     """Proxy of C++ SoVRMLCylinder class."""
+    bottom: SoSFBool
+    height: SoSFFloat
+    radius: SoSFFloat
+    side: SoSFBool
+    top: SoSFBool
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -16914,6 +17524,8 @@ class SoVRMLCylinder(SoVRMLGeometry):
 
 class SoVRMLSensor(SoNode):
     """Proxy of C++ SoVRMLSensor class."""
+    enabled: SoSFBool
+    isActive: SoSFBool
     def __init__(self, *args, **kwargs) -> None: ...
     @staticmethod
     def getClassTypeId() -> SoType: ...
@@ -16923,6 +17535,8 @@ class SoVRMLSensor(SoNode):
 
 class SoVRMLDragSensor(SoVRMLSensor):
     """Proxy of C++ SoVRMLDragSensor class."""
+    autoOffset: SoSFBool
+    trackPoint_changed: SoSFVec3f
     def __init__(self, *args, **kwargs) -> None: ...
     @staticmethod
     def getClassTypeId() -> SoType: ...
@@ -16933,6 +17547,11 @@ class SoVRMLDragSensor(SoVRMLSensor):
 
 class SoVRMLCylinderSensor(SoVRMLDragSensor):
     """Proxy of C++ SoVRMLCylinderSensor class."""
+    diskAngle: SoSFFloat
+    maxAngle: SoSFFloat
+    minAngle: SoSFFloat
+    offset: SoSFFloat
+    rotation_changed: SoSFRotation
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -16942,6 +17561,10 @@ class SoVRMLCylinderSensor(SoVRMLDragSensor):
 
 class SoVRMLLight(SoNode):
     """Proxy of C++ SoVRMLLight class."""
+    ambientIntensity: SoSFFloat
+    color: SoSFColor
+    intensity: SoSFFloat
+    on: SoSFBool
     def __init__(self, *args, **kwargs) -> None: ...
     @staticmethod
     def getClassTypeId() -> SoType: ...
@@ -16952,6 +17575,7 @@ class SoVRMLLight(SoNode):
 
 class SoVRMLDirectionalLight(SoVRMLLight):
     """Proxy of C++ SoVRMLDirectionalLight class."""
+    direction: SoSFVec3f
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -16962,6 +17586,19 @@ class SoVRMLDirectionalLight(SoVRMLLight):
 
 class SoVRMLElevationGrid(SoVRMLGeometry):
     """Proxy of C++ SoVRMLElevationGrid class."""
+    ccw: SoSFBool
+    color: SoSFNode
+    colorPerVertex: SoSFBool
+    creaseAngle: SoSFFloat
+    height: SoMFFloat
+    normal: SoSFNode
+    normalPerVertex: SoSFBool
+    solid: SoSFBool
+    texCoord: SoSFNode
+    xDimension: SoSFInt32
+    xSpacing: SoSFFloat
+    zDimension: SoSFInt32
+    zSpacing: SoSFFloat
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -16974,6 +17611,16 @@ class SoVRMLElevationGrid(SoVRMLGeometry):
 
 class SoVRMLExtrusion(SoVRMLGeometry):
     """Proxy of C++ SoVRMLExtrusion class."""
+    beginCap: SoSFBool
+    ccw: SoSFBool
+    convex: SoSFBool
+    creaseAngle: SoSFFloat
+    crossSection: SoMFVec2f
+    endCap: SoSFBool
+    orientation: SoMFRotation
+    scale: SoMFVec2f
+    solid: SoSFBool
+    spine: SoMFVec3f
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -16986,6 +17633,9 @@ class SoVRMLExtrusion(SoVRMLGeometry):
 
 class SoVRMLFog(SoNode):
     """Proxy of C++ SoVRMLFog class."""
+    color: SoSFColor
+    fogType: SoSFString
+    visibilityRange: SoSFFloat
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -17003,6 +17653,15 @@ class SoVRMLFontStyle(SoNode):
     BOLD: ClassVar[int] = ...
     ITALIC: ClassVar[int] = ...
     BOLDITALIC: ClassVar[int] = ...
+    family: SoMFString
+    horizontal: SoSFBool
+    justify: SoMFString
+    language: SoSFString
+    leftToRight: SoSFBool
+    size: SoSFFloat
+    spacing: SoSFFloat
+    style: SoMFString
+    topToBottom: SoSFBool
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -17020,6 +17679,8 @@ def so_vrml_init() -> None: ...
 
 class SoVRMLTexture(SoNode):
     """Proxy of C++ SoVRMLTexture class."""
+    repeatS: SoSFBool
+    repeatT: SoSFBool
     def __init__(self, *args, **kwargs) -> None: ...
     @staticmethod
     def getClassTypeId() -> SoType: ...
@@ -17030,6 +17691,7 @@ class SoVRMLTexture(SoNode):
 
 class SoVRMLImageTexture(SoVRMLTexture):
     """Proxy of C++ SoVRMLImageTexture class."""
+    url: SoMFString
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -17059,6 +17721,12 @@ class SoVRMLVertexShape(SoVRMLGeometry):
     PER_FACE_INDEXED: ClassVar[int] = ...
     PER_VERTEX: ClassVar[int] = ...
     PER_VERTEX_INDEXED: ClassVar[int] = ...
+    color: SoSFNode
+    colorPerVertex: SoSFBool
+    coord: SoSFNode
+    normal: SoSFNode
+    normalPerVertex: SoSFBool
+    texCoord: SoSFNode
     def __init__(self, *args, **kwargs) -> None: ...
     @staticmethod
     def getClassTypeId() -> SoType: ...
@@ -17078,6 +17746,10 @@ class SoVRMLVertexShape(SoVRMLGeometry):
 
 class SoVRMLIndexedShape(SoVRMLVertexShape):
     """Proxy of C++ SoVRMLIndexedShape class."""
+    colorIndex: SoMFInt32
+    coordIndex: SoMFInt32
+    normalIndex: SoMFInt32
+    texCoordIndex: SoMFInt32
     def __init__(self, *args, **kwargs) -> None: ...
     @staticmethod
     def getClassTypeId() -> SoType: ...
@@ -17087,6 +17759,10 @@ class SoVRMLIndexedShape(SoVRMLVertexShape):
 
 class SoVRMLIndexedFaceSet(SoVRMLIndexedShape):
     """Proxy of C++ SoVRMLIndexedFaceSet class."""
+    ccw: SoSFBool
+    convex: SoSFBool
+    creaseAngle: SoSFFloat
+    solid: SoSFBool
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -17102,6 +17778,9 @@ class SoVRMLIndexedFaceSet(SoVRMLIndexedShape):
 
 class SoVRMLVertexLine(SoVRMLGeometry):
     """Proxy of C++ SoVRMLVertexLine class."""
+    color: SoSFNode
+    colorPerVertex: SoSFBool
+    coord: SoSFNode
     def __init__(self, *args, **kwargs) -> None: ...
     @staticmethod
     def getClassTypeId() -> SoType: ...
@@ -17117,6 +17796,8 @@ class SoVRMLVertexLine(SoVRMLGeometry):
 
 class SoVRMLIndexedLine(SoVRMLVertexLine):
     """Proxy of C++ SoVRMLIndexedLine class."""
+    colorIndex: SoMFInt32
+    coordIndex: SoMFInt32
     def __init__(self, *args, **kwargs) -> None: ...
     @staticmethod
     def getClassTypeId() -> SoType: ...
@@ -17141,6 +17822,9 @@ class SoVRMLInline(SoNode):
     NEVER: ClassVar[int] = ...
     UNTIL_LOADED: ClassVar[int] = ...
     ALWAYS: ClassVar[int] = ...
+    bboxCenter: SoSFVec3f
+    bboxSize: SoSFVec3f
+    url: SoMFString
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -17183,6 +17867,9 @@ class SoVRMLInline(SoNode):
 
 class SoVRMLLOD(SoGroup):
     """Proxy of C++ SoVRMLLOD class."""
+    center: SoSFVec3f
+    level: SoMFNode
+    range: SoMFFloat
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -17237,6 +17924,12 @@ class SoVRMLLOD(SoGroup):
 
 class SoVRMLMaterial(SoNode):
     """Proxy of C++ SoVRMLMaterial class."""
+    ambientIntensity: SoSFFloat
+    diffuseColor: SoSFColor
+    emissiveColor: SoSFColor
+    shininess: SoSFFloat
+    specularColor: SoSFColor
+    transparency: SoSFFloat
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -17249,6 +17942,19 @@ class SoVRMLMaterial(SoNode):
 
 class SoVRMLMovieTexture(SoVRMLTexture):
     """Proxy of C++ SoVRMLMovieTexture class."""
+    alpha: SoSFFloat
+    blendColor: SoSFColor
+    duration_changed: SoSFTime
+    isActive: SoSFBool
+    loop: SoSFBool
+    model: SoSFEnum
+    pauseTime: SoSFTime
+    resumeTime: SoSFTime
+    scaleTexCoord: SoSFBool
+    speed: SoSFFloat
+    startTime: SoSFTime
+    stopTime: SoSFTime
+    url: SoMFString
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -17259,6 +17965,11 @@ class SoVRMLMovieTexture(SoVRMLTexture):
 
 class SoVRMLNavigationInfo(SoNode):
     """Proxy of C++ SoVRMLNavigationInfo class."""
+    avatarSize: SoMFFloat
+    headlight: SoSFBool
+    speed: SoSFFloat
+    type: SoMFString
+    visibilityLimit: SoSFFloat
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -17269,6 +17980,7 @@ class SoVRMLNavigationInfo(SoNode):
 
 class SoVRMLNormal(SoNode):
     """Proxy of C++ SoVRMLNormal class."""
+    vector: SoMFVec3f
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -17283,6 +17995,8 @@ class SoVRMLNormal(SoNode):
 
 class SoVRMLNormalInterpolator(SoVRMLInterpolator):
     """Proxy of C++ SoVRMLNormalInterpolator class."""
+    keyValue: SoMFVec3f
+    value_changed: SoEngineOutput
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -17295,6 +18009,8 @@ class SoVRMLNormalInterpolator(SoVRMLInterpolator):
 
 class SoVRMLOrientationInterpolator(SoVRMLInterpolator):
     """Proxy of C++ SoVRMLOrientationInterpolator class."""
+    keyValue: SoMFRotation
+    value_changed: SoEngineOutput
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -17307,6 +18023,7 @@ class SoVRMLOrientationInterpolator(SoVRMLInterpolator):
 
 class SoVRMLPixelTexture(SoVRMLTexture):
     """Proxy of C++ SoVRMLPixelTexture class."""
+    image: SoSFImage
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -17320,6 +18037,10 @@ class SoVRMLPixelTexture(SoVRMLTexture):
 
 class SoVRMLPlaneSensor(SoVRMLDragSensor):
     """Proxy of C++ SoVRMLPlaneSensor class."""
+    maxPosition: SoSFVec2f
+    minPosition: SoSFVec2f
+    offset: SoSFVec3f
+    translation_changed: SoSFVec3f
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -17329,6 +18050,9 @@ class SoVRMLPlaneSensor(SoVRMLDragSensor):
 
 class SoVRMLPointLight(SoVRMLLight):
     """Proxy of C++ SoVRMLPointLight class."""
+    attenuation: SoSFVec3f
+    location: SoSFVec3f
+    radius: SoSFFloat
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -17339,6 +18063,8 @@ class SoVRMLPointLight(SoVRMLLight):
 
 class SoVRMLVertexPoint(SoVRMLGeometry):
     """Proxy of C++ SoVRMLVertexPoint class."""
+    color: SoSFNode
+    coord: SoSFNode
     def __init__(self, *args, **kwargs) -> None: ...
     @staticmethod
     def getClassTypeId() -> SoType: ...
@@ -17366,6 +18092,8 @@ class SoVRMLPointSet(SoVRMLVertexPoint):
 
 class SoVRMLPositionInterpolator(SoVRMLInterpolator):
     """Proxy of C++ SoVRMLPositionInterpolator class."""
+    keyValue: SoMFVec3f
+    value_changed: SoEngineOutput
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -17378,6 +18106,14 @@ class SoVRMLPositionInterpolator(SoVRMLInterpolator):
 
 class SoVRMLProximitySensor(SoNode):
     """Proxy of C++ SoVRMLProximitySensor class."""
+    center: SoSFVec3f
+    enabled: SoSFBool
+    enterTime: SoSFTime
+    exitTime: SoSFTime
+    isActive: SoSFBool
+    orientation_changed: SoSFRotation
+    position_changed: SoSFVec3f
+    size: SoSFVec3f
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -17393,6 +18129,8 @@ class SoVRMLProximitySensor(SoNode):
 
 class SoVRMLScalarInterpolator(SoVRMLInterpolator):
     """Proxy of C++ SoVRMLScalarInterpolator class."""
+    keyValue: SoMFFloat
+    value_changed: SoEngineOutput
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -17405,6 +18143,9 @@ class SoVRMLScalarInterpolator(SoVRMLInterpolator):
 
 class SoVRMLScript(SoNode):
     """Proxy of C++ SoVRMLScript class."""
+    directOutput: SoSFBool
+    mustEvaluate: SoSFBool
+    url: SoMFString
     @staticmethod
     def initClass() -> None: ...
     def __init__(self) -> None: ...
@@ -17426,6 +18167,10 @@ class SoVRMLShape(SoNode):
     OFF: ClassVar[int] = ...
     ON: ClassVar[int] = ...
     AUTO: ClassVar[int] = ...
+    appearance: SoSFNode
+    boundingBoxCaching: SoSFEnum
+    geometry: SoSFNode
+    renderCaching: SoSFEnum
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -17451,6 +18196,18 @@ class SoVRMLShape(SoNode):
 
 class SoVRMLSound(SoNode):
     """Proxy of C++ SoVRMLSound class."""
+    direction: SoSFVec3f
+    dopplerFactor: SoSFFloat
+    dopplerVelocity: SoSFFloat
+    intensity: SoSFFloat
+    location: SoSFVec3f
+    maxBack: SoSFFloat
+    maxFront: SoSFFloat
+    minBack: SoSFFloat
+    minFront: SoSFFloat
+    priority: SoSFFloat
+    source: SoSFNode
+    spatialize: SoSFBool
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -17471,6 +18228,7 @@ class SoVRMLSound(SoNode):
 
 class SoVRMLSphere(SoVRMLGeometry):
     """Proxy of C++ SoVRMLSphere class."""
+    radius: SoSFFloat
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -17483,6 +18241,8 @@ class SoVRMLSphere(SoVRMLGeometry):
 
 class SoVRMLSphereSensor(SoVRMLDragSensor):
     """Proxy of C++ SoVRMLSphereSensor class."""
+    offset: SoSFRotation
+    rotation_changed: SoSFRotation
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -17492,6 +18252,12 @@ class SoVRMLSphereSensor(SoVRMLDragSensor):
 
 class SoVRMLSpotLight(SoVRMLLight):
     """Proxy of C++ SoVRMLSpotLight class."""
+    attenuation: SoSFVec3f
+    beamWidth: SoSFFloat
+    cutOffAngle: SoSFFloat
+    direction: SoSFVec3f
+    location: SoSFVec3f
+    radius: SoSFFloat
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -17502,6 +18268,8 @@ class SoVRMLSpotLight(SoVRMLLight):
 
 class SoVRMLSwitch(SoGroup):
     """Proxy of C++ SoVRMLSwitch class."""
+    choice: SoMFNode
+    whichChoice: SoSFInt32
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -17557,6 +18325,10 @@ class SoVRMLText(SoVRMLGeometry):
     BEGIN: ClassVar[int] = ...
     END: ClassVar[int] = ...
     MIDDLE: ClassVar[int] = ...
+    fontStyle: SoSFNode
+    length: SoMFFloat
+    maxExtent: SoSFFloat
+    string: SoMFString
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -17570,6 +18342,7 @@ class SoVRMLText(SoVRMLGeometry):
 
 class SoVRMLTextureCoordinate(SoNode):
     """Proxy of C++ SoVRMLTextureCoordinate class."""
+    point: SoMFVec2f
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -17584,6 +18357,10 @@ class SoVRMLTextureCoordinate(SoNode):
 
 class SoVRMLTextureTransform(SoNode):
     """Proxy of C++ SoVRMLTextureTransform class."""
+    center: SoSFVec2f
+    rotation: SoSFFloat
+    scale: SoSFVec2f
+    translation: SoSFVec2f
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -17598,6 +18375,15 @@ class SoVRMLTextureTransform(SoNode):
 
 class SoVRMLTimeSensor(SoNodeEngine):
     """Proxy of C++ SoVRMLTimeSensor class."""
+    cycleInterval: SoSFTime
+    cycleTime: SoEngineOutput
+    enabled: SoSFBool
+    fraction_changed: SoEngineOutput
+    isActive: SoEngineOutput
+    loop: SoSFBool
+    startTime: SoSFTime
+    stopTime: SoSFTime
+    time: SoEngineOutput
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -17613,6 +18399,13 @@ class SoVRMLTimeSensor(SoNodeEngine):
 
 class SoVRMLTouchSensor(SoNode):
     """Proxy of C++ SoVRMLTouchSensor class."""
+    enabled: SoSFBool
+    hitNormal_changed: SoSFVec3f
+    hitPoint_changed: SoSFVec3f
+    hitTexCoord_changed: SoSFVec2f
+    isActive: SoSFBool
+    isOver: SoSFBool
+    touchTime: SoSFTime
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -17624,6 +18417,11 @@ class SoVRMLTouchSensor(SoNode):
 
 class SoVRMLTransform(SoVRMLGroup):
     """Proxy of C++ SoVRMLTransform class."""
+    center: SoSFVec3f
+    rotation: SoSFRotation
+    scale: SoSFVec3f
+    scaleOrientation: SoSFRotation
+    translation: SoSFVec3f
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -17656,6 +18454,11 @@ class SoVRMLTransform(SoVRMLGroup):
 
 class SoVRMLViewpoint(SoNode):
     """Proxy of C++ SoVRMLViewpoint class."""
+    description: SoSFString
+    fieldOfView: SoSFFloat
+    jump: SoSFBool
+    orientation: SoSFRotation
+    position: SoSFVec3f
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -17666,6 +18469,12 @@ class SoVRMLViewpoint(SoNode):
 
 class SoVRMLVisibilitySensor(SoNode):
     """Proxy of C++ SoVRMLVisibilitySensor class."""
+    center: SoSFVec3f
+    enabled: SoSFBool
+    enterTime: SoSFTime
+    exitTime: SoSFTime
+    isActive: SoSFBool
+    size: SoSFVec3f
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...
@@ -17676,6 +18485,8 @@ class SoVRMLVisibilitySensor(SoNode):
 
 class SoVRMLWorldInfo(SoNode):
     """Proxy of C++ SoVRMLWorldInfo class."""
+    info: SoMFString
+    title: SoSFString
     @staticmethod
     def getClassTypeId() -> SoType: ...
     def getTypeId(self) -> SoType: ...

@@ -1673,6 +1673,11 @@ EXTEND_HELPER_METHOD_CHECKS = {
 }
 PROPERTY_ATTRIBUTE_CHECKS = {
     "coin.pyi": (
+        ("SoCube", "width", "SoSFFloat"),
+        ("SoCube", "height", "SoSFFloat"),
+        ("SoCube", "depth", "SoSFFloat"),
+        ("SoMaterial", "diffuseColor", "SoMFColor"),
+        ("SoMaterial", "transparency", "SoMFFloat"),
         ("SbViewVolume", "type", "int"),
         ("SbViewVolume", "projPoint", "SbVec3f"),
         ("SbViewVolume", "projDir", "SbVec3f"),

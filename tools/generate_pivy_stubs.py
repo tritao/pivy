@@ -944,35 +944,84 @@ def normalize_property_attributes(text, property_types):
 
     lines = text.splitlines()
     updated = []
-    current_class = None
+    index = 0
 
-    for line in lines:
-        class_match = re.match(r"^class\s+([A-Za-z_]\w*)", line)
-        if class_match:
-            current_class = class_match.group(1)
-        elif current_class and is_top_level_statement(line):
-            current_class = None
+    while index < len(lines):
+        class_match = re.match(r"^class\s+([A-Za-z_]\w*)", lines[index])
+        if not class_match:
+            updated.append(lines[index])
+            index += 1
+            continue
 
-        attr_match = re.match(
-            r"(?P<indent>\s*)(?P<name>[A-Za-z_]\w*):\s*Incomplete\s*$",
-            line,
-        )
-        if current_class and attr_match:
-            annotation = property_types.get((current_class, attr_match.group("name")))
-            if annotation:
-                updated.append(
+        class_name = class_match.group(1)
+        end = index + 1
+        while end < len(lines) and not is_top_level_statement(lines[end]):
+            end += 1
+
+        class_lines = lines[index:end]
+        class_property_types = {
+            name: annotation
+            for (owner, name), annotation in property_types.items()
+            if owner == class_name
+        }
+        if not class_property_types:
+            updated.extend(class_lines)
+            index = end
+            continue
+
+        existing_attributes = set()
+        normalized_class_lines = []
+        for line in class_lines:
+            attr_match = re.match(
+                r"\s*(?P<name>[A-Za-z_]\w*):\s*(?P<annotation>.+)$", line
+            )
+            if attr_match:
+                existing_attributes.add(attr_match.group("name"))
+
+            incomplete_match = re.match(
+                r"(?P<indent>\s*)(?P<name>[A-Za-z_]\w*):\s*Incomplete\s*$",
+                line,
+            )
+            if incomplete_match and incomplete_match.group("name") in class_property_types:
+                normalized_class_lines.append(
                     "%s%s: %s"
                     % (
-                        attr_match.group("indent"),
-                        attr_match.group("name"),
-                        annotation,
+                        incomplete_match.group("indent"),
+                        incomplete_match.group("name"),
+                        class_property_types[incomplete_match.group("name")],
                     )
                 )
-                continue
+            else:
+                normalized_class_lines.append(line)
 
-        updated.append(line)
+        missing_attributes = [
+            (name, annotation)
+            for name, annotation in sorted(class_property_types.items())
+            if name not in existing_attributes
+        ]
+        if missing_attributes:
+            insertion_index = len(normalized_class_lines)
+            for line_index, line in enumerate(normalized_class_lines[1:], 1):
+                if re.match(r"\s*(?:@|def\s)", line):
+                    insertion_index = line_index
+                    break
+
+            normalized_class_lines[insertion_index:insertion_index] = [
+                "    %s: %s" % (name, annotation)
+                for name, annotation in missing_attributes
+            ]
+
+        updated.extend(normalized_class_lines)
+        index = end
 
     return "\n".join(updated) + "\n"
+
+
+def normalize_module_cleanup_locals(text):
+    # stubgen infers the temporary variable in the wrapper's module-level
+    # property cleanup loop from its last observed value. Keep its annotation
+    # stable across runtime introspection results.
+    return text.replace("\nname: str\nthing: tuple\n", "\nname: str\nthing: property\n")
 
 
 def add_type_imports(text, used_external_types, external_class_modules):
@@ -1666,6 +1715,7 @@ def postprocess_stub(path, module, output_dir):
             used_external_types,
         ),
     )
+    processed = normalize_module_cleanup_locals(processed)
     processed = add_overload_import(processed)
     processed = add_missing_imports(processed)
     processed = add_type_imports(processed, used_external_types, external_class_modules)

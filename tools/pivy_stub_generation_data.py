@@ -167,6 +167,16 @@ EXTEND_HELPER_METHOD_TYPES = {
         "self",
         "SoBase | SoField | SoPath | None",
     ),
+    ("SoSFNode", "getValue", "self"): ("self", "SoNode | None"),
+    ("SoSFNode", "setValue", "self, newvalue: SoNode"): (
+        "self, newvalue: SoNode | None",
+        "None",
+    ),
+    ("SoSFPath", "getValue", "self"): ("self", "SoPath | None"),
+    ("SoSFPath", "setValue", "self, newvalue: SoPath"): (
+        "self, newvalue: SoPath | None",
+        "None",
+    ),
     ("SbMatrix", "getTransform", "self"): (
         "self",
         "tuple[SbVec3f, SbRotation, SbVec3f, SbRotation]",
@@ -305,4 +315,3 @@ PRIVATE_EXTENSION_STUB = (
     + "\n"
     + "def cast(*args: Any, **kwargs: Any) -> Any: ...\n"
 )
-
