@@ -56,3 +56,4 @@ test_stubs = { cmd = ["python", "-m", "tools.validate_pivy_stubs"], depends-on =
 typecheck_stubs_pyright = { cmd = ["pyright", "--warnings", "tests/typecheck/pivy_smoke.py"]}
 typecheck_stubs_pyrefly = { cmd = ["pyrefly", "check", "--summary=none", "--search-path", ".", "tests/typecheck/pivy_smoke.py"]}
 typecheck_stubs = { depends-on = ["typecheck_stubs_pyright", "typecheck_stubs_pyrefly"]}
+typecheck_report = { cmd = ["python", "-m", "tools.report_pivy_typing", "pivy/coin.pyi"]}
