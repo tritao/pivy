@@ -36,6 +36,14 @@ class FieldTypePolicy:
     setter_parameter_name: str = "newvalue"
 
 
+@dataclass(frozen=True)
+class MultifieldTypePolicy:
+    """Python-level value policy for a multiple-value Coin field."""
+
+    element_type: str
+    set_values_types: tuple[str, ...] = ()
+
+
 FIELD_TYPE_POLICIES = {
     "SoSFNode": FieldTypePolicy(
         value_type="SoNode | None",
@@ -48,6 +56,129 @@ FIELD_TYPE_POLICIES = {
         setter_value_type="SoPath | None",
     ),
 }
+
+
+MULTIFIELD_TYPE_POLICIES = {
+    "SoMFName": MultifieldTypePolicy(
+        element_type="SbName",
+        set_values_types=("SbName | str",),
+    ),
+    "SoMFBool": MultifieldTypePolicy(
+        element_type="bool",
+        set_values_types=("bool",),
+    ),
+    "SoMFEnum": MultifieldTypePolicy(
+        element_type="int",
+        set_values_types=("int",),
+    ),
+    "SoMFFloat": MultifieldTypePolicy(
+        element_type="float",
+        set_values_types=("float",),
+    ),
+    "SoMFVec3f": MultifieldTypePolicy(
+        element_type="SbVec3f",
+        set_values_types=("SbVec3f", "Sequence[float]"),
+    ),
+    "SoMFString": MultifieldTypePolicy(
+        element_type="SbString",
+        set_values_types=("SbString | str",),
+    ),
+    "SoMFVec2f": MultifieldTypePolicy(
+        element_type="SbVec2f",
+        set_values_types=("SbVec2f", "Sequence[float]"),
+    ),
+    "SoMFVec4f": MultifieldTypePolicy(
+        element_type="SbVec4f",
+        set_values_types=("SbVec4f", "Sequence[float]"),
+    ),
+    "SoMFRotation": MultifieldTypePolicy(
+        element_type="SbRotation",
+        set_values_types=("SbRotation", "Sequence[float]"),
+    ),
+    "SoMFMatrix": MultifieldTypePolicy(
+        element_type="SbMatrix",
+        set_values_types=("SbMatrix",),
+    ),
+    "SoMFColor": MultifieldTypePolicy(
+        element_type="SbColor",
+        set_values_types=("SbColor", "SbVec3f", "Sequence[float]"),
+    ),
+    "SoMFColorRGBA": MultifieldTypePolicy(element_type="SbColor4f"),
+    "SoMFDouble": MultifieldTypePolicy(element_type="float"),
+    "SoMFEngine": MultifieldTypePolicy(
+        element_type="SoEngine",
+        set_values_types=("SoEngine",),
+    ),
+    "SoMFInt32": MultifieldTypePolicy(
+        element_type="int",
+        set_values_types=("int",),
+    ),
+    "SoMFNode": MultifieldTypePolicy(
+        element_type="SoNode",
+        set_values_types=("SoNode",),
+    ),
+    "SoMFPath": MultifieldTypePolicy(
+        element_type="SoPath",
+        set_values_types=("SoPath",),
+    ),
+    "SoMFPlane": MultifieldTypePolicy(
+        element_type="SbPlane",
+        set_values_types=("SbPlane",),
+    ),
+    "SoMFShort": MultifieldTypePolicy(
+        element_type="int",
+        set_values_types=("int",),
+    ),
+    "SoMFTime": MultifieldTypePolicy(
+        element_type="SbTime",
+        set_values_types=("SbTime",),
+    ),
+    "SoMFUInt32": MultifieldTypePolicy(
+        element_type="int",
+        set_values_types=("int",),
+    ),
+    "SoMFUShort": MultifieldTypePolicy(
+        element_type="int",
+        set_values_types=("int",),
+    ),
+    "SoMFVec2b": MultifieldTypePolicy(element_type="SbVec2b"),
+    "SoMFVec2d": MultifieldTypePolicy(element_type="SbVec2d"),
+    "SoMFVec2i32": MultifieldTypePolicy(element_type="SbVec2i32"),
+    "SoMFVec2s": MultifieldTypePolicy(element_type="SbVec2s"),
+    "SoMFVec3b": MultifieldTypePolicy(element_type="SbVec3b"),
+    "SoMFVec3d": MultifieldTypePolicy(
+        element_type="SbVec3d",
+        set_values_types=("SbVec3d", "Sequence[float]"),
+    ),
+    "SoMFVec3i32": MultifieldTypePolicy(element_type="SbVec3i32"),
+    "SoMFVec3s": MultifieldTypePolicy(element_type="SbVec3s"),
+    "SoMFVec4b": MultifieldTypePolicy(element_type="SbVec4b"),
+    "SoMFVec4d": MultifieldTypePolicy(element_type="SbVec4d"),
+    "SoMFVec4i32": MultifieldTypePolicy(element_type="SbVec4i32"),
+    "SoMFVec4s": MultifieldTypePolicy(element_type="SbVec4s"),
+    "SoMFVec4ub": MultifieldTypePolicy(element_type="SbVec4ub"),
+    "SoMFVec4ui32": MultifieldTypePolicy(element_type="SbVec4ui32"),
+    "SoMFVec4us": MultifieldTypePolicy(element_type="SbVec4us"),
+}
+
+
+def multifield_iter_element_types():
+    """Return the element annotation used by each multifield iterator."""
+
+    return {
+        field_class: policy.element_type
+        for field_class, policy in MULTIFIELD_TYPE_POLICIES.items()
+    }
+
+
+def multifield_setvalues_types():
+    """Return supported Python sequence element types for ``setValues``."""
+
+    return {
+        field_class: policy.set_values_types
+        for field_class, policy in MULTIFIELD_TYPE_POLICIES.items()
+        if policy.set_values_types
+    }
 
 
 def field_method_type_overrides():

@@ -108,29 +108,6 @@ STRING_POINTER_PARAMETERS = {
     ("SbString", "__nq__", "u"),
 }
 INPLACE_DIVISION_METHODS = {"__idiv__", "__itruediv__"}
-MULTIFIELD_SETVALUES_TYPES = {
-    "SoMFBool": ("bool",),
-    "SoMFColor": ("SbColor", "SbVec3f", "Sequence[float]"),
-    "SoMFEngine": ("SoEngine",),
-    "SoMFEnum": ("int",),
-    "SoMFFloat": ("float",),
-    "SoMFInt32": ("int",),
-    "SoMFMatrix": ("SbMatrix",),
-    "SoMFName": ("SbName | str",),
-    "SoMFNode": ("SoNode",),
-    "SoMFPath": ("SoPath",),
-    "SoMFPlane": ("SbPlane",),
-    "SoMFRotation": ("SbRotation", "Sequence[float]"),
-    "SoMFShort": ("int",),
-    "SoMFString": ("SbString | str",),
-    "SoMFTime": ("SbTime",),
-    "SoMFUInt32": ("int",),
-    "SoMFUShort": ("int",),
-    "SoMFVec2f": ("SbVec2f", "Sequence[float]"),
-    "SoMFVec3d": ("SbVec3d", "Sequence[float]"),
-    "SoMFVec3f": ("SbVec3f", "Sequence[float]"),
-    "SoMFVec4f": ("SbVec4f", "Sequence[float]"),
-}
 PYTHON_HELPER_METHOD_TYPES = {
     ("_SwigNonDynamicMeta", "__setattr__"): (
         "cls, name: str, value: Any",

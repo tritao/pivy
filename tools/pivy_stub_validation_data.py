@@ -4,6 +4,8 @@ from dataclasses import dataclass
 from enum import Enum
 import os
 
+from tools.pivy_stub_typing_policy import multifield_iter_element_types
+
 GENERATED_HEADER = (
     "# SPDX-License-Identifier: ISC\n"
     "# Generated from local Pivy stubgen output; lightly normalized for checker use.\n"
@@ -78,6 +80,7 @@ ITER_CONTAINER_TYPES = {
     "SoPath": "SoNode",
     "SoPathList": "SoPath",
 }
+ITER_CONTAINER_TYPES.update(multifield_iter_element_types())
 CALLBACK_METHOD_CHECKS = {
     "coin.pyi": (
         (

@@ -62,7 +62,6 @@ try:
         MATRIX_ROW_RETURN_TYPES,
         MATRIX_SEQUENCE_PARAMETERS,
         MATRIX_VALUE_RETURN_TYPES,
-        MULTIFIELD_SETVALUES_TYPES,
         POINTER_HELPER_TYPES,
         PRIVATE_EXTENSION_STUB,
         PYTHON_HELPER_METHOD_TYPES,
@@ -96,7 +95,6 @@ except ImportError:
         MATRIX_ROW_RETURN_TYPES,
         MATRIX_SEQUENCE_PARAMETERS,
         MATRIX_VALUE_RETURN_TYPES,
-        MULTIFIELD_SETVALUES_TYPES,
         POINTER_HELPER_TYPES,
         PRIVATE_EXTENSION_STUB,
         PYTHON_HELPER_METHOD_TYPES,
@@ -113,12 +111,22 @@ except ImportError:
 
 
 try:
-    from tools.pivy_stub_typing_policy import field_method_type_overrides
+    from tools.pivy_stub_typing_policy import (
+        field_method_type_overrides,
+        multifield_iter_element_types,
+        multifield_setvalues_types,
+    )
 except ImportError:
-    from pivy_stub_typing_policy import field_method_type_overrides
+    from pivy_stub_typing_policy import (
+        field_method_type_overrides,
+        multifield_iter_element_types,
+        multifield_setvalues_types,
+    )
 
 
 FIELD_METHOD_TYPE_OVERRIDES = field_method_type_overrides()
+MULTIFIELD_ITER_ELEMENT_TYPES = multifield_iter_element_types()
+MULTIFIELD_SETVALUES_TYPES = multifield_setvalues_types()
 
 
 def stub_path(output_dir, module):
@@ -1225,6 +1233,10 @@ def collect_container_element_types(lines):
             current_class = class_match.group(1)
             if current_class in KNOWN_ITER_ELEMENT_TYPES:
                 element_types[current_class] = KNOWN_ITER_ELEMENT_TYPES[current_class]
+            if current_class in MULTIFIELD_ITER_ELEMENT_TYPES:
+                element_types[current_class] = MULTIFIELD_ITER_ELEMENT_TYPES[
+                    current_class
+                ]
             continue
 
         if not current_class:
@@ -1272,7 +1284,7 @@ def should_add_iter_method(class_name, element_types, iter_classes):
     return (
         class_name is not None
         and class_name not in iter_classes
-        and class_name.endswith("List")
+        and (class_name.endswith("List") or class_name.startswith("SoMF"))
         and class_name in element_types
     )
 
