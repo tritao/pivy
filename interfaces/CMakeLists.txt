@@ -94,7 +94,21 @@ target_link_libraries(pivy_coin PUBLIC Coin::Coin Python::Module)
 install(TARGETS pivy_coin DESTINATION ${PIVY_Python_SITEARCH}/pivy)
 
 cmake_policy(SET CMP0068 NEW)  # Use RUNPATH instead of RPATH, default from CMake 3.9
-set_target_properties(pivy_coin PROPERTIES BUILD_RPATH "$ORIGIN" INSTALL_RPATH "$ORIGIN")
+if(APPLE)
+    set(PIVY_COIN_BUILD_RPATH "@loader_path;${Coin_LIB_DIR}")
+    set(PIVY_SOQT_BUILD_RPATH "@loader_path;${SoQt_LIBRARY_DIRS}")
+    set(PIVY_COIN_INSTALL_RPATH "@loader_path/../../../")
+    set(PIVY_SOQT_INSTALL_RPATH "@loader_path/../../../../")
+elseif(UNIX)
+    set(PIVY_COIN_BUILD_RPATH "$ORIGIN;${Coin_LIB_DIR}")
+    set(PIVY_SOQT_BUILD_RPATH "$ORIGIN;${SoQt_LIBRARY_DIRS}")
+    set(PIVY_COIN_INSTALL_RPATH "$ORIGIN/../../../")
+    set(PIVY_SOQT_INSTALL_RPATH "$ORIGIN/../../../../")
+endif()
+set_target_properties(pivy_coin PROPERTIES
+    BUILD_RPATH "${PIVY_COIN_BUILD_RPATH}"
+    INSTALL_RPATH "${PIVY_COIN_INSTALL_RPATH}"
+)
 
 if(PIVY_BUILD_SOQT)
 
@@ -142,5 +156,9 @@ if(PIVY_BUILD_SOQT)
         )
 
     target_link_libraries(soqt PUBLIC SoQt::SoQt Python::Module)
+    set_target_properties(soqt PROPERTIES
+        BUILD_RPATH "${PIVY_SOQT_BUILD_RPATH}"
+        INSTALL_RPATH "${PIVY_SOQT_INSTALL_RPATH}"
+    )
     install(TARGETS soqt DESTINATION ${PIVY_Python_SITEARCH}/pivy/gui)
 endif()

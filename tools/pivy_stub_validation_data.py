@@ -1770,6 +1770,12 @@ METHOD_RETURN_TYPE_CHECKS = {
         ("SoPathSensor", "getAttachedPath", "SoPath | None"),
         ("SoSensor", "getNextInQueue", "SoSensor | None"),
     ),
+    os.path.join("gui", "soqt.pyi"): (
+        ("SoQtRenderArea", "getSceneGraph", "SoNode | None"),
+        ("SoQtRenderArea", "getOverlaySceneGraph", "SoNode | None"),
+        ("SoQtViewer", "getCamera", "SoCamera | None"),
+        ("SoQtViewer", "getSceneGraph", "SoNode | None"),
+    ),
 }
 PROPERTY_ATTRIBUTE_CHECKS = {
     "coin.pyi": (

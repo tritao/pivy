@@ -168,6 +168,10 @@ METHOD_RETURN_TYPE_OVERRIDES = {
     ("SoNode", "getChildren"): "SoChildList | None",
     ("SoPath", "getHead"): "SoNode | None",
     ("SoPath", "getTail"): "SoNode | None",
+    ("SoQtRenderArea", "getSceneGraph"): "SoNode | None",
+    ("SoQtRenderArea", "getOverlaySceneGraph"): "SoNode | None",
+    ("SoQtViewer", "getCamera"): "SoCamera | None",
+    ("SoQtViewer", "getSceneGraph"): "SoNode | None",
 }
 EXTEND_HELPER_METHOD_TYPES = {
     ("SoEngine", "getByName", "name: SbName"): (
