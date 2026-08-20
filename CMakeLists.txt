@@ -112,7 +112,7 @@ if(PIVY_GENERATE_PYI)
 
     if(PIVY_STUBGEN_EXECUTABLE)
         set(PIVY_STUB_MODULES pivy.coin)
-        set(PIVY_STUB_TARGETS pivy coin)
+        set(PIVY_STUB_TARGETS pivy pivy_coin)
 
         if(PIVY_BUILD_SOQT)
             list(APPEND PIVY_STUB_MODULES pivy.gui.soqt)
@@ -147,23 +147,14 @@ if(PIVY_GENERATE_PYI)
         set(PIVY_STUB_PREPARE_COMMANDS
             COMMAND ${CMAKE_COMMAND} -E make_directory ${PIVY_PACKAGE_OUTPUT_DIR}
             COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                $<TARGET_FILE:coin>
-                ${PIVY_PACKAGE_OUTPUT_DIR}/$<TARGET_FILE_NAME:coin>
+                $<TARGET_FILE:pivy_coin>
+                ${PIVY_PACKAGE_OUTPUT_DIR}/$<TARGET_FILE_NAME:pivy_coin>
         )
-        set(PIVY_STUB_CLEANUP_COMMANDS
-            COMMAND ${CMAKE_COMMAND} -E rm -f
-                ${PIVY_PACKAGE_OUTPUT_DIR}/$<TARGET_FILE_NAME:coin>
-        )
-
         if(PIVY_BUILD_SOQT)
             list(APPEND PIVY_STUB_PREPARE_COMMANDS
                 COMMAND ${CMAKE_COMMAND} -E make_directory ${PIVY_PACKAGE_OUTPUT_DIR}/gui
                 COMMAND ${CMAKE_COMMAND} -E copy_if_different
                     $<TARGET_FILE:soqt>
-                    ${PIVY_PACKAGE_OUTPUT_DIR}/gui/$<TARGET_FILE_NAME:soqt>
-            )
-            list(APPEND PIVY_STUB_CLEANUP_COMMANDS
-                COMMAND ${CMAKE_COMMAND} -E rm -f
                     ${PIVY_PACKAGE_OUTPUT_DIR}/gui/$<TARGET_FILE_NAME:soqt>
             )
         endif()
@@ -178,7 +169,6 @@ if(PIVY_GENERATE_PYI)
                 --output ${PIVY_PACKAGE_PARENT_DIR}
                 --stamp ${PIVY_PACKAGE_OUTPUT_DIR}/.pyi-stamp
                 ${PIVY_STUBGEN_ARGS}
-            ${PIVY_STUB_CLEANUP_COMMANDS}
             DEPENDS ${CMAKE_SOURCE_DIR}/tools/generate_pivy_stubs.py
             WORKING_DIRECTORY ${PIVY_PACKAGE_PARENT_DIR}
             COMMENT "Generating Pivy .pyi stubs"
