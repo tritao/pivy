@@ -156,6 +156,11 @@ METHOD_RETURN_TYPE_OVERRIDES = {
     ("SoEngineOutput", "getNodeContainer"): "SoNodeEngine | None",
     ("SoEngineOutput", "getFieldContainer"): "SoFieldContainer | None",
     ("SoEngineOutputData", "getOutput"): "SoEngineOutput | None",
+    ("SoInput", "findProto"): "SoProto | None",
+    ("SoInput", "getCurrentProto"): "SoProto | None",
+    ("SoInput", "getCurFileName"): "str | None",
+    ("SoInput", "findReference"): "SoBase | None",
+    ("SoOutput", "getCurrentProto"): "SoProto | None",
 }
 EXTEND_HELPER_METHOD_TYPES = {
     ("SoEngine", "getByName", "name: SbName"): (

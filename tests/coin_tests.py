@@ -1218,6 +1218,21 @@ class SoInputTests(unittest.TestCase):
     def testSetBuffer(self):
         self.input.setBuffer(self.text)
 
+    def testNullableLookupResults(self):
+        self.assertIsNone(self.input.findProto(SbName("missing")))
+        self.assertIsNone(self.input.getCurrentProto())
+        self.assertIsNone(self.input.findReference(SbName("missing")))
+
+    def testBufferFileName(self):
+        self.input.setBuffer(self.text)
+        self.assertTrue(self.input.isValidBuffer())
+        self.assertIsNone(self.input.getCurFileName())
+
+
+class SoOutputTests(unittest.TestCase):
+    def testCurrentProtoIsNullable(self):
+        self.assertIsNone(SoOutput().getCurrentProto())
+
 
 class SbVecTests(unittest.TestCase):
     def setUp(self):

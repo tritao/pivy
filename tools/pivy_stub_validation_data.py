@@ -1692,6 +1692,11 @@ EXTEND_HELPER_METHOD_CHECKS = {
 }
 METHOD_RETURN_TYPE_CHECKS = {
     "coin.pyi": (
+        ("SoInput", "findProto", "SoProto | None"),
+        ("SoInput", "getCurrentProto", "SoProto | None"),
+        ("SoInput", "getCurFileName", "str | None"),
+        ("SoInput", "findReference", "SoBase | None"),
+        ("SoOutput", "getCurrentProto", "SoProto | None"),
         ("SoEngine", "getOutput", "SoEngineOutput | None"),
         ("SoEngineOutput", "getContainer", "SoEngine | None"),
         ("SoEngineOutput", "getFieldContainer", "SoFieldContainer | None"),
