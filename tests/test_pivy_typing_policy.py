@@ -1,5 +1,9 @@
 import unittest
+from pathlib import Path
 
+import tools.pivy_stub_generation_data as compatibility_policy
+import tools.pivy_stub_typing_policy as policy
+from tools.report_pivy_typing import collect_report, quality_regressions
 from tools.pivy_stub_typing_policy import (
     FIELD_TYPE_POLICIES,
     MULTIFIELD_TYPE_POLICIES,
@@ -122,6 +126,26 @@ class IncompletePolicyTests(unittest.TestCase):
             ),
             "raw C pointers",
         )
+
+
+class PolicyBoundaryTests(unittest.TestCase):
+    def test_generation_data_is_a_compatibility_reexport(self):
+        self.assertIs(
+            compatibility_policy.METHOD_RETURN_TYPE_OVERRIDES,
+            policy.METHOD_RETURN_TYPE_OVERRIDES,
+        )
+        self.assertIs(
+            compatibility_policy.CALLBACK_TYPE_SIGNATURES,
+            policy.CALLBACK_TYPE_SIGNATURES,
+        )
+        self.assertIs(
+            compatibility_policy.KNOWN_ITER_ELEMENT_TYPES,
+            policy.KNOWN_ITER_ELEMENT_TYPES,
+        )
+
+    def test_checked_stub_meets_reviewed_quality_baseline(self):
+        report = collect_report(Path("pivy/coin.pyi"))
+        self.assertEqual(quality_regressions(report), ())
 
 
 if __name__ == "__main__":

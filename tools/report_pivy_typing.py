@@ -41,6 +41,57 @@ class TypingReport:
     incomplete_sites: tuple[tuple[AnnotationSite, str], ...]
 
 
+@dataclass(frozen=True)
+class TypingQualityBaseline:
+    """Reviewed lower/upper bounds for the generated Coin typing surface."""
+
+    min_concrete_annotations: int
+    max_any_annotations: int
+    max_incomplete_annotations: int
+    max_uncategorized_annotations: int = 0
+
+
+# These values are intentionally explicit.  Improving the generated surface
+# should make the relevant bound stricter in the same reviewed change; an
+# accidental generator or dependency drift must not silently lower quality.
+TYPING_QUALITY_BASELINE = TypingQualityBaseline(
+    min_concrete_annotations=20361,
+    max_any_annotations=147,
+    max_incomplete_annotations=942,
+)
+
+
+def quality_regressions(
+    report: TypingReport,
+    baseline: TypingQualityBaseline = TYPING_QUALITY_BASELINE,
+) -> tuple[str, ...]:
+    """Return human-readable violations of the reviewed typing baseline."""
+
+    violations = []
+    if report.concrete_annotations < baseline.min_concrete_annotations:
+        violations.append(
+            "concrete annotations dropped below %d (got %d)"
+            % (baseline.min_concrete_annotations, report.concrete_annotations)
+        )
+    if report.any_annotations > baseline.max_any_annotations:
+        violations.append(
+            "Any annotations exceeded %d (got %d)"
+            % (baseline.max_any_annotations, report.any_annotations)
+        )
+    if report.incomplete_annotations > baseline.max_incomplete_annotations:
+        violations.append(
+            "Incomplete annotations exceeded %d (got %d)"
+            % (baseline.max_incomplete_annotations, report.incomplete_annotations)
+        )
+    uncategorized = report.incomplete_categories["uncategorized"]
+    if uncategorized > baseline.max_uncategorized_annotations:
+        violations.append(
+            "uncategorized Incomplete sites exceeded %d (got %d)"
+            % (baseline.max_uncategorized_annotations, uncategorized)
+        )
+    return tuple(violations)
+
+
 def method_parameters(method: ast.FunctionDef | ast.AsyncFunctionDef) -> list[ast.arg]:
     """Return public parameters, including *args and **kwargs when present."""
 
@@ -254,6 +305,11 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="list the individual Incomplete sites left uncategorized",
     )
+    parser.add_argument(
+        "--check-baseline",
+        action="store_true",
+        help="fail if the reviewed typing-quality baseline regresses",
+    )
     return parser.parse_args()
 
 
@@ -271,6 +327,12 @@ def main() -> int:
             file=sys.stderr,
         )
         return 1
+    if args.check_baseline:
+        violations = quality_regressions(report)
+        if violations:
+            for violation in violations:
+                print("error: typing baseline: %s" % violation, file=sys.stderr)
+            return 1
     return 0
 
 

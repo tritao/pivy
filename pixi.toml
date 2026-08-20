@@ -60,4 +60,4 @@ test_typing_policy = { cmd = ["python", "-m", "unittest", "tests/test_pivy_typin
 typecheck_stubs_pyright = { cmd = ["pyright", "--warnings", "tests/typecheck"]}
 typecheck_stubs_pyrefly = { cmd = ["pyrefly", "check", "--summary=none", "--search-path", ".", "tests/typecheck"]}
 typecheck_stubs = { depends-on = ["typecheck_stubs_pyright", "typecheck_stubs_pyrefly"]}
-typecheck_report = { cmd = ["python", "-m", "tools.report_pivy_typing", "pivy/coin.pyi"]}
+typecheck_report = { cmd = ["python", "-m", "tools.report_pivy_typing", "--check-baseline", "pivy/coin.pyi"]}
