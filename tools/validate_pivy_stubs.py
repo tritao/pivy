@@ -7,6 +7,9 @@ import re
 import subprocess
 import sys
 import tempfile
+from pathlib import Path
+
+from tools.report_pivy_typing import collect_report
 
 from tools.pivy_stub_validation_data import (
     ARRAY_METHOD_CHECKS,
@@ -537,6 +540,15 @@ def assert_private_cast_stub(path, tree):
     raise AssertionError("%s is missing cast()" % path)
 
 
+def assert_incomplete_sites_classified(path):
+    report = collect_report(Path(path))
+    uncategorized = report.incomplete_categories["uncategorized"]
+    if uncategorized:
+        raise AssertionError(
+            "%s has %d unclassified Incomplete sites" % (path, uncategorized)
+        )
+
+
 def validate_stub_files(package_dir):
     missing = [
         relative
@@ -553,6 +565,8 @@ def validate_stub_files(package_dir):
         match spec.kind:
             case StubKind.PUBLIC:
                 relative = spec.relative_path
+                if relative == "coin.pyi":
+                    assert_incomplete_sites_classified(path)
                 assert_no_bare_method_stubs(path, text)
                 assert_swig_meta_setattr(path, tree)
                 assert_swig_thisown_annotations(path, tree)

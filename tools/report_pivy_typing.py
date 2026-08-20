@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import ast
+import sys
 from collections import Counter
 from dataclasses import dataclass
 from pathlib import Path
@@ -263,6 +264,13 @@ def main() -> int:
     if args.show_uncategorized:
         output += format_uncategorized(report)
     print(output)
+    uncategorized = report.incomplete_categories["uncategorized"]
+    if uncategorized:
+        print(
+            "error: %d Incomplete sites are not classified" % uncategorized,
+            file=sys.stderr,
+        )
+        return 1
     return 0
 
 
