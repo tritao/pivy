@@ -14,6 +14,10 @@
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #
 
+from __future__ import annotations
+
+from typing import Any
+
 from pivy.qt import QtCore
 
 from pivy import coin
@@ -26,24 +30,28 @@ class KeyboardHandler(DeviceHandler):
     events on the QuarterWidget. It is registered with the DeviceManager
     by default."""
 
-    def __init__(self):
+    _keyboard: coin.SoKeyboardEvent
+    _keyboardmap: Any
+    _keypadmap: Any
+
+    def __init__(self) -> None:
         self._keyboard = coin.SoKeyboardEvent()
         self._keyboardmap, self._keypadmap = self.initKeyMap()
 
-    def translateEvent(self, qevent):
+    def translateEvent(self, qevent: QtCore.QEvent) -> coin.SoKeyboardEvent | None:
         """Translates from QKeyEvents to coin.SoKeyboardEvents"""
         if qevent.type() in (QtCore.QEvent.KeyPress, QtCore.QEvent.KeyRelease):
             return self.keyEvent(qevent)
         else:
             return None
 
-    def debugKeyEvents(self):
+    def debugKeyEvents(self) -> None:
         pass
         # FIXME jkg: implement using os.ev
         #const char * env = coin_getenv("QUARTER_DEBUG_KEYEVENTS");
         #return env && (atoi(env) > 0);
 
-    def keyEvent(self, qevent):
+    def keyEvent(self, qevent: QtCore.QEvent) -> coin.SoKeyboardEvent:
         modifiers = qevent.modifiers()
 
         pos = self.manager.getLastMousePosition()
@@ -82,7 +90,7 @@ class KeyboardHandler(DeviceHandler):
         return self._keyboard
 
 
-    def initKeyMap(self):
+    def initKeyMap(self) -> tuple[Any, Any]:
 
         # FIXME jkg: move out?
         class QMap:

@@ -1,3 +1,14 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+from pivy.qt.QtCore import QEvent
+
+from .EventHandler import EventHandler
+
+if TYPE_CHECKING:
+    from ..QuarterWidget import QuarterWidget
+
 ###
 # Copyright (c) 2002-2008 Kongsberg SIM
 #
@@ -23,29 +34,32 @@ class EventManager:
       Custom device handlers can be registered with this class for more
       functionality
     """
-    def __init__(self, quarterwidget):
+    quarterwidget: QuarterWidget
+    eventhandlers: list[EventHandler]
+
+    def __init__(self, quarterwidget: QuarterWidget) -> None:
         assert(quarterwidget)
         self.quarterwidget = quarterwidget
         self.eventhandlers = []
 
-    def handleEvent(self, qevent):
+    def handleEvent(self, qevent: QEvent) -> bool:
         """Runs through the list of registered devices to translate events"""
         for handler in self.eventhandlers:
             if handler.handleEvent(qevent):
                 return True
         return False
 
-    def getWidget(self):
+    def getWidget(self) -> QuarterWidget:
         """Returns the QuarterWidget this devicemanager belongs to"""
         return self.quarterwidget
 
-    def registerEventHandler(self, handler):
+    def registerEventHandler(self, handler: EventHandler) -> None:
         """Register a device for event translation"""
         if (not handler in self.eventhandlers):
             handler.setManager(self)
             self.eventhandlers.append(handler)
 
-    def unregisterEventHandler(self, handler):
+    def unregisterEventHandler(self, handler: EventHandler) -> None:
         """unregister a device"""
         if handler in self.eventhandlers:
-            self.eventhandlers.removeAt(self.eventhandlers.indexOf(handler))
+            self.eventhandlers.remove(handler)

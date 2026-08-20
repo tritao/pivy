@@ -14,21 +14,31 @@
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #
 
-"""
+r"""
 \class SIM::Coin3D::Quarter::EventHandler EventHandler.h Quarter/eventhandlers/EventHandler.h
 
   \brief The EventHandler class is the base class for eventhandlers
   such as the ContextMenuHandler and DragDropHandler.
 """
 
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+from pivy.qt.QtCore import QEvent
+
+if TYPE_CHECKING:
+    from .EventManager import EventManager
+
 class EventHandler:
   """
   Subclasses must override this method to provide custom event
   handling
   """
-  def handleEvent(self, event):
-      pass
+  manager: EventManager
 
-  def setManager(self, manager):
+  def handleEvent(self, event: QEvent) -> bool:
+      return False
+
+  def setManager(self, manager: EventManager) -> None:
       self.manager = manager
-

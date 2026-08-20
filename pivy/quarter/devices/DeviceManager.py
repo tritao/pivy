@@ -22,12 +22,19 @@
   Custom device handlers can be registered with this class for more
   functionality
 """
-from __future__ import print_function
+from __future__ import annotations, print_function
 
-from pivy.qt.QtCore import QEvent
+from typing import TYPE_CHECKING
+
+from pivy.qt.QtCore import QEvent, QPoint
 from pivy.qt.QtGui import QMouseEvent
-from pivy.coin import SoLocation2Event
-from pivy.coin import SbVec2s
+from pivy import coin
+from pivy.coin import SbVec2s, SoLocation2Event
+
+from .DeviceHandler import DeviceHandler
+
+if TYPE_CHECKING:
+    from ..QuarterWidget import QuarterWidget
 
 #from pivy.quarter import DeviceHandler
 #from pivy.quarter.QuarterWidget import QuarterWidget
@@ -42,15 +49,21 @@ from pivy.coin import SbVec2s
 #};
 
 class DeviceManager:
-    def __init__(self, quarterwidget):
+    devices: list[DeviceHandler]
+    quarterwidget: QuarterWidget
+    globalpos: QPoint
+    lastmousepos: SbVec2s
+
+    def __init__(self, quarterwidget: QuarterWidget) -> None:
         assert(quarterwidget)
 
         # NOTE jkg: equalient to DeviceManagerP
         self.devices = []
         self.quarterwidget = quarterwidget
+        self.globalpos = QPoint()
         self.lastmousepos = SbVec2s(0, 0)
 
-    def translateEvent(self, qevent):
+    def translateEvent(self, qevent: QEvent) -> coin.SoEvent | None:
         """Runs through the list of registered devices to translate event"""
         if qevent.type() == QEvent.MouseMove:
             self.globalpos = qevent.globalPos()
@@ -66,29 +79,28 @@ class DeviceManager:
 
         return None
 
-    def getWidget(self):
+    def getWidget(self) -> QuarterWidget:
         """Returns the QuarterWidget this devicemanager belongs to"""
         return self.quarterwidget
 
-    def getLastGlobalPosition(self):
+    def getLastGlobalPosition(self) -> QPoint:
         """Returns the last mouse position in global coordinates"""
         return self.globalpos
 
-    def getLastMousePosition(self):
+    def getLastMousePosition(self) -> SbVec2s:
         """Returns the last mouse position"""
         return self.lastmousepos;
 
-    def registerDevice(self, device):
+    def registerDevice(self, device: DeviceHandler) -> None:
         """ Register a device for event translation"""
         if not device in self.devices:
             device.setManager(self)
             self.devices.append(device)
 
-    def unregisterDevice(self, device):
+    def unregisterDevice(self, device: DeviceHandler) -> None:
         """unregister a device"""
-        print("FIXME jkg: unregisterdevice not completely tested/ported")
         if device in self.devices:
-            self.devices.removeAt(self.devices.indexOf(device))
+            self.devices.remove(device)
         else:
             # FIXME jkg: give warning (not in original quarter)
             pass

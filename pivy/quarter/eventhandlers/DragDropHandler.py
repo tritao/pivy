@@ -14,13 +14,15 @@
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #
 
-"""
+r"""
 \class SIM::Coin3D::Quarter::DragDropHandler DragDropHandler.h Quarter/devices/DragDropHandler.h
 
   \brief The DragDropHandler class provides drag and drop
   functionality to the QuarterWidget. It is not registered with the
   DeviceManager by default.
 """
+
+from __future__ import annotations
 
 from pivy.qt import QtCore
 from pivy import coin
@@ -30,7 +32,9 @@ from .EventHandler import EventHandler
 # FIXME 20080508 jkg: we need to verify that this actually works, maybe its just vista..
 
 class DragDropHandler(EventHandler):
-    def __init__(self):
+    _suffixes: tuple[str, ...]
+
+    def __init__(self) -> None:
         self._suffixes = ("iv", "wrl")
 
     """
@@ -38,7 +42,7 @@ class DragDropHandler(EventHandler):
     valid Inventor or VRML it opens the file, reads in the scenegraph
     and calls setSceneGraph on the QuarterWidget
     """
-    def handleEvent(self, event):
+    def handleEvent(self, event: QtCore.QEvent) -> bool:
         if event.type() == QtCore.QEvent.DragEnter:
             self._dragEnterEvent(event)
             return True
@@ -48,7 +52,7 @@ class DragDropHandler(EventHandler):
         else:
             return False
 
-    def _dragEnterEvent(self, event):
+    def _dragEnterEvent(self, event: QtCore.QEvent) -> None:
         mimedata = event.mimeData()
         if not mimedata.hasUrls() and not mimedata.hasText(): return
 
@@ -60,7 +64,7 @@ class DragDropHandler(EventHandler):
 
         event.acceptProposedAction()
 
-    def _dropEvent(self, event):
+    def _dropEvent(self, event: QtCore.QEvent) -> None:
         mimedata = event.mimeData()
 
         input = coin.SoInput()

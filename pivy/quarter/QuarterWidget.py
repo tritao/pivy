@@ -110,18 +110,23 @@ r"""
   \subpage examiner
 """
 
+from __future__ import annotations
+
+from typing import Any, ClassVar
+
 from pivy.qt import QtCore, QtGui, QtOpenGL
+from pivy.qt.QtWidgets import QMenu
 from pivy.qt.QtOpenGL import QOpenGLWidget
 
 
 from pivy import coin
 
-from .devices import DeviceManager
-from .devices import MouseHandler
-from .devices import KeyboardHandler
+from .devices.DeviceManager import DeviceManager
+from .devices.MouseHandler import MouseHandler
+from .devices.KeyboardHandler import KeyboardHandler
 
-from .eventhandlers import EventManager
-from .eventhandlers import DragDropHandler
+from .eventhandlers.EventManager import EventManager
+from .eventhandlers.DragDropHandler import DragDropHandler
 
 from .SensorManager import SensorManager
 from .ImageReader import ImageReader
@@ -165,10 +170,22 @@ def postrenderCB(userdata, manager):
 
 class QuarterWidget(QOpenGLWidget):
 
-    _sensormanager = None
-    _imagereader = None
+    _sensormanager: ClassVar[SensorManager | None] = None
+    _imagereader: ClassVar[ImageReader | None] = None
 
-    def __init__(self, *args, **kwargs):
+    cachecontext_list: list[Any]
+    cachecontext: Any
+    statecursormap: dict[str, Any]
+    scene: coin.SoNode | None
+    contextmenu: ContextMenu | None
+    contextmenuenabled: bool
+    sorendermanager: coin.SoRenderManager
+    soeventmanager: coin.SoEventManager
+    eventmanager: EventManager
+    devicemanager: DeviceManager
+    headlight: coin.SoDirectionalLight
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         """
         Constructs a QuarterWidget.
         QuarterWidget(QWidget parent = None, QOpenGLWidget sharewidget = None, Qt.WindowFlags f = 0, scxml = "coin:scxml/navigation/examiner.xml")
@@ -254,14 +271,14 @@ class QuarterWidget(QOpenGLWidget):
         self.setFocusPolicy(QtCore.Qt.StrongFocus)
 
     @property
-    def sceneGraph(self):
+    def sceneGraph(self) -> coin.SoNode | None:
         return self.scene
 
     @sceneGraph.setter
-    def sceneGraph(self, node, *args):
+    def sceneGraph(self, node: coin.SoNode) -> None:
         self.setSceneGraph(node)
 
-    def setSceneGraph(self, node):
+    def setSceneGraph(self, node: coin.SoNode) -> None:
         if node and self.scene==node:
             return
 
@@ -296,7 +313,7 @@ class QuarterWidget(QOpenGLWidget):
         if superscene:
             superscene.touch()
 
-    def viewAll(self):
+    def viewAll(self) -> None:
         """ Reposition the current camera to display the entire scene"""
         viewallevent = coin.SbName("sim.coin3d.coin.navigation.ViewAll")
         for c in range(self.soeventmanager.getNumSoScXMLStateMachines()):
@@ -305,21 +322,21 @@ class QuarterWidget(QOpenGLWidget):
                 sostatemachine.queueEvent(viewallevent)
                 sostatemachine.processEventQueue()
 
-    def resizeGL(self, width, height):
+    def resizeGL(self, width: int, height: int) -> None:
         vp = coin.SbViewportRegion(width, height)
         self.sorendermanager.setViewportRegion(vp)
         self.soeventmanager.setViewportRegion(vp)
 
-    def paintGL(self, *args):
+    def paintGL(self, *args: Any) -> None:
         self.actualRedraw()
 
-    def actualRedraw(self, *args):
+    def actualRedraw(self, *args: Any) -> None:
         self.sorendermanager.render(True, True)
 
-    def scheduleRedraw(self, *args):
+    def scheduleRedraw(self, *args: Any) -> None:
         self.sorendermanager.scheduleRedraw()
 
-    def event(self, qevent):
+    def event(self, qevent: QtCore.QEvent) -> bool:
         """Translates Qt Events into Coin events and passes them on to the
           scenemanager for processing. If the event can not be translated or
           processed, it is forwarded to Qt and the method returns false. This
@@ -336,10 +353,10 @@ class QuarterWidget(QOpenGLWidget):
         # NOTE jkg: we must return True or False
         return QOpenGLWidget.event(self, qevent)
 
-    def setStateCursor(self, state, cursor):
+    def setStateCursor(self, state: str, cursor: Any) -> None:
         self.statecursormap[state] = cursor
 
-    def searchForCamera(self, root):
+    def searchForCamera(self, root: coin.SoNode) -> coin.SoCamera | None:
         sa = coin.SoSearchAction()
         sa.setInterest(coin.SoSearchAction.FIRST)
         sa.setType(coin.SoCamera.getClassTypeId())
@@ -351,10 +368,10 @@ class QuarterWidget(QOpenGLWidget):
                 return node
         return None
 
-    def getCacheContextId(self):
+    def getCacheContextId(self) -> int:
         return self.cachecontext.id
 
-    def findCacheContext(self, widget, sharewidget):
+    def findCacheContext(self, widget: Any, sharewidget: Any) -> Any:
 
         class QuarterWidgetP_cachecontext:
             def __init__(self):
@@ -373,13 +390,13 @@ class QuarterWidget(QOpenGLWidget):
 
         return cachecontext
 
-    def getSoRenderManager(self):
+    def getSoRenderManager(self) -> coin.SoRenderManager:
         return self.sorendermanager
 
-    def getSoEventManager(self):
+    def getSoEventManager(self) -> coin.SoEventManager:
         return self.soeventmanager
 
-    def setBackgroundColor(self, color):
+    def setBackgroundColor(self, color: QtGui.QColor | coin.SbColor4f) -> None:
         """Set backgroundcolor to a given QColor
           Remember that QColors are given in integers between 0 and 255, as
           opposed to SbColor4f which is in [0 ,1]. The default alpha value for
@@ -394,7 +411,7 @@ class QuarterWidget(QOpenGLWidget):
         else:
             self.sorendermanager.setBackgroundColor(coin.SbColor4f(color))
 
-    def getBackgroundColor(self):
+    def getBackgroundColor(self) -> QtGui.QColor:
         """  Returns color used for clearing the rendering area before
           rendering the scene."""
 
@@ -405,30 +422,30 @@ class QuarterWidget(QOpenGLWidget):
                             max(0, min(255, int(bg[2] * 255.0))),
                             max(0, min(255, int(bg[3] * 255.0))))
 
-    def getContextMenu(self):
+    def getContextMenu(self) -> QMenu:
         """Returns the context menu used by the widget."""
         if not self.contextmenu:
             self.contextmenu = ContextMenu(self)
         # NOTE 20080508 jkg: seems like we can drop .getMenu() but I dont see why that works
         return self.contextmenu.getMenu()
 
-    def contextMenuEnabled(self):
+    def contextMenuEnabled(self) -> bool:
         return self.contextmenuenabled
 
-    def enableContextMenu(self, yesno):
+    def enableContextMenu(self, yesno: bool) -> None:
         self.contextmenuenabled = yesno
 
-    def setTransparencyType(self, type):
+    def setTransparencyType(self, type: int) -> None:
         """This method sets the transparency type to be used for the scene."""
         assert(self.sorendermanager)
         self.sorendermanager.getGLRenderAction().setTransparencyType(type)
         self.sorendermanager.scheduleRedraw()
 
-    def enableHeadlight(self, onoff):
+    def enableHeadlight(self, onoff: bool) -> None:
         """  Enable/disable the headlight. This will toggle the SoDirectionalLigh::on
           field (returned from getHeadlight())."""
         self.headlight.on = onoff
 
-    def getHeadlight(self):
+    def getHeadlight(self) -> coin.SoDirectionalLight:
         """Returns the light used for the headlight."""
         return self.headlight

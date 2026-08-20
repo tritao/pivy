@@ -14,9 +14,17 @@
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #
 
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from pivy.qt import QtCore
+from pivy.qt.QtCore import QEvent
 
 from pivy import coin
+
+if TYPE_CHECKING:
+    from .DeviceManager import DeviceManager
 
 class DeviceHandler:
     """
@@ -25,10 +33,12 @@ class DeviceHandler:
     to create event handlers for other devices.
     """
     
-    def setManager(self, manager):
+    manager: DeviceManager
+
+    def setManager(self, manager: DeviceManager) -> None:
         self.manager = manager
 
-    def setModifiers(self, soevent, qevent):
+    def setModifiers(self, soevent: coin.SoEvent, qevent: QEvent) -> None:
         # FIXME: How do we get the time from the qevent? (20070306 frodo)
         soevent.setTime(coin.SbTime.getTimeOfDay())
 

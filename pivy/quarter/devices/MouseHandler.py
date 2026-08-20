@@ -14,6 +14,8 @@
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #
 
+from __future__ import annotations
+
 from pivy.qt import QtCore, QtGui
 
 from pivy import coin
@@ -21,7 +23,11 @@ from pivy import coin
 from .DeviceHandler import DeviceHandler
 
 class MouseHandler(DeviceHandler):
-    def __init__(self):
+    location2: coin.SoLocation2Event
+    mousebutton: coin.SoMouseButtonEvent
+    windowsize: coin.SbVec2s
+
+    def __init__(self) -> None:
         """The MouseHandler class provides translation of mouse events
         on the QuarterWidget. It is registered with the DeviceManager by
         default."""
@@ -30,7 +36,7 @@ class MouseHandler(DeviceHandler):
         self.mousebutton = coin.SoMouseButtonEvent()
         self.windowsize = coin.SbVec2s(-1, -1)
 
-    def translateEvent(self, qevent):
+    def translateEvent(self, qevent: QtCore.QEvent) -> coin.SoEvent | None:
         """Translates from QMouseEvents to SoLocation2Events and SoMouseButtonEvents"""
 
         if qevent.type() == QtCore.QEvent.MouseMove:
@@ -48,11 +54,11 @@ class MouseHandler(DeviceHandler):
         return None
 
 
-    def resizeEvent(self, qevent):
+    def resizeEvent(self, qevent: QtCore.QEvent) -> None:
         self.windowsize = coin.SbVec2s(qevent.size().width(),
                                        qevent.size().height())
 
-    def mouseMoveEvent(self, qevent):
+    def mouseMoveEvent(self, qevent: QtCore.QEvent) -> coin.SoLocation2Event:
         self.setModifiers(self.location2, qevent)
 
         assert(self.windowsize[1] != -1)
@@ -60,7 +66,7 @@ class MouseHandler(DeviceHandler):
         self.location2.setPosition(pos)
         return self.location2
 
-    def mouseWheelEvent(self, qevent):
+    def mouseWheelEvent(self, qevent: QtCore.QEvent) -> coin.SoMouseButtonEvent:
 
         # FIXME 20080509 jkg: zooming with mouse wheel seems to not work.
         # At least it does not work in the original Quarter examples either.
@@ -83,7 +89,7 @@ class MouseHandler(DeviceHandler):
         return self.mousebutton
 
 
-    def mouseButtonEvent(self, qevent):
+    def mouseButtonEvent(self, qevent: QtCore.QEvent) -> coin.SoMouseButtonEvent:
         self.setModifiers(self.mousebutton, qevent)
         self.mouseMoveEvent(qevent) # NOTE jkg: mouseMoveEvent not triggered when showing popup menu in PyQt
         self.mousebutton.setPosition(self.location2.getPosition())
