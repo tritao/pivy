@@ -11,6 +11,8 @@ def check_engine_outputs() -> None:
     assert_type(boolean.operation, coin.SoMFEnum)
     assert_type(boolean.output, coin.SoEngineOutput)
     assert_type(boolean.inverse, coin.SoEngineOutput)
+    assert_type(boolean.__getattr__("a"), coin.SoField | coin.SoEngineOutput)
+    assert_type(boolean.__getattr__("output"), coin.SoField | coin.SoEngineOutput)
     assert_type(boolean.getOutput(coin.SbName("missing")), coin.SoEngineOutput | None)
     assert_type(boolean.getOutputName(boolean.output, coin.SbName()), bool)
     assert_type(boolean.getOutputData(), coin.SoEngineOutputData)
@@ -67,3 +69,8 @@ def check_representative_engine_fields() -> None:
     assert_type(decomposer.x, coin.SoEngineOutput)
     assert_type(decomposer.y, coin.SoEngineOutput)
     assert_type(decomposer.z, coin.SoEngineOutput)
+
+
+def check_dynamic_engine_and_nodekit_access() -> None:
+    engine = coin.SoBoolOperation()
+    assert_type(engine.__getattr__("output"), coin.SoField | coin.SoEngineOutput)

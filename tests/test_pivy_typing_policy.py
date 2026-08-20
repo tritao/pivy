@@ -42,6 +42,14 @@ class FieldTypePolicyTests(unittest.TestCase):
             policy.PYTHON_HELPER_METHOD_TYPES[("SoType", "fromName")],
             ("name: SbName | str", "SoType"),
         )
+        self.assertEqual(
+            policy.PYTHON_HELPER_METHOD_TYPES[("SoBaseKit", "__getattr__")],
+            ("self, name: str", "SoNode | SoField"),
+        )
+        self.assertEqual(
+            policy.PYTHON_HELPER_METHOD_TYPES[("SoEngine", "__getattr__")],
+            ("self, name: str", "SoField | SoEngineOutput"),
+        )
 
 
 class MultifieldTypePolicyTests(unittest.TestCase):

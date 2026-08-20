@@ -78,6 +78,8 @@ class EngineOutputTests(unittest.TestCase):
         engine = SoBoolOperation()
         output = engine.output
 
+        self.assertTrue(isinstance(engine.__getattr__("output"), SoEngineOutput))
+        self.assertTrue(isinstance(engine.__getattr__("a"), SoMFBool))
         self.assertIsNone(engine.getOutput(SbName("missing")))
         self.assertIsNone(SoEngine.getByName(SbName("missing")))
         self.assertTrue(isinstance(output.getContainer(), SoBoolOperation))
@@ -1070,6 +1072,12 @@ class NodeKitTests(unittest.TestCase):
         """check if . returns a part not a nodefield"""
         s = SoShapeKit()
         self.assertTrue(isinstance(s.appearance.material, SoMaterial))
+
+    def testDynamicPartLookup(self):
+        s = SoShapeKit()
+        self.assertTrue(isinstance(s.__getattr__("shape"), SoNode))
+        self.assertTrue(isinstance(s.__getattr__("appearance"), SoAppearanceKit))
+        self.assertRaises(AttributeError, s.__getattr__, "missing")
 
 class SoGroupMethods(unittest.TestCase):
     """checks methods and operators for SoGroup"""

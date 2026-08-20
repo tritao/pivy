@@ -1560,7 +1560,7 @@ PYTHON_HELPER_METHOD_CHECKS = {
             "SoBaseKit",
             "__getattr__",
             {"name": "str"},
-            "Any",
+            "SoNode | SoField",
         ),
         (
             "SoBaseKit",
@@ -1572,7 +1572,7 @@ PYTHON_HELPER_METHOD_CHECKS = {
             "SoEngine",
             "__getattr__",
             {"name": "str"},
-            "Any",
+            "SoField | SoEngineOutput",
         ),
         (
             "SoEngine",
@@ -1851,6 +1851,7 @@ from pivy.coin import (
     SoDepthBufferElement,
     SoDragger,
     SoEngine,
+    SoEngineOutput,
     SoEventCallback,
     SoField,
     SoFieldData,
@@ -2074,10 +2075,10 @@ field_container.__setattr__("field", object())
 field_names: list[str] = field_container.__dir__()
 field_name: str | None = field_container.getFieldName(SoField())
 basekit = SoBaseKit()
-part_value: Any = basekit.__getattr__("part")
+part_value: SoNode | SoField = basekit.__getattr__("part")
 basekit.__setattr__("part", SoNode())
 engine = SoEngine()
-output_value: Any = engine.__getattr__("output")
+output_value: SoField | SoEngineOutput = engine.__getattr__("output")
 engine.__setattr__("output", object())
 
 sensor_manager: SoSensorManager = SoDB.getSensorManager()

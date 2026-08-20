@@ -55,6 +55,12 @@ def check_field_and_name_lookups() -> None:
     )
 
 
+def check_nodekit_lookup() -> None:
+    kit = coin.SoShapeKit()
+    assert_type(kit.shape, coin.SoNode | coin.SoField)
+    assert_type(kit.appearance, coin.SoNode | coin.SoField)
+
+
 def check_reflection_contract() -> None:
     cube_type = coin.SoType.fromName("SoCube")
     assert_type(cube_type, coin.SoType)
