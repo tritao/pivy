@@ -10,6 +10,8 @@ def check_scalar_multifield() -> None:
 
     assert_type(len(values), int)
     assert_type(iter(values), Iterator[float])
+    assert_type(values.getValues(), list[float])
+    assert_type(values.getValues(0), list[float])
 
     values.setValues(0, 2, [1.0, 2.0])
     values.set1Value(0, 3.0)
@@ -24,6 +26,7 @@ def check_vector_multifield() -> None:
 
     assert_type(iter(values), Iterator[coin.SbVec3f])
     assert_type(values[0], coin.SbVec3f)
+    assert_type(values.getValues(), list[coin.SbVec3f])
     values.setValues(0, 1, vectors)
     values.setValues(0, 1, coordinates)
     values.set1Value(0, coordinates[0])
@@ -36,6 +39,7 @@ def check_color_multifield() -> None:
 
     assert_type(iter(values), Iterator[coin.SbColor])
     assert_type(values[0], coin.SbColor)
+    assert_type(values.getValues(), list[coin.SbColor])
     values.setValues(0, 1, [coin.SbColor()])
     values.setValues(0, 1, [rgb])
     values.set1Value(0, rgb)
@@ -55,3 +59,4 @@ def check_object_multifields() -> None:
     strings.setValues(0, 2, string_values)
     assert_type(iter(strings), Iterator[coin.SbString])
     assert_type(strings[0], coin.SbString)
+    assert_type(strings.getValues(), list[str])

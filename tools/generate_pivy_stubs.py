@@ -77,6 +77,7 @@ try:
         SEQUENCE_VALUE_RETURN_TYPES,
         STRING_POINTER_PARAMETERS,
         field_method_type_overrides,
+        multifield_getvalues_types,
         multifield_iter_element_types,
         multifield_setvalues_types,
     )
@@ -115,12 +116,14 @@ except ImportError:
         SEQUENCE_VALUE_RETURN_TYPES,
         STRING_POINTER_PARAMETERS,
         field_method_type_overrides,
+        multifield_getvalues_types,
         multifield_iter_element_types,
         multifield_setvalues_types,
     )
 
 
 FIELD_METHOD_TYPE_OVERRIDES = field_method_type_overrides()
+MULTIFIELD_GETVALUES_TYPES = multifield_getvalues_types()
 MULTIFIELD_ITER_ELEMENT_TYPES = multifield_iter_element_types()
 MULTIFIELD_SETVALUES_TYPES = multifield_setvalues_types()
 
@@ -1507,6 +1510,36 @@ def normalize_multifield_helpers(text):
     return "\n".join(updated) + "\n"
 
 
+def normalize_multifield_getvalues(text):
+    lines = text.splitlines()
+    updated = []
+    current_class = None
+
+    for line in lines:
+        class_match = re.match(r"^class\s+([A-Za-z_]\w*)", line)
+        if class_match:
+            current_class = class_match.group(1)
+        elif current_class and is_top_level_statement(line):
+            current_class = None
+
+        match = re.match(
+            r"(?P<indent>\s*)def getValues\((?P<args>[^)]*)\)"
+            r"(?: -> [^:]+)?: \.\.\.$",
+            line,
+        )
+        value_type = MULTIFIELD_GETVALUES_TYPES.get(current_class)
+        if match and value_type is not None:
+            updated.append(
+                "%sdef getValues(%s) -> list[%s]: ..."
+                % (match.group("indent"), match.group("args"), value_type)
+            )
+            continue
+
+        updated.append(line)
+
+    return "\n".join(updated) + "\n"
+
+
 def normalize_python_helpers(text):
     lines = text.splitlines()
     updated = []
@@ -1736,6 +1769,7 @@ def postprocess_stub(path, module, output_dir):
         )
     processed = normalize_operator_helpers(processed)
     processed = normalize_multifield_helpers(processed)
+    processed = normalize_multifield_getvalues(processed)
     processed = normalize_python_helpers(processed)
     processed = normalize_extend_helpers(processed)
     processed = normalize_property_attributes(

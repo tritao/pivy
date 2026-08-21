@@ -10,7 +10,7 @@ import tempfile
 from pathlib import Path
 
 from tools.report_pivy_typing import collect_report
-from tools.pivy_stub_typing_policy import FACTORY_CLASSES
+from tools.pivy_stub_typing_policy import FACTORY_CLASSES, multifield_getvalues_types
 
 from tools.pivy_stub_validation_data import (
     ARRAY_METHOD_CHECKS,
@@ -484,6 +484,27 @@ def assert_no_bare_multifield_setvalues(path, tree):
                 )
 
 
+def assert_multifield_getvalues(path, tree):
+    if not path.endswith("coin.pyi"):
+        return
+
+    classes = class_map(tree)
+    for class_name, element_type in multifield_getvalues_types().items():
+        node = classes.get(class_name)
+        if node is None:
+            raise AssertionError("%s is missing %s" % (path, class_name))
+
+        expected_return = "list[%s]" % element_type
+        methods = methods_named(node, "getValues")
+        if not any(
+            annotation_text(method.returns) == expected_return for method in methods
+        ):
+            raise AssertionError(
+                "%s has an unexpected %s.getValues return annotation"
+                % (path, class_name)
+            )
+
+
 def assert_soqt_coin_duplicate_classes(path, tree):
     classes = class_map(tree)
     missing_classes = sorted(SOQT_COIN_DUPLICATE_CLASSES - set(classes))
@@ -627,6 +648,7 @@ def validate_stub_files(package_dir):
                 assert_multifield_helpers(
                     path, tree, MULTIFIELD_METHOD_CHECKS.get(relative, ())
                 )
+                assert_multifield_getvalues(path, tree)
                 assert_python_helpers(
                     path, tree, PYTHON_HELPER_METHOD_CHECKS.get(relative, ())
                 )

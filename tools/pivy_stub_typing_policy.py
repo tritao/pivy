@@ -654,6 +654,7 @@ class MultifieldTypePolicy:
 
     element_type: str
     set_values_types: tuple[str, ...] = ()
+    get_values_type: str | None = None
 
 
 FIELD_TYPE_POLICIES = {
@@ -674,84 +675,104 @@ MULTIFIELD_TYPE_POLICIES = {
     "SoMFName": MultifieldTypePolicy(
         element_type="SbName",
         set_values_types=("SbName | str",),
+        get_values_type="str",
     ),
     "SoMFBool": MultifieldTypePolicy(
         element_type="bool",
         set_values_types=("bool",),
+        get_values_type="bool",
     ),
     "SoMFEnum": MultifieldTypePolicy(
         element_type="int",
         set_values_types=("int",),
+        get_values_type="int",
     ),
     "SoMFFloat": MultifieldTypePolicy(
         element_type="float",
         set_values_types=("float",),
+        get_values_type="float",
     ),
     "SoMFVec3f": MultifieldTypePolicy(
         element_type="SbVec3f",
         set_values_types=("SbVec3f", "Sequence[float]"),
+        get_values_type="SbVec3f",
     ),
     "SoMFString": MultifieldTypePolicy(
         element_type="SbString",
         set_values_types=("SbString | str",),
+        get_values_type="str",
     ),
     "SoMFVec2f": MultifieldTypePolicy(
         element_type="SbVec2f",
         set_values_types=("SbVec2f", "Sequence[float]"),
+        get_values_type="SbVec2f",
     ),
     "SoMFVec4f": MultifieldTypePolicy(
         element_type="SbVec4f",
         set_values_types=("SbVec4f", "Sequence[float]"),
+        get_values_type="SbVec4f",
     ),
     "SoMFRotation": MultifieldTypePolicy(
         element_type="SbRotation",
         set_values_types=("SbRotation", "Sequence[float]"),
+        get_values_type="SbRotation",
     ),
     "SoMFMatrix": MultifieldTypePolicy(
         element_type="SbMatrix",
         set_values_types=("SbMatrix",),
+        get_values_type="SbMatrix",
     ),
     "SoMFColor": MultifieldTypePolicy(
         element_type="SbColor",
         set_values_types=("SbColor", "SbVec3f", "Sequence[float]"),
+        get_values_type="SbColor",
     ),
     "SoMFColorRGBA": MultifieldTypePolicy(element_type="SbColor4f"),
     "SoMFDouble": MultifieldTypePolicy(element_type="float"),
     "SoMFEngine": MultifieldTypePolicy(
         element_type="SoEngine",
         set_values_types=("SoEngine",),
+        get_values_type="SoEngine",
     ),
     "SoMFInt32": MultifieldTypePolicy(
         element_type="int",
         set_values_types=("int",),
+        get_values_type="int",
     ),
     "SoMFNode": MultifieldTypePolicy(
         element_type="SoNode",
         set_values_types=("SoNode",),
+        get_values_type="SoNode",
     ),
     "SoMFPath": MultifieldTypePolicy(
         element_type="SoPath",
         set_values_types=("SoPath",),
+        get_values_type="SoPath",
     ),
     "SoMFPlane": MultifieldTypePolicy(
         element_type="SbPlane",
         set_values_types=("SbPlane",),
+        get_values_type="SbPlane",
     ),
     "SoMFShort": MultifieldTypePolicy(
         element_type="int",
         set_values_types=("int",),
+        get_values_type="int",
     ),
     "SoMFTime": MultifieldTypePolicy(
         element_type="SbTime",
         set_values_types=("SbTime",),
+        get_values_type="SbTime",
     ),
     "SoMFUInt32": MultifieldTypePolicy(
         element_type="int",
         set_values_types=("int",),
+        get_values_type="int",
     ),
     "SoMFUShort": MultifieldTypePolicy(
         element_type="int",
         set_values_types=("int",),
+        get_values_type="int",
     ),
     "SoMFVec2b": MultifieldTypePolicy(element_type="SbVec2b"),
     "SoMFVec2d": MultifieldTypePolicy(element_type="SbVec2d"),
@@ -761,6 +782,7 @@ MULTIFIELD_TYPE_POLICIES = {
     "SoMFVec3d": MultifieldTypePolicy(
         element_type="SbVec3d",
         set_values_types=("SbVec3d", "Sequence[float]"),
+        get_values_type="SbVec3d",
     ),
     "SoMFVec3i32": MultifieldTypePolicy(element_type="SbVec3i32"),
     "SoMFVec3s": MultifieldTypePolicy(element_type="SbVec3s"),
@@ -790,6 +812,16 @@ def multifield_setvalues_types():
         field_class: policy.set_values_types
         for field_class, policy in MULTIFIELD_TYPE_POLICIES.items()
         if policy.set_values_types
+    }
+
+
+def multifield_getvalues_types():
+    """Return Python element types returned by wrapped ``getValues`` calls."""
+
+    return {
+        field_class: policy.get_values_type
+        for field_class, policy in MULTIFIELD_TYPE_POLICIES.items()
+        if policy.get_values_type
     }
 
 

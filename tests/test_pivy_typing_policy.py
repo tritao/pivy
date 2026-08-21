@@ -12,6 +12,7 @@ from tools.pivy_stub_typing_policy import (
     MULTIFIELD_TYPE_POLICIES,
     classify_incomplete,
     field_method_type_overrides,
+    multifield_getvalues_types,
     multifield_iter_element_types,
     multifield_setvalues_types,
 )
@@ -81,6 +82,14 @@ class MultifieldTypePolicyTests(unittest.TestCase):
             ("SbColor", "SbVec3f", "Sequence[float]"),
         )
         self.assertNotIn("SoMFDouble", setvalues_types)
+
+    def test_multifield_getvalues_types_are_derived_from_policy(self):
+        getvalues_types = multifield_getvalues_types()
+
+        self.assertEqual(getvalues_types["SoMFFloat"], "float")
+        self.assertEqual(getvalues_types["SoMFVec3f"], "SbVec3f")
+        self.assertEqual(getvalues_types["SoMFName"], "str")
+        self.assertNotIn("SoMFDouble", getvalues_types)
 
 
 class IncompletePolicyTests(unittest.TestCase):
