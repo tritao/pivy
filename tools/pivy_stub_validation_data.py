@@ -638,36 +638,6 @@ DEFERRED_RAW_METHOD_CHECKS = {
             "Incomplete",
         ),
         (
-            "SoSFImage",
-            "startEditing",
-            {},
-            "Incomplete",
-        ),
-        (
-            "SoSFImage",
-            "setValue",
-            {"size": "SbVec2s", "nc": "int", "pixels": "Incomplete"},
-            "None",
-        ),
-        (
-            "SoSFImage3",
-            "getValue",
-            {},
-            "Incomplete",
-        ),
-        (
-            "SoSFImage3",
-            "startEditing",
-            {},
-            "Incomplete",
-        ),
-        (
-            "SoSFImage3",
-            "setValue",
-            {"size": "SbVec3s", "nc": "int", "bytes": "Incomplete"},
-            "None",
-        ),
-        (
             "SoMultiTextureImageElement",
             "getDefault",
             {"size": "SbVec3s", "numComponents": "intp"},
@@ -1715,6 +1685,10 @@ METHOD_RETURN_TYPE_CHECKS = {
         ("SoSearchAction", "getPath", "SoPath | None"),
         ("SoPathSensor", "getAttachedPath", "SoPath | None"),
         ("SoSensor", "getNextInQueue", "SoSensor | None"),
+        ("SoSFImage", "getValue", "tuple[str, SbVec2s, int]"),
+        ("SoSFImage", "startEditing", "tuple[str, SbVec2s, int]"),
+        ("SoSFImage3", "getValue", "tuple[str, SbVec3s, int]"),
+        ("SoSFImage3", "startEditing", "tuple[str, SbVec3s, int]"),
     ),
     os.path.join("gui", "soqt.pyi"): (
         ("SoQtRenderArea", "getSceneGraph", "SoNode | None"),

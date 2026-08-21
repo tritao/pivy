@@ -232,6 +232,12 @@ PYTHON_HELPER_METHOD_TYPES = {
     ("SoType", "fromName"): ("name: SbName | str", "SoType"),
 }
 METHOD_RETURN_TYPE_OVERRIDES = {
+    # SWIG's image typemaps expose the native pixel pointer together with the
+    # dimensions and component count as a Python tuple.
+    ("SoSFImage", "getValue"): "tuple[str, SbVec2s, int]",
+    ("SoSFImage", "startEditing"): "tuple[str, SbVec2s, int]",
+    ("SoSFImage3", "getValue"): "tuple[str, SbVec3s, int]",
+    ("SoSFImage3", "startEditing"): "tuple[str, SbVec3s, int]",
     ("SoAction", "getNodeAppliedTo"): "SoNode | None",
     ("SoAction", "getPathAppliedTo"): "SoPath | None",
     ("SoAction", "getPathListAppliedTo"): "SoPathList | None",
@@ -275,6 +281,11 @@ METHOD_RETURN_TYPE_OVERRIDES = {
     ("SoQtRenderArea", "getOverlaySceneGraph"): "SoNode | None",
     ("SoQtViewer", "getCamera"): "SoCamera | None",
     ("SoQtViewer", "getSceneGraph"): "SoNode | None",
+}
+PYTHON_PARAMETER_TYPE_OVERRIDES = {
+    ("SoSFImage", "setValue", "pixels"): "str | bytes",
+    ("SoSFImage3", "setValue", "bytes"): "str | bytes",
+    ("SoSFImage3", "setValue", "pixels"): "str | bytes",
 }
 
 # Coin's element and field header macros expose these class-specific factories

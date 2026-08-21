@@ -64,6 +64,10 @@ adapters and accept Python callables with `(userdata, SoInput)` and
 `(userdata, SbName, fraction, interruptible)` arguments respectively. Header
 output callback pointers remain intentionally incomplete.
 
+`SoSFImage` and `SoSFImage3` expose their pixel data through Python tuples of
+`(str, size, component_count)` for `getValue()` and `startEditing()`. Their
+pixel setters accept the strings or bytes used by the existing SWIG typemaps.
+
 `SoCallbackList` uses Python shadow methods for callback registration and
 accepts `(userdata, callbackdata)` callables. Callback data is passed as the
 same Python object supplied to `invokeCallbacks`.

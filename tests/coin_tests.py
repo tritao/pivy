@@ -329,6 +329,8 @@ class FieldSetValue(unittest.TestCase):
         s.setValue(t)
         self.assertTrue(("abcd", SbVec2s(2,2), 1) == t.getValue() == s.getValue(), 
                         'setValue on SoSFImage failed')
+        self.assertEqual(t.startEditing(), ("abcd", SbVec2s(2,2), 1))
+        t.finishEditing()
 
     def testSFImage3(self):
         """check setValue for SoSFImage3"""
@@ -338,6 +340,8 @@ class FieldSetValue(unittest.TestCase):
         s.setValue(t)
         self.assertTrue(("abcdefgh", SbVec3s(2,2,2), 1) == t.getValue() == s.getValue(), 
                         'setValue on SoSFImage3 failed')
+        self.assertEqual(t.startEditing(), ("abcdefgh", SbVec3s(2,2,2), 1))
+        t.finishEditing()
 
     def testSFPath(self):
         """check setValue for SoSFPath"""

@@ -51,6 +51,20 @@ def check_nullable_fields() -> None:
     path.setValue(None)
 
 
+def check_image_fields() -> None:
+    image = coin.SoSFImage()
+    image.setValue(coin.SbVec2s(2, 2), 1, "abcd")
+    assert_type(image.getValue(), tuple[str, coin.SbVec2s, int])
+    assert_type(image.startEditing(), tuple[str, coin.SbVec2s, int])
+    image.finishEditing()
+
+    image3 = coin.SoSFImage3()
+    image3.setValue(coin.SbVec3s(2, 2, 2), 1, b"abcdefgh")
+    assert_type(image3.getValue(), tuple[str, coin.SbVec3s, int])
+    assert_type(image3.startEditing(), tuple[str, coin.SbVec3s, int])
+    image3.finishEditing()
+
+
 def check_field_factory_contract() -> None:
     assert_type(coin.SoSFFloat.createInstance(), coin.SoSFFloat)
     assert_type(coin.SoMFVec3f.createInstance(), coin.SoMFVec3f)

@@ -24,6 +24,22 @@ from tools.pivy_stub_typing_policy import (
 
 
 class FieldTypePolicyTests(unittest.TestCase):
+    def test_image_field_python_surfaces(self):
+        self.assertEqual(
+            policy.METHOD_RETURN_TYPE_OVERRIDES[("SoSFImage", "getValue")],
+            "tuple[str, SbVec2s, int]",
+        )
+        self.assertEqual(
+            policy.METHOD_RETURN_TYPE_OVERRIDES[("SoSFImage3", "startEditing")],
+            "tuple[str, SbVec3s, int]",
+        )
+        self.assertEqual(
+            policy.PYTHON_PARAMETER_TYPE_OVERRIDES[
+                ("SoSFImage3", "setValue", "bytes")
+            ],
+            "str | bytes",
+        )
+
     def test_nullable_node_policy(self):
         policy = FIELD_TYPE_POLICIES["SoSFNode"]
 

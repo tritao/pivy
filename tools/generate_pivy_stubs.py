@@ -66,6 +66,7 @@ try:
         MATRIX_SEQUENCE_PARAMETERS,
         MATRIX_VALUE_RETURN_TYPES,
         POINTER_HELPER_TYPES,
+        PYTHON_PARAMETER_TYPE_OVERRIDES,
         PRIVATE_EXTENSION_STUB,
         PYTHON_HELPER_METHOD_TYPES,
         PYTHON_SHADOW_METHOD_TYPES,
@@ -110,6 +111,7 @@ except ImportError:
         MATRIX_SEQUENCE_PARAMETERS,
         MATRIX_VALUE_RETURN_TYPES,
         POINTER_HELPER_TYPES,
+        PYTHON_PARAMETER_TYPE_OVERRIDES,
         PRIVATE_EXTENSION_STUB,
         PYTHON_HELPER_METHOD_TYPES,
         PYTHON_SHADOW_METHOD_TYPES,
@@ -614,9 +616,13 @@ def render_python_signature(
         parameter_name = sanitize_parameter_name(
             cpp_arg.name, used_names, "arg%d" % position
         )
-        parameter_type = CALLBACK_PARAMETER_TYPE_OVERRIDES.get(
+        parameter_type = PYTHON_PARAMETER_TYPE_OVERRIDES.get(
             (class_name, name, cpp_arg.name)
         )
+        if parameter_type is None:
+            parameter_type = CALLBACK_PARAMETER_TYPE_OVERRIDES.get(
+                (class_name, name, cpp_arg.name)
+            )
         cpp_base = base_cpp_type(cpp_arg.type)
         if parameter_type is None and cpp_base == "PyObject":
             match pyobject_argument_role(cpp_arg.name):
