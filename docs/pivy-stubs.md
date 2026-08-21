@@ -109,6 +109,10 @@ dragger proxy, and removal matches the callback and userdata by identity.
 retained on the selection proxy and matched by callback and userdata identity;
 the pick-filter closure is retained while it is installed.
 
+`SoExtSelection` filter setters expose typed lasso, triangle, line-segment, and
+point callbacks. Their closures are retained while installed, and passing
+`None` clears each native filter callback.
+
 Known pointer-buffer surfaces:
 
 - `SoMFDouble.getValues`

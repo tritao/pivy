@@ -1632,6 +1632,39 @@ class ZZSelectionCallbackTests(unittest.TestCase):
             selection.addSelectionCallback(None)
 
 
+class ZZExtendedSelectionCallbackTests(unittest.TestCase):
+    def testPythonCallbackSetters(self):
+        selection = SoExtSelection()
+        data = object()
+
+        def lasso_callback(callback_data, path):
+            self.assertIs(callback_data, data)
+            self.assertIsInstance(path, SoPath)
+            return path
+
+        def triangle_callback(callback_data, action, v1, v2, v3):
+            return True
+
+        def line_callback(callback_data, action, v1, v2):
+            return False
+
+        def point_callback(callback_data, action, vertex):
+            return True
+
+        selection.setLassoFilterCallback(lasso_callback, data, False)
+        selection.setTriangleFilterCallback(triangle_callback, data)
+        selection.setLineSegmentFilterCallback(line_callback, data)
+        selection.setPointFilterCallback(point_callback, data)
+
+        selection.setLassoFilterCallback(None)
+        selection.setTriangleFilterCallback(None)
+        selection.setLineSegmentFilterCallback(None)
+        selection.setPointFilterCallback(None)
+
+        with self.assertRaises(TypeError):
+            selection.setPointFilterCallback(42)
+
+
 class ZZGLCacheCallbackTests(unittest.TestCase):
     def testPythonScheduleDeleteCallback(self):
         events = []

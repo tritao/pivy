@@ -1003,6 +1003,81 @@ CALLBACK_METHOD_POLICIES[("SoSelection", "setPickFilterCallback")] = (
     )
 )
 
+CALLBACK_METHOD_POLICIES.update(
+    {
+        ("SoExtSelection", "setLassoFilterCallback"): CallbackMethodPolicy(
+            (
+                (
+                    "f",
+                    "Callable[[object, SoPath], SoPath | None] | None",
+                ),
+                ("userdata", "object | None"),
+                ("callonlyifselectable", "bool"),
+            ),
+            (
+                "self, f: Callable[[object, SoPath], SoPath | None] | None, "
+                "userdata: object | None = ..., "
+                "callonlyifselectable: bool = ...",
+                "None",
+            ),
+        ),
+        (
+            "SoExtSelection",
+            "setTriangleFilterCallback",
+        ): CallbackMethodPolicy(
+            (
+                (
+                    "func",
+                    "Callable[[object, SoCallbackAction, SoPrimitiveVertex, "
+                    "SoPrimitiveVertex, SoPrimitiveVertex], bool] | None",
+                ),
+                ("userdata", "object | None"),
+            ),
+            (
+                "self, func: Callable[[object, SoCallbackAction, "
+                "SoPrimitiveVertex, SoPrimitiveVertex, SoPrimitiveVertex], "
+                "bool] | None, userdata: object | None = ...",
+                "None",
+            ),
+        ),
+        (
+            "SoExtSelection",
+            "setLineSegmentFilterCallback",
+        ): CallbackMethodPolicy(
+            (
+                (
+                    "func",
+                    "Callable[[object, SoCallbackAction, SoPrimitiveVertex, "
+                    "SoPrimitiveVertex], bool] | None",
+                ),
+                ("userdata", "object | None"),
+            ),
+            (
+                "self, func: Callable[[object, SoCallbackAction, "
+                "SoPrimitiveVertex, SoPrimitiveVertex], bool] | None, "
+                "userdata: object | None = ...",
+                "None",
+            ),
+        ),
+        ("SoExtSelection", "setPointFilterCallback"): CallbackMethodPolicy(
+            (
+                (
+                    "func",
+                    "Callable[[object, SoCallbackAction, SoPrimitiveVertex], "
+                    "bool] | None",
+                ),
+                ("userdata", "object | None"),
+            ),
+            (
+                "self, func: Callable[[object, SoCallbackAction, "
+                "SoPrimitiveVertex], bool] | None, "
+                "userdata: object | None = ...",
+                "None",
+            ),
+        ),
+    }
+)
+
 
 PYTHON_SHADOW_METHOD_TYPES = {
     key: policy.shadow_signature

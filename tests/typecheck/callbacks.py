@@ -222,6 +222,56 @@ def check_event_and_selection_callbacks() -> None:
     selection.addChangeCallback(selection_class_callback, None)
     selection.removeChangeCallback(selection_class_callback, None)
 
+    def lasso_filter_callback(
+        data: object,
+        path: coin.SoPath,
+    ) -> coin.SoPath | None:
+        return path
+
+    def triangle_filter_callback(
+        data: object,
+        action: coin.SoCallbackAction,
+        v1: coin.SoPrimitiveVertex,
+        v2: coin.SoPrimitiveVertex,
+        v3: coin.SoPrimitiveVertex,
+    ) -> bool:
+        return True
+
+    def line_filter_callback(
+        data: object,
+        action: coin.SoCallbackAction,
+        v1: coin.SoPrimitiveVertex,
+        v2: coin.SoPrimitiveVertex,
+    ) -> bool:
+        return False
+
+    def point_filter_callback(
+        data: object,
+        action: coin.SoCallbackAction,
+        vertex: coin.SoPrimitiveVertex,
+    ) -> bool:
+        return True
+
+    extended_selection = coin.SoExtSelection()
+    extended_selection.setLassoFilterCallback(
+        lasso_filter_callback,
+        None,
+        False,
+    )
+    extended_selection.setLassoFilterCallback(None)
+    extended_selection.setTriangleFilterCallback(
+        triangle_filter_callback,
+        None,
+    )
+    extended_selection.setTriangleFilterCallback(None)
+    extended_selection.setLineSegmentFilterCallback(
+        line_filter_callback,
+        None,
+    )
+    extended_selection.setLineSegmentFilterCallback(None)
+    extended_selection.setPointFilterCallback(point_filter_callback, None)
+    extended_selection.setPointFilterCallback(None)
+
 
 def check_render_and_scene_callbacks() -> None:
     def pass_callback(data: Any) -> None:

@@ -93,6 +93,7 @@ if (init_file_emulator() < 0) {
 %include pivy_common_typemaps.i
 %ignore SoDepthBufferElement::get;
 %include coin_header_includes.h
+%include "Inventor/nodes/SoExtSelection.i"
 
 /* Coin's enum reference is represented by its underlying integer in the
    Python binding, just like the other scalar output references. */
