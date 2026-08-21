@@ -44,7 +44,7 @@ until the binding grows a Python-level wrapper or typemap.
 
 Known callback-pointer surfaces:
 
-- `SoSensor.{getFunction,getData,setData}`
+- `SoSensor.setData`
 - `SoDB.getHeaderData`
 - `SoGLImage.setEndFrameCallback`
 
@@ -55,8 +55,9 @@ and `None` for native handlers that Pivy cannot represent as Python objects.
 
 Sensor constructors and the `SoSensor.setFunction`/`SoDataSensor.setDeleteCallback`
 setters use the existing SWIG-side sensor adapter and accept Python callables
-with `(userdata, SoSensor)` arguments. The raw sensor data accessors remain
-intentionally incomplete.
+with `(userdata, SoSensor)` arguments. `SoSensor.getFunction` and `getData`
+return the retained callback and userdata for callbacks installed through Pivy;
+the raw `setData` surface remains intentionally incomplete.
 
 `SoDB.registerHeader` and the progress callback registration methods use SWIG
 adapters and accept Python callables with `(userdata, SoInput)` and

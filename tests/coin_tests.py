@@ -1477,10 +1477,14 @@ class ZZSensorCallbackTests(unittest.TestCase):
 
         sensor = SoTimerSensor()
         sensor.setFunction(callback)
+        self.assertIs(sensor.getFunction(), callback)
+        self.assertIsNone(sensor.getData())
         sensor.trigger()
         self.assertEqual(events, [(None, "SoTimerSensor")])
 
         sensor_with_data = SoTimerSensor(callback, "sensor-data")
+        self.assertIs(sensor_with_data.getFunction(), callback)
+        self.assertIs(sensor_with_data.getData(), "sensor-data")
         sensor_with_data.setFunction(callback)
         sensor_with_data.trigger()
         self.assertEqual(events[-1], ("sensor-data", "SoTimerSensor"))

@@ -104,3 +104,21 @@ def setFunction(self, callbackfunction):
    _coin.SoSensor_setData(self, callback_data)
    return _coin.SoSensor_setFunction(self, callbackfunction)
 %}
+
+%feature("shadow") SoSensor::getFunction %{
+def getFunction(self):
+   """getFunction(SoSensor self) -> SoSensorCB *"""
+   callback_data = getattr(self, "_pivy_sensor_callback_data", None)
+   if callback_data is None:
+      return None
+   return callback_data[0]
+%}
+
+%feature("shadow") SoSensor::getData %{
+def getData(self):
+   """getData(SoSensor self) -> void *"""
+   callback_data = getattr(self, "_pivy_sensor_callback_data", None)
+   if callback_data is None:
+      return None
+   return callback_data[1]
+%}

@@ -28,6 +28,11 @@ def check_sensor_callbacks() -> None:
 
     plain_timer = coin.SoTimerSensor()
     plain_timer.setFunction(base_sensor_callback)
+    assert_type(
+        plain_timer.getFunction(),
+        Callable[[object, coin.SoSensor], None] | None,
+    )
+    assert_type(plain_timer.getData(), object | None)
 
     data_sensor = coin.SoFieldSensor()
     data_sensor.setDeleteCallback(base_sensor_callback, {"source": "test"})

@@ -485,6 +485,11 @@ def factory_method_return_type(class_name, method_name):
         return class_name
     return None
 EXTEND_HELPER_METHOD_TYPES = {
+    ("SoSensor", "getFunction", "self"): (
+        "self",
+        "Callable[[object, SoSensor], None] | None",
+    ),
+    ("SoSensor", "getData", "self"): ("self", "object | None"),
     ("SoError", "getHandlerCallback", ""): (
         "",
         "Callable[[object, SoError], None] | None",
