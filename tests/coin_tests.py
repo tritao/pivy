@@ -1607,6 +1607,31 @@ class ZZDraggerCallbackTests(unittest.TestCase):
             dragger.addValueChangedCallback(None)
 
 
+class ZZSelectionCallbackTests(unittest.TestCase):
+    def testPythonCallbacks(self):
+        events = []
+        selection = SoSelection()
+        data = object()
+
+        def callback(callback_data, path):
+            events.append((callback_data, path))
+
+        selection.addSelectionCallback(callback, data)
+        node = SoCube()
+        selection.addChild(node)
+        selection.select(node)
+        self.assertEqual(len(events), 1)
+        self.assertIs(events[0][0], data)
+        self.assertIsInstance(events[0][1], SoPath)
+
+        selection.removeSelectionCallback(callback, data)
+        selection.deselect(node)
+        self.assertEqual(len(events), 1)
+
+        with self.assertRaises(TypeError):
+            selection.addSelectionCallback(None)
+
+
 class ZZGLCacheCallbackTests(unittest.TestCase):
     def testPythonScheduleDeleteCallback(self):
         events = []

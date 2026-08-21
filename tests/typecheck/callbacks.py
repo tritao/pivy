@@ -194,17 +194,17 @@ def check_event_and_selection_callbacks() -> None:
     )
     event_node.removeEventCallback(coin.SoType.badType(), event_handle)
 
-    def selection_callback(data: Any, path: coin.SoPath) -> None:
+    def selection_callback(data: object, path: coin.SoPath) -> None:
         pass
 
     def selection_class_callback(
-        data: Any,
+        data: object,
         selection: coin.SoSelection,
     ) -> None:
         pass
 
     def pick_filter_callback(
-        data: Any,
+        data: object,
         point: coin.SoPickedPoint,
     ) -> coin.SoPath:
         return coin.SoPath()

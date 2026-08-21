@@ -942,6 +942,67 @@ for _dragger_callback_name in (
             ),
         )
 
+for _selection_callback_name in (
+    "addSelectionCallback",
+    "removeSelectionCallback",
+    "addDeselectionCallback",
+    "removeDeselectionCallback",
+):
+    CALLBACK_METHOD_POLICIES[("SoSelection", _selection_callback_name)] = (
+        CallbackMethodPolicy(
+            (
+                ("pyfunc", "Callable[[object, SoPath], None]"),
+                ("userdata", "object | None"),
+            ),
+            (
+                "self, pyfunc: Callable[[object, SoPath], None], "
+                "userdata: object | None = ...",
+                "None",
+            ),
+        )
+    )
+
+for _selection_callback_name in (
+    "addStartCallback",
+    "removeStartCallback",
+    "addFinishCallback",
+    "removeFinishCallback",
+    "addChangeCallback",
+    "removeChangeCallback",
+):
+    CALLBACK_METHOD_POLICIES[("SoSelection", _selection_callback_name)] = (
+        CallbackMethodPolicy(
+            (
+                ("pyfunc", "Callable[[object, SoSelection], None]"),
+                ("userdata", "object | None"),
+            ),
+            (
+                "self, pyfunc: Callable[[object, SoSelection], None], "
+                "userdata: object | None = ...",
+                "None",
+            ),
+        )
+    )
+
+CALLBACK_METHOD_POLICIES[("SoSelection", "setPickFilterCallback")] = (
+    CallbackMethodPolicy(
+        (
+            ("pyfunc", "Callable[[object, SoPickedPoint], SoPath]"),
+            ("userdata", "object | None"),
+        ),
+        (
+            "self, pyfunc: Callable[[object, SoPickedPoint], SoPath], "
+            "userdata: object | None = ..., callOnlyIfSelectable: int = ...",
+            "None",
+        ),
+        (
+            ("pyfunc", "Callable[[object, SoPickedPoint], SoPath]"),
+            ("userdata", "object | None"),
+            ("callOnlyIfSelectable", "int"),
+        ),
+    )
+)
+
 
 PYTHON_SHADOW_METHOD_TYPES = {
     key: policy.shadow_signature

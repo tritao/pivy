@@ -104,6 +104,11 @@ retained closure after the scheduled read callback runs or the schedule fails.
 `(userdata, SoDragger)` contract. Their Python closures are retained on the
 dragger proxy, and removal matches the callback and userdata by identity.
 
+`SoSelection` path and selection callbacks use `(userdata, SoPath)` or
+`(userdata, SoSelection)` contracts. Their registration/removal closures are
+retained on the selection proxy and matched by callback and userdata identity;
+the pick-filter closure is retained while it is installed.
+
 Known pointer-buffer surfaces:
 
 - `SoMFDouble.getValues`
