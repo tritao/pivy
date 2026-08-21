@@ -49,7 +49,7 @@ configure = { cmd = ["cmake", "-G", "Ninja", "-B", "build", "-S", ".",
                      "-D", "QT_HOST_PATH=$CONDA_PREFIX" 
                      ], depends-on = []}
 
-build = { cmd = ["ninja", "-C", "build", "-j", "1", "install"], depends-on = ["configure"]}
+build = { cmd = ["ninja", "-C", "build", "install"], depends-on = ["configure"]}
 test = { cmd = ["python", "tests/coin_tests.py"], depends-on = ["build"]}
 test_soqt = { cmd = ["python", "tests/soqt_tests.py"], depends-on = ["build"]}
 test_quarter = { cmd = ["python", "tests/quarter_tests.py"], depends-on = ["build"]}
