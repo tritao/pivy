@@ -167,6 +167,22 @@ class FieldTypePolicyTests(unittest.TestCase):
                 "None",
             ),
         )
+        self.assertEqual(
+            policy.PYTHON_SHADOW_METHOD_TYPES[("SbImage", "addReadImageCB")],
+            (
+                "cb: Callable[[object, SbString, SbImage], bool], "
+                "closure: object | None = ...",
+                "None",
+            ),
+        )
+        self.assertEqual(
+            policy.PYTHON_SHADOW_METHOD_TYPES[("SbImage", "removeReadImageCB")],
+            (
+                "cb: Callable[[object, SbString, SbImage], bool], "
+                "closure: object | None = ...",
+                "None",
+            ),
+        )
 
     def test_int32_references_use_the_existing_integer_pointer_helper(self):
         self.assertEqual(policy.SCALAR_REFERENCE_HELPER_TYPES["int32_t"], "intp")

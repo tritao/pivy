@@ -116,6 +116,16 @@ def check_graphics_callback_setters() -> None:
     coin.SoProto.setFetchExternProtoCallback(fetch_proto_callback, None)
     coin.SoProto.setFetchExternProtoCallback(None)
 
+    def image_read_callback(
+        data: object,
+        filename: coin.SbString,
+        image: coin.SbImage,
+    ) -> bool:
+        return bool(filename) and isinstance(image, coin.SbImage)
+
+    coin.SbImage.addReadImageCB(image_read_callback, None)
+    coin.SbImage.removeReadImageCB(image_read_callback, None)
+
 
 def check_callback_action_callbacks() -> None:
     def node_callback(

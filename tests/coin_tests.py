@@ -1638,6 +1638,15 @@ class ZZGraphicsCallbackSetterTests(unittest.TestCase):
         with self.assertRaises(TypeError):
             SoProto.setFetchExternProtoCallback(42)
 
+        def image_read_callback(data, filename, image):
+            return True
+
+        SbImage.addReadImageCB(image_read_callback, "image-data")
+        SbImage.removeReadImageCB(image_read_callback, "image-data")
+
+        with self.assertRaises(TypeError):
+            SbImage.addReadImageCB(42)
+
 
 class ZZGLCallbackTests(unittest.TestCase):
     def testSortedObjectOrderCallback(self):

@@ -209,6 +209,24 @@ CALLBACK_METHOD_CHECKS = {
             "None",
         ),
         (
+            "SbImage",
+            "addReadImageCB",
+            {
+                "cb": "Callable[[object, SbString, SbImage], bool]",
+                "closure": "object | None",
+            },
+            "None",
+        ),
+        (
+            "SbImage",
+            "removeReadImageCB",
+            {
+                "cb": "Callable[[object, SbString, SbImage], bool]",
+                "closure": "object | None",
+            },
+            "None",
+        ),
+        (
             "SoError",
             "setHandlerCallback",
             {"pyfunc": "Callable[[object, SoError], None]", "data": "object"},
@@ -926,12 +944,6 @@ DEFERRED_RAW_METHOD_CHECKS = {
             "SbImage",
             "__init__",
             {"bytes": "Incomplete"},
-            "None",
-        ),
-        (
-            "SbImage",
-            "addReadImageCB",
-            {"cb": "Incomplete", "closure": "Incomplete"},
             "None",
         ),
         (

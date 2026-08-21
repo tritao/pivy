@@ -92,6 +92,11 @@ the Python proxy and accept `None` to clear the native callback.
 presented as a Python list of borrowed `SbString` proxies, and the static
 callback closure is retained until replaced or cleared.
 
+`SbImage.addReadImageCB` and `removeReadImageCB` accept
+`(userdata, filename, image) -> bool` callbacks. Registration and removal use
+Python callback and userdata identity, and the retained closure is released on
+removal.
+
 Known pointer-buffer surfaces:
 
 - `SoMFDouble.getValues`

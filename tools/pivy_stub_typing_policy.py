@@ -695,6 +695,16 @@ PYTHON_SHADOW_METHOD_TYPES = {
         "closure: object | None = ...",
         "None",
     ),
+    ("SbImage", "addReadImageCB"): (
+        "cb: Callable[[object, SbString, SbImage], bool], "
+        "closure: object | None = ...",
+        "None",
+    ),
+    ("SbImage", "removeReadImageCB"): (
+        "cb: Callable[[object, SbString, SbImage], bool], "
+        "closure: object | None = ...",
+        "None",
+    ),
     ("SoDB", "registerHeader"): (
         "headerstring: SbString, isbinary: bool, ivversion: float, "
         "precallback: Callable[[object, SoInput], None], "
@@ -777,6 +787,14 @@ CALLBACK_PARAMETER_TYPE_OVERRIDES.update(
         ("SoProto", "setFetchExternProtoCallback", "closure"): (
             "object | None"
         ),
+        ("SbImage", "addReadImageCB", "cb"): (
+            "Callable[[object, SbString, SbImage], bool]"
+        ),
+        ("SbImage", "addReadImageCB", "closure"): "object | None",
+        ("SbImage", "removeReadImageCB", "cb"): (
+            "Callable[[object, SbString, SbImage], bool]"
+        ),
+        ("SbImage", "removeReadImageCB", "closure"): "object | None",
         ("SoDB", "registerHeader", "precallback"): (
             "Callable[[object, SoInput], None]"
         ),
@@ -1452,8 +1470,6 @@ TRIAGED_INCOMPLETE_SITES = frozenset(
         ('parameter', 'SbHeap', 'remove', 'obj'),
         ('parameter', 'SbHeap', 'traverseHeap', 'func'),
         ('parameter', 'SbHeap', 'traverseHeap', 'userdata'),
-        ('parameter', 'SbImage', 'addReadImageCB', 'closure'),
-        ('parameter', 'SbImage', 'removeReadImageCB', 'closure'),
         ('parameter', 'SbImage', 'scheduleReadFile', 'closure'),
         ('parameter', 'SbMatrix', 'LUBackSubstitution', 'index'),
         ('parameter', 'SbMatrix', 'LUDecomposition', 'index'),
