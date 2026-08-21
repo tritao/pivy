@@ -5,6 +5,7 @@ from enum import Enum
 import os
 
 from tools.pivy_stub_typing_policy import (
+    callback_method_checks,
     multifield_component_sequence_types,
     multifield_iter_element_types,
     multifield_setvalues_types,
@@ -89,179 +90,8 @@ ITER_CONTAINER_TYPES = {
 ITER_CONTAINER_TYPES.update(multifield_iter_element_types())
 ITER_CONTAINER_TYPES.update(vector_iter_element_types())
 CALLBACK_METHOD_CHECKS = {
-    "coin.pyi": (
-        (
-            "SoCallbackList",
-            "addCallback",
-            {
-                "f": "Callable[[object, object], None]",
-                "userData": "object | None",
-            },
-            "None",
-        ),
-        (
-            "SoCallbackList",
-            "removeCallback",
-            {
-                "f": "Callable[[object, object], None]",
-                "userdata": "object | None",
-            },
-            "None",
-        ),
-        (
-            "SoContextHandler",
-            "addContextDestructionCallback",
-            {
-                "func": "Callable[[object, int], None]",
-                "userdata": "object | None",
-            },
-            "None",
-        ),
-        (
-            "SoContextHandler",
-            "removeContextDestructionCallback",
-            {
-                "func": "Callable[[object, int], None]",
-                "userdata": "object | None",
-            },
-            "None",
-        ),
-        (
-            "SoDB",
-            "registerHeader",
-            {
-                "precallback": "Callable[[object, SoInput], None]",
-                "postcallback": "Callable[[object, SoInput], None]",
-                "userdata": "object | None",
-            },
-            "bool",
-        ),
-        (
-            "SoDB",
-            "addProgressCallback",
-            {
-                "func": "Callable[[object, SbName, float, bool], bool]",
-                "userdata": "object | None",
-            },
-            "None",
-        ),
-        (
-            "SoDB",
-            "removeProgressCallback",
-            {
-                "func": "Callable[[object, SbName, float, bool], bool]",
-                "userdata": "object | None",
-            },
-            "None",
-        ),
-        (
-            "SoSensor",
-            "setFunction",
-            {"callbackfunction": "Callable[[object, SoSensor], None]"},
-            "None",
-        ),
-        (
-            "SoDataSensor",
-            "setDeleteCallback",
-            {
-                "function": "Callable[[object, SoSensor], None]",
-                "data": "object | None",
-            },
-            "None",
-        ),
-        (
-            "SoGLCacheContextElement",
-            "scheduleDeleteCallback",
-            {
-                "cb": "Callable[[object, int], None]",
-                "closure": "object | None",
-            },
-            "None",
-        ),
-        (
-            "SoGLImage",
-            "setEndFrameCallback",
-            {
-                "cb": "Callable[[object], None] | None",
-                "closure": "object | None",
-            },
-            "None",
-        ),
-        (
-            "SoShaderProgram",
-            "setEnableCallback",
-            {
-                "cb": "Callable[[object, SoState, bool], None] | None",
-                "closure": "object | None",
-            },
-            "None",
-        ),
-        (
-            "SoProto",
-            "setFetchExternProtoCallback",
-            {
-                "cb": (
-                    "Callable[[object, SoInput, list[SbString], int], "
-                    "SoProto | None] | None"
-                ),
-                "closure": "object | None",
-            },
-            "None",
-        ),
-        (
-            "SbImage",
-            "addReadImageCB",
-            {
-                "cb": "Callable[[object, SbString, SbImage], bool]",
-                "closure": "object | None",
-            },
-            "None",
-        ),
-        (
-            "SbImage",
-            "removeReadImageCB",
-            {
-                "cb": "Callable[[object, SbString, SbImage], bool]",
-                "closure": "object | None",
-            },
-            "None",
-        ),
-        (
-            "SbImage",
-            "scheduleReadFile",
-            {
-                "cb": "Callable[[object, SbString, SbImage], bool]",
-                "closure": "object | None",
-                "filename": "SbString",
-                "searchdirectories": "SbString | None",
-                "numdirectories": "int",
-            },
-            "bool",
-        ),
-        (
-            "SoError",
-            "setHandlerCallback",
-            {"pyfunc": "Callable[[object, SoError], None]", "data": "object"},
-            "None",
-        ),
-        (
-            "SoDebugError",
-            "setHandlerCallback",
-            {"pyfunc": "Callable[[object, SoError], None]", "data": "object"},
-            "None",
-        ),
-        (
-            "SoMemoryError",
-            "setHandlerCallback",
-            {"pyfunc": "Callable[[object, SoError], None]", "data": "object"},
-            "None",
-        ),
-        (
-            "SoReadError",
-            "setHandlerCallback",
-            {"pyfunc": "Callable[[object, SoError], None]", "data": "object"},
-            "None",
-        ),
+    "coin.pyi": callback_method_checks()
+    + (
         (
             "SoSensorManager",
             "setChangedCallback",
@@ -448,15 +278,6 @@ CALLBACK_METHOD_CHECKS = {
             {
                 "pyfunc": "Callable[[Any, SoSelection], None]",
                 "userdata": "Any | None",
-            },
-            "None",
-        ),
-        (
-            "SoGLRenderAction",
-            "setSortedObjectOrderStrategy",
-            {
-                "cb": "Callable[[object, SoGLRenderAction], float] | None",
-                "closure": "object | None",
             },
             "None",
         ),

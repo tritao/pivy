@@ -371,6 +371,26 @@ class IncompletePolicyTests(unittest.TestCase):
 
 
 class CallbackTypePolicyTests(unittest.TestCase):
+    def test_callback_policy_generates_generator_views(self):
+        for (class_name, method_name), method_policy in (
+            policy.CALLBACK_METHOD_POLICIES.items()
+        ):
+            with self.subTest(class_name=class_name, method_name=method_name):
+                if method_policy.shadow_signature is not None:
+                    self.assertEqual(
+                        policy.PYTHON_SHADOW_METHOD_TYPES[
+                            (class_name, method_name)
+                        ],
+                        method_policy.shadow_signature,
+                    )
+                for parameter_name, annotation in method_policy.parameter_types:
+                    self.assertEqual(
+                        policy.CALLBACK_PARAMETER_TYPE_OVERRIDES[
+                            (class_name, method_name, parameter_name)
+                        ],
+                        annotation,
+                    )
+
     def test_error_callbacks_use_python_callable_overrides(self):
         expected = "Callable[[object, SoError], None]"
 

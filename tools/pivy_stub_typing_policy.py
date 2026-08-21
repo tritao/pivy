@@ -644,192 +644,302 @@ CALLBACK_TYPE_SIGNATURES = {
     "SoErrorCB": "Callable[[object, SoError], None]",
     "SoQtRenderAreaEventCB": "Callable[[Any, QEvent], Any]",
 }
+@dataclass(frozen=True)
+class CallbackMethodPolicy:
+    """Python contract for one callback-bearing Coin method."""
+
+    parameter_types: tuple[tuple[str, str], ...]
+    shadow_signature: tuple[str, str] | None = None
+    validation_parameter_types: tuple[tuple[str, str], ...] | None = None
+
+    def parameters(self) -> dict[str, str]:
+        return dict(
+            self.validation_parameter_types
+            if self.validation_parameter_types is not None
+            else self.parameter_types
+        )
+
+
+CALLBACK_METHOD_POLICIES = {
+    ("SoError", "setHandlerCallback"): CallbackMethodPolicy(
+        (
+            ("pyfunc", "Callable[[object, SoError], None]"),
+            ("data", "object"),
+        ),
+        (
+            "pyfunc: Callable[[object, SoError], None], data: object",
+            "None",
+        ),
+    ),
+    ("SoDebugError", "setHandlerCallback"): CallbackMethodPolicy(
+        (
+            ("pyfunc", "Callable[[object, SoError], None]"),
+            ("data", "object"),
+        ),
+        (
+            "pyfunc: Callable[[object, SoError], None], data: object",
+            "None",
+        ),
+    ),
+    ("SoMemoryError", "setHandlerCallback"): CallbackMethodPolicy(
+        (
+            ("pyfunc", "Callable[[object, SoError], None]"),
+            ("data", "object"),
+        ),
+        (
+            "pyfunc: Callable[[object, SoError], None], data: object",
+            "None",
+        ),
+    ),
+    ("SoReadError", "setHandlerCallback"): CallbackMethodPolicy(
+        (
+            ("pyfunc", "Callable[[object, SoError], None]"),
+            ("data", "object"),
+        ),
+        (
+            "pyfunc: Callable[[object, SoError], None], data: object",
+            "None",
+        ),
+    ),
+    ("SoCallbackList", "addCallback"): CallbackMethodPolicy(
+        (
+            ("f", "Callable[[object, object], None]"),
+            ("userData", "object | None"),
+        ),
+        (
+            "self, f: Callable[[object, object], None], "
+            "userData: object | None = ...",
+            "None",
+        ),
+    ),
+    ("SoCallbackList", "removeCallback"): CallbackMethodPolicy(
+        (
+            ("f", "Callable[[object, object], None]"),
+            ("userdata", "object | None"),
+        ),
+        (
+            "self, f: Callable[[object, object], None], "
+            "userdata: object | None = ...",
+            "None",
+        ),
+    ),
+    ("SoCallbackList", "clearCallbacks"): CallbackMethodPolicy(
+        (), ("self", "None")
+    ),
+    ("SoCallbackList", "invokeCallbacks"): CallbackMethodPolicy(
+        (("callbackdata", "object"),),
+        ("self, callbackdata: object", "None"),
+    ),
+    ("SoContextHandler", "addContextDestructionCallback"): CallbackMethodPolicy(
+        (
+            ("func", "Callable[[object, int], None]"),
+            ("userdata", "object | None"),
+        ),
+        (
+            "func: Callable[[object, int], None], userdata: object | None = ...",
+            "None",
+        ),
+    ),
+    ("SoContextHandler", "removeContextDestructionCallback"): CallbackMethodPolicy(
+        (
+            ("func", "Callable[[object, int], None]"),
+            ("userdata", "object | None"),
+        ),
+        (
+            "func: Callable[[object, int], None], userdata: object | None = ...",
+            "None",
+        ),
+    ),
+    ("SoGLRenderAction", "setSortedObjectOrderStrategy"): CallbackMethodPolicy(
+        (
+            ("cb", "Callable[[object, SoGLRenderAction], float] | None"),
+            ("closure", "object | None"),
+        ),
+        (
+            "self, strategy: int, "
+            "cb: Callable[[object, SoGLRenderAction], float] | None = ..., "
+            "closure: object | None = ...",
+            "None",
+        ),
+        (
+            ("strategy", "int"),
+            ("cb", "Callable[[object, SoGLRenderAction], float] | None"),
+            ("closure", "object | None"),
+        ),
+    ),
+    ("SoGLCacheContextElement", "scheduleDeleteCallback"): CallbackMethodPolicy(
+        (
+            ("cb", "Callable[[object, int], None]"),
+            ("closure", "object | None"),
+        ),
+        (
+            "contextid: int, "
+            "cb: Callable[[object, int], None], "
+            "closure: object | None = ...",
+            "None",
+        ),
+    ),
+    ("SoGLImage", "setEndFrameCallback"): CallbackMethodPolicy(
+        (
+            ("cb", "Callable[[object], None] | None"),
+            ("closure", "object | None"),
+        ),
+        (
+            "self, cb: Callable[[object], None] | None, "
+            "closure: object | None = ...",
+            "None",
+        ),
+    ),
+    ("SoShaderProgram", "setEnableCallback"): CallbackMethodPolicy(
+        (
+            ("cb", "Callable[[object, SoState, bool], None] | None"),
+            ("closure", "object | None"),
+        ),
+        (
+            "self, cb: Callable[[object, SoState, bool], None] | None, "
+            "closure: object | None = ...",
+            "None",
+        ),
+    ),
+    ("SoProto", "setFetchExternProtoCallback"): CallbackMethodPolicy(
+        (
+            (
+                "cb",
+                "Callable[[object, SoInput, list[SbString], int], "
+                "SoProto | None] | None",
+            ),
+            ("closure", "object | None"),
+        ),
+        (
+            "cb: Callable[[object, SoInput, list[SbString], int], "
+            "SoProto | None] | None, closure: object | None = ...",
+            "None",
+        ),
+    ),
+    ("SbImage", "addReadImageCB"): CallbackMethodPolicy(
+        (
+            ("cb", "Callable[[object, SbString, SbImage], bool]"),
+            ("closure", "object | None"),
+        ),
+        (
+            "cb: Callable[[object, SbString, SbImage], bool], "
+            "closure: object | None = ...",
+            "None",
+        ),
+    ),
+    ("SbImage", "removeReadImageCB"): CallbackMethodPolicy(
+        (
+            ("cb", "Callable[[object, SbString, SbImage], bool]"),
+            ("closure", "object | None"),
+        ),
+        (
+            "cb: Callable[[object, SbString, SbImage], bool], "
+            "closure: object | None = ...",
+            "None",
+        ),
+    ),
+    ("SbImage", "scheduleReadFile"): CallbackMethodPolicy(
+        (
+            ("cb", "Callable[[object, SbString, SbImage], bool]"),
+            ("closure", "object | None"),
+        ),
+        (
+            "self, cb: Callable[[object, SbString, SbImage], bool], "
+            "closure: object | None, filename: SbString, "
+            "searchdirectories: SbString | None = ..., "
+            "numdirectories: int = ...",
+            "bool",
+        ),
+        (
+            ("cb", "Callable[[object, SbString, SbImage], bool]"),
+            ("closure", "object | None"),
+            ("filename", "SbString"),
+            ("searchdirectories", "SbString | None"),
+            ("numdirectories", "int"),
+        ),
+    ),
+    ("SoDB", "registerHeader"): CallbackMethodPolicy(
+        (
+            ("precallback", "Callable[[object, SoInput], None]"),
+            ("postcallback", "Callable[[object, SoInput], None]"),
+            ("userdata", "object | None"),
+        ),
+        (
+            "headerstring: SbString, isbinary: bool, ivversion: float, "
+            "precallback: Callable[[object, SoInput], None], "
+            "postcallback: Callable[[object, SoInput], None], "
+            "userdata: object | None = ...",
+            "bool",
+        ),
+    ),
+    ("SoDB", "addProgressCallback"): CallbackMethodPolicy(
+        (
+            ("func", "Callable[[object, SbName, float, bool], bool]"),
+            ("userdata", "object | None"),
+        ),
+        (
+            "func: Callable[[object, SbName, float, bool], bool], "
+            "userdata: object | None",
+            "None",
+        ),
+    ),
+    ("SoDB", "removeProgressCallback"): CallbackMethodPolicy(
+        (
+            ("func", "Callable[[object, SbName, float, bool], bool]"),
+            ("userdata", "object | None"),
+        ),
+        (
+            "func: Callable[[object, SbName, float, bool], bool], "
+            "userdata: object | None",
+            "None",
+        ),
+    ),
+    ("SoSensor", "setFunction"): CallbackMethodPolicy(
+        (("callbackfunction", "Callable[[object, SoSensor], None]"),),
+        (
+            "self, callbackfunction: Callable[[object, SoSensor], None]",
+            "None",
+        ),
+    ),
+    ("SoDataSensor", "setDeleteCallback"): CallbackMethodPolicy(
+        (
+            ("function", "Callable[[object, SoSensor], None]"),
+            ("data", "object | None"),
+        ),
+        (
+            "self, function: Callable[[object, SoSensor], None], "
+            "data: object | None = ...",
+            "None",
+        ),
+    ),
+}
+
+
 PYTHON_SHADOW_METHOD_TYPES = {
-    ("SoCallbackList", "addCallback"): (
-        "self, f: Callable[[object, object], None], "
-        "userData: object | None = ...",
-        "None",
-    ),
-    ("SoCallbackList", "removeCallback"): (
-        "self, f: Callable[[object, object], None], "
-        "userdata: object | None = ...",
-        "None",
-    ),
-    ("SoCallbackList", "clearCallbacks"): ("self", "None"),
-    ("SoCallbackList", "invokeCallbacks"): (
-        "self, callbackdata: object",
-        "None",
-    ),
-    ("SoContextHandler", "addContextDestructionCallback"): (
-        "func: Callable[[object, int], None], userdata: object | None = ...",
-        "None",
-    ),
-    ("SoContextHandler", "removeContextDestructionCallback"): (
-        "func: Callable[[object, int], None], userdata: object | None = ...",
-        "None",
-    ),
-    ("SoGLRenderAction", "setSortedObjectOrderStrategy"): (
-        "self, strategy: int, "
-        "cb: Callable[[object, SoGLRenderAction], float] | None = ..., "
-        "closure: object | None = ...",
-        "None",
-    ),
-    ("SoGLCacheContextElement", "scheduleDeleteCallback"): (
-        "contextid: int, "
-        "cb: Callable[[object, int], None], "
-        "closure: object | None = ...",
-        "None",
-    ),
-    ("SoGLImage", "setEndFrameCallback"): (
-        "self, cb: Callable[[object], None] | None, "
-        "closure: object | None = ...",
-        "None",
-    ),
-    ("SoShaderProgram", "setEnableCallback"): (
-        "self, cb: Callable[[object, SoState, bool], None] | None, "
-        "closure: object | None = ...",
-        "None",
-    ),
-    ("SoProto", "setFetchExternProtoCallback"): (
-        "cb: Callable[[object, SoInput, list[SbString], int], SoProto | None] | None, "
-        "closure: object | None = ...",
-        "None",
-    ),
-    ("SbImage", "addReadImageCB"): (
-        "cb: Callable[[object, SbString, SbImage], bool], "
-        "closure: object | None = ...",
-        "None",
-    ),
-    ("SbImage", "removeReadImageCB"): (
-        "cb: Callable[[object, SbString, SbImage], bool], "
-        "closure: object | None = ...",
-        "None",
-    ),
-    ("SbImage", "scheduleReadFile"): (
-        "self, cb: Callable[[object, SbString, SbImage], bool], "
-        "closure: object | None, filename: SbString, "
-        "searchdirectories: SbString | None = ..., "
-        "numdirectories: int = ...",
-        "bool",
-    ),
-    ("SoDB", "registerHeader"): (
-        "headerstring: SbString, isbinary: bool, ivversion: float, "
-        "precallback: Callable[[object, SoInput], None], "
-        "postcallback: Callable[[object, SoInput], None], "
-        "userdata: object | None = ...",
-        "bool",
-    ),
-    ("SoDB", "addProgressCallback"): (
-        "func: Callable[[object, SbName, float, bool], bool], "
-        "userdata: object | None",
-        "None",
-    ),
-    ("SoDB", "removeProgressCallback"): (
-        "func: Callable[[object, SbName, float, bool], bool], "
-        "userdata: object | None",
-        "None",
-    ),
-    ("SoSensor", "setFunction"): (
-        "self, callbackfunction: Callable[[object, SoSensor], None]",
-        "None",
-    ),
-    ("SoDataSensor", "setDeleteCallback"): (
-        "self, function: Callable[[object, SoSensor], None], "
-        "data: object | None = ...",
-        "None",
-    ),
+    key: policy.shadow_signature
+    for key, policy in CALLBACK_METHOD_POLICIES.items()
+    if policy.shadow_signature is not None
 }
 CALLBACK_PARAMETER_TYPE_OVERRIDES = {
-    (class_name, "setHandlerCallback", parameter_name): annotation
-    for class_name in (
-        "SoError",
-        "SoDebugError",
-        "SoMemoryError",
-        "SoReadError",
-    )
-    for parameter_name, annotation in (
-        ("pyfunc", "Callable[[object, SoError], None]"),
-        ("data", "object"),
-    )
+    (class_name, method_name, parameter_name): annotation
+    for (class_name, method_name), method_policy in CALLBACK_METHOD_POLICIES.items()
+    for parameter_name, annotation in method_policy.parameter_types
 }
-CALLBACK_PARAMETER_TYPE_OVERRIDES.update(
-    {
-        ("SoContextHandler", "addContextDestructionCallback", "func"): (
-            "Callable[[object, int], None]"
-        ),
-        ("SoContextHandler", "addContextDestructionCallback", "userdata"): (
-            "object | None"
-        ),
-        ("SoContextHandler", "removeContextDestructionCallback", "func"): (
-            "Callable[[object, int], None]"
-        ),
-        ("SoContextHandler", "removeContextDestructionCallback", "userdata"): (
-            "object | None"
-        ),
-        ("SoGLRenderAction", "setSortedObjectOrderStrategy", "cb"): (
-            "Callable[[object, SoGLRenderAction], float] | None"
-        ),
-        ("SoGLRenderAction", "setSortedObjectOrderStrategy", "closure"): (
-            "object | None"
-        ),
-        ("SoGLCacheContextElement", "scheduleDeleteCallback", "cb"): (
-            "Callable[[object, int], None]"
-        ),
-        ("SoGLCacheContextElement", "scheduleDeleteCallback", "closure"): (
-            "object | None"
-        ),
-        ("SoGLImage", "setEndFrameCallback", "cb"): (
-            "Callable[[object], None] | None"
-        ),
-        ("SoGLImage", "setEndFrameCallback", "closure"): "object | None",
-        ("SoShaderProgram", "setEnableCallback", "cb"): (
-            "Callable[[object, SoState, bool], None] | None"
-        ),
-        ("SoShaderProgram", "setEnableCallback", "closure"): (
-            "object | None"
-        ),
-        ("SoProto", "setFetchExternProtoCallback", "cb"): (
-            "Callable[[object, SoInput, list[SbString], int], SoProto | None] | None"
-        ),
-        ("SoProto", "setFetchExternProtoCallback", "closure"): (
-            "object | None"
-        ),
-        ("SbImage", "addReadImageCB", "cb"): (
-            "Callable[[object, SbString, SbImage], bool]"
-        ),
-        ("SbImage", "addReadImageCB", "closure"): "object | None",
-        ("SbImage", "removeReadImageCB", "cb"): (
-            "Callable[[object, SbString, SbImage], bool]"
-        ),
-        ("SbImage", "removeReadImageCB", "closure"): "object | None",
-        ("SbImage", "scheduleReadFile", "cb"): (
-            "Callable[[object, SbString, SbImage], bool]"
-        ),
-        ("SbImage", "scheduleReadFile", "closure"): "object | None",
-        ("SoDB", "registerHeader", "precallback"): (
-            "Callable[[object, SoInput], None]"
-        ),
-        ("SoDB", "registerHeader", "postcallback"): (
-            "Callable[[object, SoInput], None]"
-        ),
-        ("SoDB", "registerHeader", "userdata"): "object | None",
-        ("SoDB", "addProgressCallback", "func"): (
-            "Callable[[object, SbName, float, bool], bool]"
-        ),
-        ("SoDB", "addProgressCallback", "userdata"): "object | None",
-        ("SoDB", "removeProgressCallback", "func"): (
-            "Callable[[object, SbName, float, bool], bool]"
-        ),
-        ("SoDB", "removeProgressCallback", "userdata"): "object | None",
-        ("SoSensor", "setFunction", "callbackfunction"): (
-            "Callable[[object, SoSensor], None]"
-        ),
-        ("SoDataSensor", "setDeleteCallback", "function"): (
-            "Callable[[object, SoSensor], None]"
-        ),
-        ("SoDataSensor", "setDeleteCallback", "data"): "object | None",
-    }
-)
+
+
+def callback_method_checks():
+    """Return validator expectations derived from callback policy metadata."""
+
+    return tuple(
+        (
+            class_name,
+            method_name,
+            method_policy.parameters(),
+            method_policy.shadow_signature[1],
+        )
+        for (class_name, method_name), method_policy in CALLBACK_METHOD_POLICIES.items()
+        if method_policy.shadow_signature is not None
+    )
 FUNCTION_POINTER_TYPE_SIGNATURES = {"void(*)(void*)": "Callable[[Any], None]"}
 SENSOR_CALLBACK_CLASSES = {
     "SoAlarmSensor",
