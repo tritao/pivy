@@ -1449,12 +1449,20 @@ class ZZErrorCallbackTests(unittest.TestCase):
 
         SoError.initClasses()
         SoError.setHandlerCallback(callback, "error-data")
+        self.assertIs(SoError.getHandlerCallback(), callback)
+        self.assertIs(SoError.getHandlerData(), "error-data")
         SoError.post("pivy callback test")
         self.assertEqual(events, [("error-data", "SoError")])
 
         SoDebugError.setHandlerCallback(callback, "debug-data")
+        self.assertIs(SoDebugError.getHandlerCallback(), callback)
+        self.assertIs(SoDebugError.getHandlerData(), "debug-data")
         SoMemoryError.setHandlerCallback(callback, None)
+        self.assertIs(SoMemoryError.getHandlerCallback(), callback)
+        self.assertIsNone(SoMemoryError.getHandlerData())
         SoReadError.setHandlerCallback(callback, None)
+        self.assertIs(SoReadError.getHandlerCallback(), callback)
+        self.assertIsNone(SoReadError.getHandlerData())
 
         with self.assertRaises(TypeError):
             SoError.setHandlerCallback(None, None)

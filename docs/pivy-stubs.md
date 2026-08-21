@@ -44,17 +44,14 @@ until the binding grows a Python-level wrapper or typemap.
 
 Known callback-pointer surfaces:
 
-- `SoError.{getHandlerCallback,getHandlerData}`
-- `SoDebugError.{getHandlerCallback,getHandlerData}`
-- `SoMemoryError.{getHandlerCallback,getHandlerData}`
-- `SoReadError.{getHandlerCallback,getHandlerData}`
 - `SoSensor.{getFunction,getData,setData}`
 - `SoDB.getHeaderData`
 - `SoGLImage.setEndFrameCallback`
 
-The four error-handler setters now use a SWIG-side adapter and accept a Python
-callable with `(userdata, SoError)` arguments. The getter methods still expose
-Coin's raw callback and data pointers and remain intentionally incomplete.
+The four error-handler setters use a SWIG-side adapter and accept a Python
+callable with `(userdata, SoError)` arguments. The getter methods return the
+retained Python callable and data when the handler was installed through Pivy,
+and `None` for native handlers that Pivy cannot represent as Python objects.
 
 Sensor constructors and the `SoSensor.setFunction`/`SoDataSensor.setDeleteCallback`
 setters use the existing SWIG-side sensor adapter and accept Python callables

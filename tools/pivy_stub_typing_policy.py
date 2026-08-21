@@ -485,6 +485,26 @@ def factory_method_return_type(class_name, method_name):
         return class_name
     return None
 EXTEND_HELPER_METHOD_TYPES = {
+    ("SoError", "getHandlerCallback", ""): (
+        "",
+        "Callable[[object, SoError], None] | None",
+    ),
+    ("SoError", "getHandlerData", ""): ("", "object | None"),
+    ("SoDebugError", "getHandlerCallback", ""): (
+        "",
+        "Callable[[object, SoError], None] | None",
+    ),
+    ("SoDebugError", "getHandlerData", ""): ("", "object | None"),
+    ("SoMemoryError", "getHandlerCallback", ""): (
+        "",
+        "Callable[[object, SoError], None] | None",
+    ),
+    ("SoMemoryError", "getHandlerData", ""): ("", "object | None"),
+    ("SoReadError", "getHandlerCallback", ""): (
+        "",
+        "Callable[[object, SoError], None] | None",
+    ),
+    ("SoReadError", "getHandlerData", ""): ("", "object | None"),
     ("SoEngine", "getByName", "name: SbName"): (
         "name: SbName",
         "SoEngine | None",

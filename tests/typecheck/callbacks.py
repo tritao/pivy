@@ -370,3 +370,24 @@ def check_error_callbacks() -> None:
     coin.SoDebugError.setHandlerCallback(error_callback, None)
     coin.SoMemoryError.setHandlerCallback(error_callback, None)
     coin.SoReadError.setHandlerCallback(error_callback, None)
+
+    assert_type(
+        coin.SoError.getHandlerCallback(),
+        Callable[[object, coin.SoError], None] | None,
+    )
+    assert_type(
+        coin.SoDebugError.getHandlerCallback(),
+        Callable[[object, coin.SoError], None] | None,
+    )
+    assert_type(
+        coin.SoMemoryError.getHandlerCallback(),
+        Callable[[object, coin.SoError], None] | None,
+    )
+    assert_type(
+        coin.SoReadError.getHandlerCallback(),
+        Callable[[object, coin.SoError], None] | None,
+    )
+    assert_type(coin.SoError.getHandlerData(), object | None)
+    assert_type(coin.SoDebugError.getHandlerData(), object | None)
+    assert_type(coin.SoMemoryError.getHandlerData(), object | None)
+    assert_type(coin.SoReadError.getHandlerData(), object | None)
