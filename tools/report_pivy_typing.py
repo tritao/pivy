@@ -48,16 +48,24 @@ class TypingQualityBaseline:
     min_concrete_annotations: int
     max_any_annotations: int
     max_incomplete_annotations: int
-    max_uncategorized_annotations: int = 0
+    max_incomplete_by_category: tuple[tuple[str, int], ...] = ()
 
 
 # These values are intentionally explicit.  Improving the generated surface
 # should make the relevant bound stricter in the same reviewed change; an
 # accidental generator or dependency drift must not silently lower quality.
 TYPING_QUALITY_BASELINE = TypingQualityBaseline(
-    min_concrete_annotations=20361,
-    max_any_annotations=147,
-    max_incomplete_annotations=942,
+    min_concrete_annotations=21039,
+    max_any_annotations=104,
+    max_incomplete_annotations=569,
+    max_incomplete_by_category=(
+        ("raw C pointers", 108),
+        ("callbacks", 30),
+        ("unknown output parameters", 0),
+        ("function pointers", 36),
+        ("dynamic/runtime API", 395),
+        ("uncategorized", 0),
+    ),
 )
 
 
@@ -83,12 +91,13 @@ def quality_regressions(
             "Incomplete annotations exceeded %d (got %d)"
             % (baseline.max_incomplete_annotations, report.incomplete_annotations)
         )
-    uncategorized = report.incomplete_categories["uncategorized"]
-    if uncategorized > baseline.max_uncategorized_annotations:
-        violations.append(
-            "uncategorized Incomplete sites exceeded %d (got %d)"
-            % (baseline.max_uncategorized_annotations, uncategorized)
-        )
+    for category, maximum in baseline.max_incomplete_by_category:
+        actual = report.incomplete_categories[category]
+        if actual > maximum:
+            violations.append(
+                "%s Incomplete sites exceeded %d (got %d)"
+                % (category, maximum, actual)
+            )
     return tuple(violations)
 
 

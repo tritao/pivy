@@ -1,13 +1,19 @@
 import re
 import unittest
+from dataclasses import replace
 from pathlib import Path
 
 import tools.pivy_stub_generation_data as compatibility_policy
 import tools.pivy_stub_typing_policy as policy
-from tools.report_pivy_typing import collect_report, quality_regressions
+from tools.report_pivy_typing import (
+    TYPING_QUALITY_BASELINE,
+    collect_report,
+    quality_regressions,
+)
 from tools.pivy_stub_typing_policy import (
     FACTORY_CLASSES,
     FIELD_TYPE_POLICIES,
+    INCOMPLETE_CATEGORIES,
     factory_method_return_type,
     MULTIFIELD_TYPE_POLICIES,
     classify_incomplete,
@@ -488,6 +494,23 @@ class PolicyBoundaryTests(unittest.TestCase):
     def test_checked_stub_meets_reviewed_quality_baseline(self):
         report = collect_report(Path("pivy/coin.pyi"))
         self.assertEqual(quality_regressions(report), ())
+
+    def test_quality_baseline_covers_every_incomplete_category(self):
+        budget_categories = {
+            category for category, _ in TYPING_QUALITY_BASELINE.max_incomplete_by_category
+        }
+        self.assertEqual(budget_categories, set(INCOMPLETE_CATEGORIES))
+
+    def test_quality_regressions_enforces_category_budget(self):
+        report = collect_report(Path("pivy/coin.pyi"))
+        baseline = replace(
+            TYPING_QUALITY_BASELINE,
+            max_incomplete_by_category=(
+                ("dynamic/runtime API", 394),
+            ),
+        )
+        violations = quality_regressions(report, baseline)
+        self.assertTrue(any("dynamic/runtime API" in violation for violation in violations))
 
 
 if __name__ == "__main__":
