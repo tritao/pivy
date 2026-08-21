@@ -674,6 +674,12 @@ PYTHON_SHADOW_METHOD_TYPES = {
         "closure: object | None = ...",
         "None",
     ),
+    ("SoGLCacheContextElement", "scheduleDeleteCallback"): (
+        "contextid: int, "
+        "cb: Callable[[object, int], None], "
+        "closure: object | None = ...",
+        "None",
+    ),
     ("SoDB", "registerHeader"): (
         "headerstring: SbString, isbinary: bool, ivversion: float, "
         "precallback: Callable[[object, SoInput], None], "
@@ -732,6 +738,12 @@ CALLBACK_PARAMETER_TYPE_OVERRIDES.update(
             "Callable[[object, SoGLRenderAction], float] | None"
         ),
         ("SoGLRenderAction", "setSortedObjectOrderStrategy", "closure"): (
+            "object | None"
+        ),
+        ("SoGLCacheContextElement", "scheduleDeleteCallback", "cb"): (
+            "Callable[[object, int], None]"
+        ),
+        ("SoGLCacheContextElement", "scheduleDeleteCallback", "closure"): (
             "object | None"
         ),
         ("SoDB", "registerHeader", "precallback"): (

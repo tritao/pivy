@@ -83,6 +83,8 @@ def check_context_handler_callbacks() -> None:
     coin.SoContextHandler.addContextDestructionCallback(callback, None)
     coin.SoContextHandler.removeContextDestructionCallback(callback, None)
 
+    coin.SoGLCacheContextElement.scheduleDeleteCallback(41, callback, None)
+
 
 def check_callback_action_callbacks() -> None:
     def node_callback(

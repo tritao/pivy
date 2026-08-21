@@ -1584,6 +1584,28 @@ class ZZContextHandlerCallbackTests(unittest.TestCase):
             SoContextHandler.addContextDestructionCallback(None)
 
 
+class ZZGLCacheCallbackTests(unittest.TestCase):
+    def testPythonScheduleDeleteCallback(self):
+        events = []
+
+        def callback(data, contextid):
+            events.append((data, contextid))
+
+        SoGLCacheContextElement.scheduleDeleteCallback(
+            41,
+            callback,
+            "delete-data",
+        )
+        SoContextHandler.destructingContext(41)
+        self.assertEqual(events, [("delete-data", 41)])
+
+        SoContextHandler.destructingContext(41)
+        self.assertEqual(events, [("delete-data", 41)])
+
+        with self.assertRaises(TypeError):
+            SoGLCacheContextElement.scheduleDeleteCallback(42, 42)
+
+
 class ZZGLCallbackTests(unittest.TestCase):
     def testSortedObjectOrderCallback(self):
         action = SoGLRenderAction(SbViewportRegion())

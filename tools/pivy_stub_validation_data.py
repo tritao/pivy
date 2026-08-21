@@ -170,6 +170,15 @@ CALLBACK_METHOD_CHECKS = {
             "None",
         ),
         (
+            "SoGLCacheContextElement",
+            "scheduleDeleteCallback",
+            {
+                "cb": "Callable[[object, int], None]",
+                "closure": "object | None",
+            },
+            "None",
+        ),
+        (
             "SoError",
             "setHandlerCallback",
             {"pyfunc": "Callable[[object, SoError], None]", "data": "object"},

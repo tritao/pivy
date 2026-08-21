@@ -78,6 +78,10 @@ removal methods match callbacks by Python object identity.
 `(userdata, SoGLRenderAction) -> float` callback. The callback closure is kept
 alive by the action and is cleared when a non-callback strategy is selected.
 
+`SoGLCacheContextElement.scheduleDeleteCallback` accepts a
+`(userdata, contextid) -> None` callback. Its Python closure is retained until
+Coin dispatches the scheduled deletion callback, then released.
+
 Known pointer-buffer surfaces:
 
 - `SoMFDouble.getValues`
