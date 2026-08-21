@@ -97,6 +97,20 @@ class FieldTypePolicyTests(unittest.TestCase):
             ),
         )
 
+    def test_callback_list_shadow_methods_have_python_signatures(self):
+        self.assertEqual(
+            policy.PYTHON_SHADOW_METHOD_TYPES[("SoCallbackList", "addCallback")],
+            (
+                "self, f: Callable[[object, object], None], "
+                "userData: object | None = ...",
+                "None",
+            ),
+        )
+        self.assertEqual(
+            policy.PYTHON_SHADOW_METHOD_TYPES[("SoCallbackList", "invokeCallbacks")],
+            ("self, callbackdata: object", "None"),
+        )
+
     def test_int32_references_use_the_existing_integer_pointer_helper(self):
         self.assertEqual(policy.SCALAR_REFERENCE_HELPER_TYPES["int32_t"], "intp")
 

@@ -1537,6 +1537,34 @@ class ZZSoDBCallbackTests(unittest.TestCase):
             )
 
 
+class ZZCallbackListTests(unittest.TestCase):
+    def testPythonCallbacks(self):
+        callback_list = SoCallbackList()
+        events = []
+
+        def callback(data, callbackdata):
+            events.append((data, callbackdata))
+
+        callback_list.addCallback(callback, "callback-data")
+        self.assertEqual(callback_list.getNumCallbacks(), 1)
+
+        payload = ["payload"]
+        callback_list.invokeCallbacks(payload)
+        self.assertEqual(events, [("callback-data", payload)])
+
+        callback_list.removeCallback(callback, "callback-data")
+        self.assertEqual(callback_list.getNumCallbacks(), 0)
+        callback_list.invokeCallbacks("not-dispatched")
+        self.assertEqual(events, [("callback-data", payload)])
+
+        callback_list.addCallback(callback, None)
+        callback_list.clearCallbacks()
+        self.assertEqual(callback_list.getNumCallbacks(), 0)
+
+        with self.assertRaises(TypeError):
+            callback_list.addCallback(None)
+
+
 class SbVecTests(unittest.TestCase):
     def setUp(self):
         self.sbvec3f = coin.SbVec3f(1, 1, 1)

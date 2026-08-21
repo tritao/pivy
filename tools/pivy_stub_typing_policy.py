@@ -645,6 +645,21 @@ CALLBACK_TYPE_SIGNATURES = {
     "SoQtRenderAreaEventCB": "Callable[[Any, QEvent], Any]",
 }
 PYTHON_SHADOW_METHOD_TYPES = {
+    ("SoCallbackList", "addCallback"): (
+        "self, f: Callable[[object, object], None], "
+        "userData: object | None = ...",
+        "None",
+    ),
+    ("SoCallbackList", "removeCallback"): (
+        "self, f: Callable[[object, object], None], "
+        "userdata: object | None = ...",
+        "None",
+    ),
+    ("SoCallbackList", "clearCallbacks"): ("self", "None"),
+    ("SoCallbackList", "invokeCallbacks"): (
+        "self, callbackdata: object",
+        "None",
+    ),
     ("SoDB", "registerHeader"): (
         "headerstring: SbString, isbinary: bool, ivversion: float, "
         "precallback: Callable[[object, SoInput], None], "

@@ -66,6 +66,10 @@ adapters and accept Python callables with `(userdata, SoInput)` and
 `(userdata, SbName, fraction, interruptible)` arguments respectively. Header
 output callback pointers remain intentionally incomplete.
 
+`SoCallbackList` uses Python shadow methods for callback registration and
+accepts `(userdata, callbackdata)` callables. Callback data is passed as the
+same Python object supplied to `invokeCallbacks`.
+
 Known pointer-buffer surfaces:
 
 - `SoMFDouble.getValues`

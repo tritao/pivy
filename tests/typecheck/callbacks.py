@@ -65,6 +65,17 @@ def check_database_callbacks() -> None:
     coin.SoDB.removeProgressCallback(progress_callback, None)
 
 
+def check_callback_list() -> None:
+    callback_list = coin.SoCallbackList()
+
+    def callback(data: object, callbackdata: object) -> None:
+        pass
+
+    callback_list.addCallback(callback, None)
+    callback_list.removeCallback(callback, None)
+    callback_list.invokeCallbacks({"source": "typing"})
+
+
 def check_callback_action_callbacks() -> None:
     def node_callback(
         data: Any,

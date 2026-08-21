@@ -91,6 +91,24 @@ ITER_CONTAINER_TYPES.update(vector_iter_element_types())
 CALLBACK_METHOD_CHECKS = {
     "coin.pyi": (
         (
+            "SoCallbackList",
+            "addCallback",
+            {
+                "f": "Callable[[object, object], None]",
+                "userData": "object | None",
+            },
+            "None",
+        ),
+        (
+            "SoCallbackList",
+            "removeCallback",
+            {
+                "f": "Callable[[object, object], None]",
+                "userdata": "object | None",
+            },
+            "None",
+        ),
+        (
             "SoDB",
             "registerHeader",
             {
