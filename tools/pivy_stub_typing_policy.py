@@ -914,6 +914,34 @@ CALLBACK_METHOD_POLICIES = {
     ),
 }
 
+for _dragger_callback_name in (
+    "Start",
+    "Motion",
+    "Finish",
+    "ValueChanged",
+    "OtherEvent",
+):
+    for _dragger_callback_action in ("add", "remove"):
+        CALLBACK_METHOD_POLICIES[
+            (
+                "SoDragger",
+                "%s%sCallback" % (
+                    _dragger_callback_action,
+                    _dragger_callback_name,
+                ),
+            )
+        ] = CallbackMethodPolicy(
+            (
+                ("pyfunc", "Callable[[object, SoDragger], None]"),
+                ("data", "object | None"),
+            ),
+            (
+                "self, pyfunc: Callable[[object, SoDragger], None], "
+                "data: object | None = ...",
+                "None",
+            ),
+        )
+
 
 PYTHON_SHADOW_METHOD_TYPES = {
     key: policy.shadow_signature

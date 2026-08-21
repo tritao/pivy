@@ -100,6 +100,10 @@ removal.
 `SbImage.scheduleReadFile` uses the same callback contract and releases the
 retained closure after the scheduled read callback runs or the schedule fails.
 
+`SoDragger` callback registration and removal methods use the same
+`(userdata, SoDragger)` contract. Their Python closures are retained on the
+dragger proxy, and removal matches the callback and userdata by identity.
+
 Known pointer-buffer surfaces:
 
 - `SoMFDouble.getValues`

@@ -273,7 +273,7 @@ def check_render_and_scene_callbacks() -> None:
 
 
 def check_other_callback_domains() -> None:
-    def dragger_callback(data: Any, dragger: coin.SoDragger) -> None:
+    def dragger_callback(data: object, dragger: coin.SoDragger) -> None:
         pass
 
     dragger = coin.SoDragger()

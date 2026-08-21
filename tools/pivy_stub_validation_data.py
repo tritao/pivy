@@ -365,66 +365,6 @@ CALLBACK_METHOD_CHECKS = {
             "None",
         ),
         (
-            "SoDragger",
-            "addStartCallback",
-            {"pyfunc": "Callable[[Any, SoDragger], None]", "data": "Any | None"},
-            "None",
-        ),
-        (
-            "SoDragger",
-            "removeStartCallback",
-            {"pyfunc": "Callable[[Any, SoDragger], None]", "data": "Any | None"},
-            "None",
-        ),
-        (
-            "SoDragger",
-            "addMotionCallback",
-            {"pyfunc": "Callable[[Any, SoDragger], None]", "data": "Any | None"},
-            "None",
-        ),
-        (
-            "SoDragger",
-            "removeMotionCallback",
-            {"pyfunc": "Callable[[Any, SoDragger], None]", "data": "Any | None"},
-            "None",
-        ),
-        (
-            "SoDragger",
-            "addFinishCallback",
-            {"pyfunc": "Callable[[Any, SoDragger], None]", "data": "Any | None"},
-            "None",
-        ),
-        (
-            "SoDragger",
-            "removeFinishCallback",
-            {"pyfunc": "Callable[[Any, SoDragger], None]", "data": "Any | None"},
-            "None",
-        ),
-        (
-            "SoDragger",
-            "addValueChangedCallback",
-            {"pyfunc": "Callable[[Any, SoDragger], None]", "data": "Any | None"},
-            "None",
-        ),
-        (
-            "SoDragger",
-            "removeValueChangedCallback",
-            {"pyfunc": "Callable[[Any, SoDragger], None]", "data": "Any | None"},
-            "None",
-        ),
-        (
-            "SoDragger",
-            "addOtherEventCallback",
-            {"pyfunc": "Callable[[Any, SoDragger], None]", "data": "Any | None"},
-            "None",
-        ),
-        (
-            "SoDragger",
-            "removeOtherEventCallback",
-            {"pyfunc": "Callable[[Any, SoDragger], None]", "data": "Any | None"},
-            "None",
-        ),
-        (
             "SoSceneManager",
             "setRenderCallback",
             {

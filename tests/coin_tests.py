@@ -1584,6 +1584,29 @@ class ZZContextHandlerCallbackTests(unittest.TestCase):
             SoContextHandler.addContextDestructionCallback(None)
 
 
+class ZZDraggerCallbackTests(unittest.TestCase):
+    def testPythonCallbacks(self):
+        events = []
+        dragger = SoTranslate1Dragger()
+        data = object()
+
+        def callback(callback_data, callback_dragger):
+            events.append((callback_data, callback_dragger))
+
+        dragger.addValueChangedCallback(callback, data)
+        dragger.valueChanged()
+        self.assertEqual(len(events), 1)
+        self.assertIs(events[0][0], data)
+        self.assertIsInstance(events[0][1], SoDragger)
+
+        dragger.removeValueChangedCallback(callback, data)
+        dragger.valueChanged()
+        self.assertEqual(len(events), 1)
+
+        with self.assertRaises(TypeError):
+            dragger.addValueChangedCallback(None)
+
+
 class ZZGLCacheCallbackTests(unittest.TestCase):
     def testPythonScheduleDeleteCallback(self):
         events = []
