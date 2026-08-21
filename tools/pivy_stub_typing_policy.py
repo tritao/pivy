@@ -705,6 +705,13 @@ PYTHON_SHADOW_METHOD_TYPES = {
         "closure: object | None = ...",
         "None",
     ),
+    ("SbImage", "scheduleReadFile"): (
+        "self, cb: Callable[[object, SbString, SbImage], bool], "
+        "closure: object | None, filename: SbString, "
+        "searchdirectories: SbString | None = ..., "
+        "numdirectories: int = ...",
+        "bool",
+    ),
     ("SoDB", "registerHeader"): (
         "headerstring: SbString, isbinary: bool, ivversion: float, "
         "precallback: Callable[[object, SoInput], None], "
@@ -795,6 +802,10 @@ CALLBACK_PARAMETER_TYPE_OVERRIDES.update(
             "Callable[[object, SbString, SbImage], bool]"
         ),
         ("SbImage", "removeReadImageCB", "closure"): "object | None",
+        ("SbImage", "scheduleReadFile", "cb"): (
+            "Callable[[object, SbString, SbImage], bool]"
+        ),
+        ("SbImage", "scheduleReadFile", "closure"): "object | None",
         ("SoDB", "registerHeader", "precallback"): (
             "Callable[[object, SoInput], None]"
         ),
@@ -1470,7 +1481,6 @@ TRIAGED_INCOMPLETE_SITES = frozenset(
         ('parameter', 'SbHeap', 'remove', 'obj'),
         ('parameter', 'SbHeap', 'traverseHeap', 'func'),
         ('parameter', 'SbHeap', 'traverseHeap', 'userdata'),
-        ('parameter', 'SbImage', 'scheduleReadFile', 'closure'),
         ('parameter', 'SbMatrix', 'LUBackSubstitution', 'index'),
         ('parameter', 'SbMatrix', 'LUDecomposition', 'index'),
         ('parameter', 'SbMatrix', '__init__', 'matrix'),

@@ -126,6 +126,16 @@ def check_graphics_callback_setters() -> None:
     coin.SbImage.addReadImageCB(image_read_callback, None)
     coin.SbImage.removeReadImageCB(image_read_callback, None)
 
+    image = coin.SbImage()
+    assert_type(
+        image.scheduleReadFile(
+            image_read_callback,
+            None,
+            coin.SbString("missing-image"),
+        ),
+        bool,
+    )
+
 
 def check_callback_action_callbacks() -> None:
     def node_callback(

@@ -227,6 +227,18 @@ CALLBACK_METHOD_CHECKS = {
             "None",
         ),
         (
+            "SbImage",
+            "scheduleReadFile",
+            {
+                "cb": "Callable[[object, SbString, SbImage], bool]",
+                "closure": "object | None",
+                "filename": "SbString",
+                "searchdirectories": "SbString | None",
+                "numdirectories": "int",
+            },
+            "bool",
+        ),
+        (
             "SoError",
             "setHandlerCallback",
             {"pyfunc": "Callable[[object, SoError], None]", "data": "object"},
@@ -945,18 +957,6 @@ DEFERRED_RAW_METHOD_CHECKS = {
             "__init__",
             {"bytes": "Incomplete"},
             "None",
-        ),
-        (
-            "SbImage",
-            "scheduleReadFile",
-            {
-                "cb": "Incomplete",
-                "closure": "Incomplete",
-                "filename": "SbString",
-                "searchdirectories": "SbString | None",
-                "numdirectories": "int",
-            },
-            "bool",
         ),
         (
             "SbImage",

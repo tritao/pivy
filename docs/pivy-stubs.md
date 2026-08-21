@@ -97,6 +97,9 @@ callback closure is retained until replaced or cleared.
 Python callback and userdata identity, and the retained closure is released on
 removal.
 
+`SbImage.scheduleReadFile` uses the same callback contract and releases the
+retained closure after the scheduled read callback runs or the schedule fails.
+
 Known pointer-buffer surfaces:
 
 - `SoMFDouble.getValues`

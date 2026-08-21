@@ -1647,6 +1647,16 @@ class ZZGraphicsCallbackSetterTests(unittest.TestCase):
         with self.assertRaises(TypeError):
             SbImage.addReadImageCB(42)
 
+        image = SbImage()
+        self.assertIn(
+            image.scheduleReadFile(
+                image_read_callback,
+                "schedule-data",
+                SbString("missing-image"),
+            ),
+            (0, 1),
+        )
+
 
 class ZZGLCallbackTests(unittest.TestCase):
     def testSortedObjectOrderCallback(self):

@@ -174,6 +174,24 @@ pivy_sb_image_find_read_closure(PyObject *cb, PyObject *userdata)
   return NULL;
 }
 
+static void
+pivy_sb_image_remove_read_closure(PyObject *pyclosure)
+{
+  if (pivy_sb_image_read_closures == NULL || pyclosure == NULL) {
+    return;
+  }
+
+  Py_ssize_t count = PyList_Size(pivy_sb_image_read_closures);
+  for (Py_ssize_t index = 0; index < count; ++index) {
+    if (PyList_GetItem(
+          pivy_sb_image_read_closures,
+          index) == pyclosure) {
+      PySequence_DelItem(pivy_sb_image_read_closures, index);
+      return;
+    }
+  }
+}
+
 static SbBool
 pivy_sb_image_read_python_cb(const SbString &filename,
                              SbImage *image,
@@ -222,6 +240,21 @@ pivy_sb_image_read_python_cb(const SbString &filename,
   PyGILState_Release(gil);
   return callback_result;
 }
+
+static SbBool
+pivy_sb_image_schedule_read_python_cb(const SbString &filename,
+                                      SbImage *image,
+                                      void *userdata)
+{
+  SbBool callback_result = pivy_sb_image_read_python_cb(
+    filename,
+    image,
+    userdata);
+  PyGILState_STATE gil = PyGILState_Ensure();
+  pivy_sb_image_remove_read_closure((PyObject *)userdata);
+  PyGILState_Release(gil);
+  return callback_result;
+}
 %}
 
 %typemap(in) PyObject * cb {
@@ -246,8 +279,10 @@ pivy_sb_image_read_python_cb(const SbString &filename,
 
 %ignore SbImage::addReadImageCB;
 %ignore SbImage::removeReadImageCB;
+%ignore SbImage::scheduleReadFile;
 %rename(addReadImageCB) SbImage::_pivy_addReadImageCB;
 %rename(removeReadImageCB) SbImage::_pivy_removeReadImageCB;
+%rename(scheduleReadFile) SbImage::_pivy_scheduleReadFile;
 
 %extend SbImage {
   static void _pivy_addReadImageCB(
@@ -284,14 +319,37 @@ pivy_sb_image_read_python_cb(const SbString &filename,
       pivy_sb_image_read_python_cb,
       (void *)pyclosure);
 
-    Py_ssize_t count = PyList_Size(pivy_sb_image_read_closures);
-    for (Py_ssize_t index = 0; index < count; ++index) {
-      if (PyList_GetItem(
-            pivy_sb_image_read_closures,
-            index) == pyclosure) {
-        PySequence_DelItem(pivy_sb_image_read_closures, index);
-        return;
-      }
+    pivy_sb_image_remove_read_closure(pyclosure);
+  }
+
+  SbBool _pivy_scheduleReadFile(
+      PyObject * cb,
+      PyObject * closure,
+      const SbString & filename,
+      const SbString * const * searchdirectories = NULL,
+      const int numdirectories = 0) {
+    PyObject *pyclosure = Py_BuildValue(
+      "(OO)",
+      cb,
+      closure ? closure : Py_None);
+    if (pyclosure == NULL) {
+      return FALSE;
     }
+    if (pivy_sb_image_keep_read_closure(pyclosure) < 0) {
+      Py_DECREF(pyclosure);
+      return FALSE;
+    }
+
+    SbBool result = self->scheduleReadFile(
+      pivy_sb_image_schedule_read_python_cb,
+      (void *)pyclosure,
+      filename,
+      searchdirectories,
+      numdirectories);
+    if (!result) {
+      pivy_sb_image_remove_read_closure(pyclosure);
+    }
+    Py_DECREF(pyclosure);
+    return result;
   }
 }
