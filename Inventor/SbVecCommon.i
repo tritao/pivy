@@ -116,6 +116,10 @@ static void convert_SbVec4d_array(PyObject *input, double output[4])
 %ignore _class_::getValue() const;
 
 %extend _class_ {
+  _class_(const _class_ &other) {
+    return new _class_(other);
+  }
+
   _scalar_ __getitem__(int index) {
     if (index < 0) index += _width_;
     if (index < 0 || index >= _width_) {

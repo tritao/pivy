@@ -17,6 +17,9 @@
 /* header include needed to let nodekit extensions find the SbTime header */
 %{
 #include <Inventor/SbTime.h>
+#include <limits.h>
+#include <stdint.h>
+#include <stdlib.h>
 
 #if (PY_VERSION_HEX < 0x02050000)
 /* Py_ssize_t needed for Python 2.5 compatibility, but isn't defined
@@ -261,9 +264,98 @@ autocast_event(SoEvent * event)
 
 %pointer_class(char, charp);
 %pointer_class(int, intp);
+%pointer_class(unsigned int, uintp);
 %pointer_class(long, longp);
 %pointer_class(float, floatp);
 %pointer_class(double, doublep);
+
+%{
+static int
+pivy_convert_numeric_sequence(PyObject * input, int kind, void ** output)
+{
+  Py_ssize_t length;
+  Py_ssize_t index;
+  size_t element_size = kind == 0 ? sizeof(int) :
+                        kind == 1 ? sizeof(int32_t) : sizeof(float);
+  char * storage;
+
+  if (!PySequence_Check(input)) {
+    PyErr_SetString(PyExc_TypeError, "expected a numeric sequence");
+    return -1;
+  }
+
+  length = PySequence_Length(input);
+  if (length < 0) return -1;
+  storage = length == 0 ? NULL : (char *)malloc((size_t)length * element_size);
+  if (length != 0 && storage == NULL) {
+    PyErr_NoMemory();
+    return -1;
+  }
+
+  for (index = 0; index < length; index++) {
+    PyObject * item = PySequence_GetItem(input, index);
+    if (item == NULL) {
+      free(storage);
+      return -1;
+    }
+
+    if (kind == 2) {
+      PyObject * number = PyNumber_Float(item);
+      if (number == NULL) {
+        Py_DECREF(item);
+        free(storage);
+        return -1;
+      }
+      ((float *)storage)[index] = (float)PyFloat_AsDouble(number);
+      Py_DECREF(number);
+      if (PyErr_Occurred()) {
+        Py_DECREF(item);
+        free(storage);
+        return -1;
+      }
+    } else {
+      long long value = PyLong_AsLongLong(item);
+      long long minimum = kind == 0 ? INT_MIN : INT32_MIN;
+      long long maximum = kind == 0 ? INT_MAX : INT32_MAX;
+      if (PyErr_Occurred() || value < minimum || value > maximum) {
+        if (!PyErr_Occurred()) {
+          PyErr_SetString(PyExc_OverflowError, "integer is outside the C range");
+        }
+        Py_DECREF(item);
+        free(storage);
+        return -1;
+      }
+      if (kind == 0) ((int *)storage)[index] = (int)value;
+      else ((int32_t *)storage)[index] = (int32_t)value;
+    }
+    Py_DECREF(item);
+  }
+
+  *output = storage;
+  return 0;
+}
+%}
+
+%define PIVY_CONST_NUMERIC_SEQUENCE_POINTER(_type_, _kind_, _name_)
+%typemap(in) const _type_ * const _name_ ( _type_ * temp ) {
+  if (pivy_convert_numeric_sequence($input, _kind_, (void **)&temp) < 0) {
+    SWIG_fail;
+  }
+  $1 = temp;
+}
+
+%typemap(freearg) const _type_ * const _name_ {
+  free((void *)$1);
+}
+
+%typemap(typecheck) const _type_ * const _name_ {
+  $1 = PySequence_Check($input) ? 1 : 0;
+}
+%enddef
+
+PIVY_CONST_NUMERIC_SEQUENCE_POINTER(int, 0, values)
+PIVY_CONST_NUMERIC_SEQUENCE_POINTER(int32_t, 1, indices)
+PIVY_CONST_NUMERIC_SEQUENCE_POINTER(float, 2, values)
 
 /* if SWIG determines the class abstract it doesn't generate
  * constructors of any kind. the following %feature

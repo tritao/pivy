@@ -70,6 +70,7 @@ try:
         RUNTIME_UNSUPPORTED_METHOD_NOTES,
         RUNTIME_UNSUPPORTED_NOTE,
         SCALAR_POINTER_HELPER_PARAMETERS,
+        SCALAR_REFERENCE_HELPER_PARAMETERS,
         SCALAR_REFERENCE_HELPER_TYPES,
         SENSOR_CALLBACK_CLASSES,
         SEQUENCE_ARRAY_PARAMETERS,
@@ -111,6 +112,7 @@ except ImportError:
         RUNTIME_UNSUPPORTED_METHOD_NOTES,
         RUNTIME_UNSUPPORTED_NOTE,
         SCALAR_POINTER_HELPER_PARAMETERS,
+        SCALAR_REFERENCE_HELPER_PARAMETERS,
         SCALAR_REFERENCE_HELPER_TYPES,
         SENSOR_CALLBACK_CLASSES,
         SEQUENCE_ARRAY_PARAMETERS,
@@ -349,6 +351,14 @@ def string_pointer_parameter_type(class_name, method_name, cpp_arg):
 
 
 def scalar_pointer_helper_parameter_type(class_name, method_name, cpp_arg):
+    helper_type = SCALAR_REFERENCE_HELPER_PARAMETERS.get(
+        (class_name, method_name, cpp_arg.name)
+    )
+    if helper_type:
+        normalized = normalize_cpp_type(cpp_arg.type)
+        if "&" in normalized and "*" not in normalized and "[" not in normalized:
+            return helper_type
+
     helper_type = SCALAR_POINTER_HELPER_PARAMETERS.get(
         (class_name, method_name, cpp_arg.name)
     )

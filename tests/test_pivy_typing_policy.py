@@ -202,6 +202,39 @@ class IncompletePolicyTests(unittest.TestCase):
             "raw C pointers",
         )
 
+    def test_known_reference_helpers_are_site_specific(self):
+        self.assertEqual(
+            policy.SCALAR_REFERENCE_HELPER_PARAMETERS[
+                ("SoOutput", "getAvailableCompressionMethods", "num")
+            ],
+            "uintp",
+        )
+        self.assertEqual(
+            policy.SCALAR_REFERENCE_HELPER_PARAMETERS[
+                ("SoDepthBufferElement", "get", "function_out")
+            ],
+            "intp",
+        )
+
+    def test_deferred_pointer_outputs_are_classified_explicitly(self):
+        for class_name, method_name, parameter_name in (
+            ("SoAction", "getPathCode", "indices"),
+            ("SoAction", "usePathCode", "indices"),
+            ("SoFieldData", "getEnumData", "values"),
+            ("SoSensorManager", "doSelect", "userTimeOut"),
+            ("SoDB", "doSelect", "usertimeout"),
+        ):
+            with self.subTest(class_name=class_name, method_name=method_name):
+                self.assertEqual(
+                    self.classify(
+                        kind="parameter",
+                        class_name=class_name,
+                        method_name=method_name,
+                        parameter_name=parameter_name,
+                    ),
+                    "raw C pointers",
+                )
+
 
 class PolicyBoundaryTests(unittest.TestCase):
     def test_factory_policy_matches_swig_inventory(self):

@@ -61,6 +61,7 @@ SOQT_COIN_DUPLICATE_CLASSES = {
 POINTER_HELPER_TYPES = {
     "charp": "str",
     "intp": "int",
+    "uintp": "int",
     "longp": "int",
     "floatp": "float",
     "doublep": "float",
@@ -1461,7 +1462,7 @@ UNSUPPORTED_REFERENCE_METHOD_CHECKS = {
         (
             "SoOutput",
             "getAvailableCompressionMethods",
-            {"num": "Incomplete"},
+            {"num": "uintp"},
             "SbName",
         ),
         (
@@ -1494,7 +1495,7 @@ UNSUPPORTED_REFERENCE_METHOD_CHECKS = {
                 "state": "SoState",
                 "test_out": "intp",
                 "write_out": "intp",
-                "function_out": "Incomplete",
+                "function_out": "intp",
                 "range_out": "SbVec2f",
             },
             "None",

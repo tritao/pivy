@@ -91,7 +91,29 @@ if (init_file_emulator() < 0) {
 
 /* include the typemaps common to all pivy modules */
 %include pivy_common_typemaps.i
+%ignore SoDepthBufferElement::get;
 %include coin_header_includes.h
+
+/* Coin's enum reference is represented by its underlying integer in the
+   Python binding, just like the other scalar output references. */
+%rename(get) SoDepthBufferElement::getInt;
+%extend SoDepthBufferElement {
+  static void getInt(SoState * state, int & test_out, int & write_out,
+                     int & function_out, SbVec2f & range_out) {
+    SbBool test;
+    SbBool write;
+    SoDepthBufferElement::DepthWriteFunction function;
+    SoDepthBufferElement::get(
+      state,
+      test,
+      write,
+      function,
+      range_out);
+    test_out = static_cast<int>(test);
+    write_out = static_cast<int>(write);
+    function_out = static_cast<int>(function);
+  }
+}
 
 /*
   removes all the properties for fields in classes derived from

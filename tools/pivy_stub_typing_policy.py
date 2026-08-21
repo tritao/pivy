@@ -131,6 +131,7 @@ COMPARISON_METHODS = {
 POINTER_HELPER_TYPES = {
     "charp": "str",
     "intp": "int",
+    "uintp": "int",
     "longp": "int",
     "floatp": "float",
     "doublep": "float",
@@ -139,6 +140,10 @@ SCALAR_POINTER_HELPER_PARAMETERS = {
     ("SoQt", "getVersionInfo", "major"): "intp",
     ("SoQt", "getVersionInfo", "minor"): "intp",
     ("SoQt", "getVersionInfo", "micro"): "intp",
+}
+SCALAR_REFERENCE_HELPER_PARAMETERS = {
+    ("SoDepthBufferElement", "get", "function_out"): "intp",
+    ("SoOutput", "getAvailableCompressionMethods", "num"): "uintp",
 }
 SCALAR_REFERENCE_HELPER_TYPES = {
     "SbBool": "intp",
@@ -152,6 +157,12 @@ SCALAR_REFERENCE_HELPER_TYPES = {
 SEQUENCE_POINTER_PARAMETERS = {
     ("SbColor", "__init__", "rgb"): "Sequence[float]",
     ("SbColor4f", "__init__", "rgba"): "Sequence[float]",
+    ("SoGLColorIndexElement", "set", "indices"): "Sequence[int]",
+    ("SoGLLazyElement", "setColorIndexElt", "indices"): "Sequence[int]",
+    ("SoLazyElement", "setColorIndices", "indices"): "Sequence[int]",
+    ("SoMFEnum", "setEnums", "values"): "Sequence[int]",
+    ("SoShininessElement", "set", "values"): "Sequence[float]",
+    ("SoTransparencyElement", "set", "values"): "Sequence[float]",
     ("SoQt", "init", "argv"): "Sequence[str]",
 }
 SEQUENCE_ARRAY_PARAMETERS = {
@@ -1559,6 +1570,17 @@ TRIAGED_INCOMPLETE_SITES = frozenset(
     }
 )
 
+# These are intentionally opaque pointer-to-pointer or platform-structure
+# surfaces. Keep them visible in the report without pretending that the raw
+# SWIG representation is a useful Python type.
+INCOMPLETE_CATEGORY_OVERRIDES = {
+    ("parameter", "SoAction", "getPathCode", "indices"): "raw C pointers",
+    ("parameter", "SoAction", "usePathCode", "indices"): "raw C pointers",
+    ("parameter", "SoFieldData", "getEnumData", "values"): "raw C pointers",
+    ("parameter", "SoSensorManager", "doSelect", "userTimeOut"): "raw C pointers",
+    ("parameter", "SoDB", "doSelect", "usertimeout"): "raw C pointers",
+}
+
 
 def classify_incomplete(
     *,
@@ -1570,6 +1592,10 @@ def classify_incomplete(
 ) -> str:
     """Classify one incomplete site using the shared policy rules."""
 
+    key = (kind, class_name, method_name, parameter_name)
+    if key in INCOMPLETE_CATEGORY_OVERRIDES:
+        return INCOMPLETE_CATEGORY_OVERRIDES[key]
+
     for rule in INCOMPLETE_RULES:
         if rule.matches(
             kind=kind,
@@ -1579,7 +1605,6 @@ def classify_incomplete(
             has_raw_pointer_note=has_raw_pointer_note,
         ):
             return rule.category
-    key = (kind, class_name, method_name, parameter_name)
     if key in TRIAGED_INCOMPLETE_SITES:
         return "dynamic/runtime API"
     return "uncategorized"

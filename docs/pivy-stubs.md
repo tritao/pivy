@@ -111,16 +111,24 @@ Representative unsupported scalar-ref surfaces:
 - `SoInput.read(unsigned int & i)`
 - `SoInput.read(short & s)`
 - `SoInput.read(unsigned short & s)`
-- `SoOutput.getAvailableCompressionMethods(unsigned int & num)`
 - short/unsigned-short box and vector out-params such as
   `SbBox2s.getBounds(...)` and `SbVec4us.getValue(...)`
 
 Representative unsupported enum-ref surfaces:
 
 - `SoPolygonOffsetElement.{get,getDefault}` with `Style &`
-- `SoDepthBufferElement.get(...)` with `DepthWriteFunction &`
 - `SoShapeHintsElement.get(...)` with shape-hint enum refs
 - `SoMultiTextureImageElement.get(...)` with `Wrap &` and `Model &`
+
+The current binding now exposes `SoOutput.getAvailableCompressionMethods()`
+through the `uintp` helper and adapts `SoDepthBufferElement.get()` to use
+`intp` for its enum output. The remaining pointer-to-pointer surfaces are
+still deliberately deferred:
+
+- `SoAction.{getPathCode,usePathCode}` and `SoFieldData.getEnumData()` expose
+  raw `const int *` output pointers.
+- `SoSensorManager.doSelect()` and `SoDB.doSelect()` expose platform
+  `timeval *` pointers.
 
 TODO: add SWIG typemaps or Python wrapper helpers for these families before
 tightening the stubs. Until then, `Incomplete` is the least misleading type.
