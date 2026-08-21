@@ -194,10 +194,9 @@ METHOD_RETURN_TYPE_OVERRIDES = {
     ("SoQtViewer", "getSceneGraph"): "SoNode | None",
 }
 
-# Coin's SO_ELEMENT_HEADER macro exposes these class-specific factories as
-# ``void *``. The binding's element typemap autocasts and owns the concrete
-# object, so the generated Python contract can name the class returned by each
-# factory.
+# Coin's element and field header macros expose these class-specific factories
+# as ``void *``. The binding typemaps autocast and own the concrete object, so
+# the generated Python contract can name the class returned by each factory.
 ELEMENT_FACTORY_CLASSES = frozenset(
     {
         "SoDecimationTypeElement",
@@ -303,9 +302,103 @@ ELEMENT_FACTORY_CLASSES = frozenset(
     }
 )
 
+FIELD_FACTORY_CLASSES = frozenset(
+    {
+        "SoSFEnum",
+        "SoSFFloat",
+        "SoSFUShort",
+        "SoSFInt32",
+        "SoSFBool",
+        "SoSFImage",
+        "SoSFString",
+        "SoSFColor",
+        "SoSFNode",
+        "SoSFName",
+        "SoMFName",
+        "SoSFVec3f",
+        "SoSFRotation",
+        "SoSFVec2f",
+        "SoMFBool",
+        "SoMFEnum",
+        "SoMFFloat",
+        "SoMFVec3f",
+        "SoMFString",
+        "SoMFVec2f",
+        "SoMFVec4f",
+        "SoMFRotation",
+        "SoMFMatrix",
+        "SoSFPath",
+        "SoSFTrigger",
+        "SoSFShort",
+        "SoSFTime",
+        "SoSFBitMask",
+        "SoSFBox2s",
+        "SoSFBox2i32",
+        "SoSFBox2f",
+        "SoSFBox2d",
+        "SoSFBox3s",
+        "SoSFBox3i32",
+        "SoSFBox3f",
+        "SoSFBox3d",
+        "SoSFColorRGBA",
+        "SoSFDouble",
+        "SoSFEngine",
+        "SoSFImage3",
+        "SoSFMatrix",
+        "SoSFPlane",
+        "SoSFUInt32",
+        "SoSFVec2b",
+        "SoSFVec2s",
+        "SoSFVec2i32",
+        "SoSFVec2d",
+        "SoSFVec3b",
+        "SoSFVec3s",
+        "SoSFVec3i32",
+        "SoSFVec3d",
+        "SoSFVec4b",
+        "SoSFVec4ub",
+        "SoSFVec4s",
+        "SoSFVec4us",
+        "SoSFVec4i32",
+        "SoSFVec4ui32",
+        "SoSFVec4f",
+        "SoSFVec4d",
+        "SoMFColor",
+        "SoMFColorRGBA",
+        "SoMFDouble",
+        "SoMFEngine",
+        "SoMFBitMask",
+        "SoMFInt32",
+        "SoMFNode",
+        "SoMFPath",
+        "SoMFPlane",
+        "SoMFShort",
+        "SoMFTime",
+        "SoMFUInt32",
+        "SoMFUShort",
+        "SoMFVec2b",
+        "SoMFVec2s",
+        "SoMFVec2i32",
+        "SoMFVec2d",
+        "SoMFVec3b",
+        "SoMFVec3s",
+        "SoMFVec3i32",
+        "SoMFVec3d",
+        "SoMFVec4b",
+        "SoMFVec4ub",
+        "SoMFVec4s",
+        "SoMFVec4us",
+        "SoMFVec4i32",
+        "SoMFVec4ui32",
+        "SoMFVec4d",
+    }
+)
 
-def element_factory_method_return_type(class_name, method_name):
-    if method_name == "createInstance" and class_name in ELEMENT_FACTORY_CLASSES:
+FACTORY_CLASSES = ELEMENT_FACTORY_CLASSES | FIELD_FACTORY_CLASSES
+
+
+def factory_method_return_type(class_name, method_name):
+    if method_name == "createInstance" and class_name in FACTORY_CLASSES:
         return class_name
     return None
 EXTEND_HELPER_METHOD_TYPES = {

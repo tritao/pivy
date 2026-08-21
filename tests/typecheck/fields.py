@@ -49,3 +49,9 @@ def check_nullable_fields() -> None:
     path = coin.SoSFPath()
     assert_type(path.getValue(), coin.SoPath | None)
     path.setValue(None)
+
+
+def check_field_factory_contract() -> None:
+    assert_type(coin.SoSFFloat.createInstance(), coin.SoSFFloat)
+    assert_type(coin.SoMFVec3f.createInstance(), coin.SoMFVec3f)
+    assert_type(coin.SoSFBox3d.createInstance(), coin.SoSFBox3d)

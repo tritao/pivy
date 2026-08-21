@@ -6,10 +6,11 @@ import tools.pivy_stub_generation_data as compatibility_policy
 import tools.pivy_stub_typing_policy as policy
 from tools.report_pivy_typing import collect_report, quality_regressions
 from tools.pivy_stub_typing_policy import (
+    FACTORY_CLASSES,
     FIELD_TYPE_POLICIES,
+    factory_method_return_type,
     MULTIFIELD_TYPE_POLICIES,
     classify_incomplete,
-    element_factory_method_return_type,
     field_method_type_overrides,
     multifield_iter_element_types,
     multifield_setvalues_types,
@@ -152,20 +153,23 @@ class IncompletePolicyTests(unittest.TestCase):
 
 
 class PolicyBoundaryTests(unittest.TestCase):
-    def test_element_factory_policy_matches_swig_inventory(self):
-        text = Path("Inventor/elements/SoElement.i").read_text()
-        interface_classes = {
-            class_name
-            for class_name in re.findall(
-                r"PIVY_ELEMENT_FACTORY_OUT\(([^)]+)\)", text
+    def test_factory_policy_matches_swig_inventory(self):
+        interface_classes = set()
+        for path, macro in (
+            ("Inventor/elements/SoElement.i", "PIVY_ELEMENT_FACTORY_OUT"),
+            ("Inventor/fields/SoField.i", "PIVY_FIELD_FACTORY_OUT"),
+        ):
+            text = Path(path).read_text()
+            interface_classes.update(
+                class_name
+                for class_name in re.findall(rf"{macro}\(([^)]+)\)", text)
+                if class_name != "_class_"
             )
-            if class_name != "_class_"
-        }
 
-        self.assertEqual(interface_classes, policy.ELEMENT_FACTORY_CLASSES)
+        self.assertEqual(interface_classes, FACTORY_CLASSES)
         for class_name in interface_classes:
             self.assertEqual(
-                element_factory_method_return_type(class_name, "createInstance"),
+                factory_method_return_type(class_name, "createInstance"),
                 class_name,
             )
 

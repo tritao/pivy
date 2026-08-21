@@ -153,7 +153,7 @@ autocast_path(SoPath * path)
 
 /* autocasting helper function for SoField */
 SWIGEXPORT PyObject *
-autocast_field(SoField * field)
+autocast_field(SoField * field, int own = 0)
 {
   PyObject * result = NULL;
 
@@ -166,12 +166,18 @@ autocast_field(SoField * field)
     while (!(type.isBad() || result)) {
       obj = SWIG_NewPointerObj((void*)field, SWIGTYPE_p_SoField, 0);
       
-      result = cast_internal(NULL, obj, type.getName().getString(), type.getName().getLength());
+      result = cast_internal(NULL, obj, type.getName().getString(),
+                             type.getName().getLength(), own);
 
       Py_DECREF(obj);
       
       if (!result) { type = type.getParent(); }
     }
+  }
+
+  if (!result && field && own) {
+    result = SWIG_NewPointerObj((void*)field, SWIGTYPE_p_SoField,
+                                SWIG_POINTER_OWN);
   }
 
   if (!result) {

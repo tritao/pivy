@@ -59,8 +59,8 @@ Known pointer-buffer surfaces:
 
 Resolved binding-backed surfaces:
 
-- Class-specific static `createInstance()` methods for Coin elements now
-  return owned, concrete element wrappers through a SWIG typemap.
+- Class-specific static `createInstance()` methods for Coin elements and
+  fields now return owned, concrete wrappers through SWIG typemaps.
 
 High-volume `Incomplete` clusters that still need SWIG-side work:
 

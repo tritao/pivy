@@ -85,6 +85,20 @@ class ElementFactoryTests(unittest.TestCase):
         self.assertTrue(model_matrix.thisown)
 
 
+class FieldFactoryTests(unittest.TestCase):
+    def testFieldFactoryAutocastAndOwnership(self):
+        fields = (
+            SoSFFloat.createInstance(),
+            SoMFVec3f.createInstance(),
+            SoSFBox3d.createInstance(),
+        )
+        self.assertIsInstance(fields[0], SoSFFloat)
+        self.assertIsInstance(fields[1], SoMFVec3f)
+        self.assertIsInstance(fields[2], SoSFBox3d)
+        self.assertTrue(all(isinstance(field, SoField) for field in fields))
+        self.assertTrue(all(field.thisown for field in fields))
+
+
 class EngineOutputTests(unittest.TestCase):
     def testEngineOutputContract(self):
         engine = SoBoolOperation()

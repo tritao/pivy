@@ -51,7 +51,7 @@ try:
         CALLBACK_PARAMETER_NAMES,
         CALLBACK_TYPE_SIGNATURES,
         COMPARISON_METHODS,
-        element_factory_method_return_type,
+        factory_method_return_type,
         EXTEND_HELPER_METHOD_TYPES,
         FLOAT_TYPES,
         FUNCTION_POINTER_TYPE_SIGNATURES,
@@ -89,7 +89,7 @@ except ImportError:
         CALLBACK_PARAMETER_NAMES,
         CALLBACK_TYPE_SIGNATURES,
         COMPARISON_METHODS,
-        element_factory_method_return_type,
+        factory_method_return_type,
         EXTEND_HELPER_METHOD_TYPES,
         FLOAT_TYPES,
         FUNCTION_POINTER_TYPE_SIGNATURES,
@@ -632,7 +632,7 @@ def render_python_signature(
         return_type = "bool"
     else:
         cpp_return = signature.return_type
-        factory_return_type = element_factory_method_return_type(class_name, name)
+        factory_return_type = factory_method_return_type(class_name, name)
         if (
             name in {"getValue", "getHSVValue"}
             and class_name in SEQUENCE_VALUE_RETURN_TYPES
