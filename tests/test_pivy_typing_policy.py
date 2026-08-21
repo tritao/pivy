@@ -51,6 +51,9 @@ class FieldTypePolicyTests(unittest.TestCase):
             ("self, name: str", "SoField | SoEngineOutput"),
         )
 
+    def test_int32_references_use_the_existing_integer_pointer_helper(self):
+        self.assertEqual(policy.SCALAR_REFERENCE_HELPER_TYPES["int32_t"], "intp")
+
 
 class MultifieldTypePolicyTests(unittest.TestCase):
     def test_multifield_element_types_cover_sequence_fields(self):

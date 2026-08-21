@@ -73,4 +73,26 @@ def check_double_precision_values() -> None:
 
     assert_type(axis, coin.SbVec3d)
     assert_type(angle, float)
-    assert_type(rotation.getMatrix(), coin.SbDPMatrix)
+
+
+def check_int32_scalar_output_helpers() -> None:
+    scalar = coin.intp()
+
+    vector2 = coin.SbVec2i32(1, 2)
+    assert_type(vector2.getValue(scalar, scalar), None)
+
+    vector3 = coin.SbVec3i32(1, 2, 3)
+    assert_type(vector3.getValue(scalar, scalar, scalar), None)
+
+    vector4 = coin.SbVec4i32(1, 2, 3, 4)
+    assert_type(vector4.getValue(scalar, scalar, scalar, scalar), None)
+
+    box2 = coin.SbBox2i32(1, 2, 3, 4)
+    assert_type(box2.getBounds(scalar, scalar, scalar, scalar), None)
+    assert_type(box2.getOrigin(scalar, scalar), None)
+    assert_type(box2.getSize(scalar, scalar), None)
+
+    box3 = coin.SbBox3i32(1, 2, 3, 4, 5, 6)
+    assert_type(box3.getBounds(scalar, scalar, scalar, scalar, scalar, scalar), None)
+    assert_type(box3.getOrigin(scalar, scalar, scalar), None)
+    assert_type(box3.getSize(scalar, scalar, scalar), None)

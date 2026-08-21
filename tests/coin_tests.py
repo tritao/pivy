@@ -1166,6 +1166,47 @@ class SbBaseClasses(unittest.TestCase):
         # the following treats the SbMatrix as a sequence!
         #m3 = SbDPMatrix(SbMatrix())
 
+    def testInt32ScalarOutputHelpers(self):
+        vector2 = SbVec2i32(1, 2)
+        x, y = intp(), intp()
+        vector2.getValue(x, y)
+        self.assertEqual((x.value(), y.value()), (1, 2))
+
+        vector3 = SbVec3i32(1, 2, 3)
+        x, y, z = intp(), intp(), intp()
+        vector3.getValue(x, y, z)
+        self.assertEqual((x.value(), y.value(), z.value()), (1, 2, 3))
+
+        vector4 = SbVec4i32(1, 2, 3, 4)
+        x, y, z, w = intp(), intp(), intp(), intp()
+        vector4.getValue(x, y, z, w)
+        self.assertEqual((x.value(), y.value(), z.value(), w.value()), (1, 2, 3, 4))
+
+        box2 = SbBox2i32(1, 2, 3, 4)
+        xmin, ymin, xmax, ymax = intp(), intp(), intp(), intp()
+        box2.getBounds(xmin, ymin, xmax, ymax)
+        self.assertEqual((xmin.value(), ymin.value(), xmax.value(), ymax.value()), (1, 2, 3, 4))
+        origin_x, origin_y = intp(), intp()
+        box2.getOrigin(origin_x, origin_y)
+        self.assertEqual((origin_x.value(), origin_y.value()), (1, 2))
+        size_x, size_y = intp(), intp()
+        box2.getSize(size_x, size_y)
+        self.assertEqual((size_x.value(), size_y.value()), (2, 2))
+
+        box3 = SbBox3i32(1, 2, 3, 4, 5, 6)
+        xmin, ymin, zmin, xmax, ymax, zmax = (intp() for _ in range(6))
+        box3.getBounds(xmin, ymin, zmin, xmax, ymax, zmax)
+        self.assertEqual(
+            (xmin.value(), ymin.value(), zmin.value(), xmax.value(), ymax.value(), zmax.value()),
+            (1, 2, 3, 4, 5, 6),
+        )
+        origin_x, origin_y, origin_z = intp(), intp(), intp()
+        box3.getOrigin(origin_x, origin_y, origin_z)
+        self.assertEqual((origin_x.value(), origin_y.value(), origin_z.value()), (1, 2, 3))
+        size_x, size_y, size_z = intp(), intp(), intp()
+        box3.getSize(size_x, size_y, size_z)
+        self.assertEqual((size_x.value(), size_y.value(), size_z.value()), (3, 3, 3))
+
     def testVecMatrixOperators(self):
         """tests operators between vec and matrix classes"""
         v = SbVec3f(1,0,0)
