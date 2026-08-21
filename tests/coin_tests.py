@@ -1491,6 +1491,52 @@ class ZZSensorCallbackTests(unittest.TestCase):
             data_sensor.setDeleteCallback(None)
 
 
+class ZZSoDBCallbackTests(unittest.TestCase):
+    def testPythonDatabaseCallbacks(self):
+        progress_events = []
+
+        def progress_callback(data, itemid, fraction, interruptible):
+            progress_events.append((data, itemid, fraction, interruptible))
+            return False
+
+        SoDB.addProgressCallback(progress_callback, "progress-data")
+        SoDB.removeProgressCallback(progress_callback, "progress-data")
+
+        header_events = []
+
+        def header_callback(data, input):
+            header_events.append((data, type(input).__name__))
+
+        result = SoDB.registerHeader(
+            SbString("#PivyCallbackProbe"),
+            False,
+            1.0,
+            header_callback,
+            header_callback,
+            "header-data",
+        )
+        self.assertTrue(result)
+
+        input = SoInput()
+        input.setBuffer(b"#PivyCallbackProbe V1.0 ascii\nSeparator {\n}\n")
+        SoDB.readAll(input)
+        self.assertEqual(
+            header_events,
+            [("header-data", "SoInput"), ("header-data", "SoInput")],
+        )
+
+        with self.assertRaises(TypeError):
+            SoDB.addProgressCallback(None, None)
+        with self.assertRaises(TypeError):
+            SoDB.registerHeader(
+                SbString("#PivyCallbackProbeInvalid"),
+                False,
+                1.0,
+                None,
+                header_callback,
+            )
+
+
 class SbVecTests(unittest.TestCase):
     def setUp(self):
         self.sbvec3f = coin.SbVec3f(1, 1, 1)

@@ -49,6 +49,7 @@ Known callback-pointer surfaces:
 - `SoMemoryError.{getHandlerCallback,getHandlerData}`
 - `SoReadError.{getHandlerCallback,getHandlerData}`
 - `SoSensor.{getFunction,getData,setData}`
+- `SoDB.getHeaderData`
 - `SoGLImage.setEndFrameCallback`
 
 The four error-handler setters now use a SWIG-side adapter and accept a Python
@@ -59,6 +60,11 @@ Sensor constructors and the `SoSensor.setFunction`/`SoDataSensor.setDeleteCallba
 setters use the existing SWIG-side sensor adapter and accept Python callables
 with `(userdata, SoSensor)` arguments. The raw sensor data accessors remain
 intentionally incomplete.
+
+`SoDB.registerHeader` and the progress callback registration methods use SWIG
+adapters and accept Python callables with `(userdata, SoInput)` and
+`(userdata, SbName, fraction, interruptible)` arguments respectively. Header
+output callback pointers remain intentionally incomplete.
 
 Known pointer-buffer surfaces:
 

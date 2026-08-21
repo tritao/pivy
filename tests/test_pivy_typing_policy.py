@@ -77,6 +77,26 @@ class FieldTypePolicyTests(unittest.TestCase):
             ),
         )
 
+    def test_database_shadow_methods_have_python_signatures(self):
+        self.assertEqual(
+            policy.PYTHON_SHADOW_METHOD_TYPES[("SoDB", "registerHeader")],
+            (
+                "headerstring: SbString, isbinary: bool, ivversion: float, "
+                "precallback: Callable[[object, SoInput], None], "
+                "postcallback: Callable[[object, SoInput], None], "
+                "userdata: object | None = ...",
+                "bool",
+            ),
+        )
+        self.assertEqual(
+            policy.PYTHON_SHADOW_METHOD_TYPES[("SoDB", "addProgressCallback")],
+            (
+                "func: Callable[[object, SbName, float, bool], bool], "
+                "userdata: object | None",
+                "None",
+            ),
+        )
+
     def test_int32_references_use_the_existing_integer_pointer_helper(self):
         self.assertEqual(policy.SCALAR_REFERENCE_HELPER_TYPES["int32_t"], "intp")
 

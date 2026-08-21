@@ -91,6 +91,34 @@ ITER_CONTAINER_TYPES.update(vector_iter_element_types())
 CALLBACK_METHOD_CHECKS = {
     "coin.pyi": (
         (
+            "SoDB",
+            "registerHeader",
+            {
+                "precallback": "Callable[[object, SoInput], None]",
+                "postcallback": "Callable[[object, SoInput], None]",
+                "userdata": "object | None",
+            },
+            "bool",
+        ),
+        (
+            "SoDB",
+            "addProgressCallback",
+            {
+                "func": "Callable[[object, SbName, float, bool], bool]",
+                "userdata": "object | None",
+            },
+            "None",
+        ),
+        (
+            "SoDB",
+            "removeProgressCallback",
+            {
+                "func": "Callable[[object, SbName, float, bool], bool]",
+                "userdata": "object | None",
+            },
+            "None",
+        ),
+        (
             "SoSensor",
             "setFunction",
             {"callbackfunction": "Callable[[object, SoSensor], None]"},

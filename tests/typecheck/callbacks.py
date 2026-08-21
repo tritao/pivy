@@ -39,6 +39,32 @@ def check_sensor_callbacks() -> None:
     coin.SoDB.getSensorManager().setChangedCallback(changed_callback, None)
 
 
+def check_database_callbacks() -> None:
+    def header_callback(data: object, input: coin.SoInput) -> None:
+        pass
+
+    def progress_callback(
+        data: object,
+        itemid: coin.SbName,
+        fraction: float,
+        interruptible: bool,
+    ) -> bool:
+        return interruptible and fraction >= 0.0 and bool(itemid)
+
+    assert_type(
+        coin.SoDB.registerHeader(
+            coin.SbString("#PivyTypingHeader"),
+            False,
+            1.0,
+            header_callback,
+            header_callback,
+        ),
+        bool,
+    )
+    coin.SoDB.addProgressCallback(progress_callback, None)
+    coin.SoDB.removeProgressCallback(progress_callback, None)
+
+
 def check_callback_action_callbacks() -> None:
     def node_callback(
         data: Any,

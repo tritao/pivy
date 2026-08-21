@@ -645,6 +645,23 @@ CALLBACK_TYPE_SIGNATURES = {
     "SoQtRenderAreaEventCB": "Callable[[Any, QEvent], Any]",
 }
 PYTHON_SHADOW_METHOD_TYPES = {
+    ("SoDB", "registerHeader"): (
+        "headerstring: SbString, isbinary: bool, ivversion: float, "
+        "precallback: Callable[[object, SoInput], None], "
+        "postcallback: Callable[[object, SoInput], None], "
+        "userdata: object | None = ...",
+        "bool",
+    ),
+    ("SoDB", "addProgressCallback"): (
+        "func: Callable[[object, SbName, float, bool], bool], "
+        "userdata: object | None",
+        "None",
+    ),
+    ("SoDB", "removeProgressCallback"): (
+        "func: Callable[[object, SbName, float, bool], bool], "
+        "userdata: object | None",
+        "None",
+    ),
     ("SoSensor", "setFunction"): (
         "self, callbackfunction: Callable[[object, SoSensor], None]",
         "None",
@@ -670,6 +687,21 @@ CALLBACK_PARAMETER_TYPE_OVERRIDES = {
 }
 CALLBACK_PARAMETER_TYPE_OVERRIDES.update(
     {
+        ("SoDB", "registerHeader", "precallback"): (
+            "Callable[[object, SoInput], None]"
+        ),
+        ("SoDB", "registerHeader", "postcallback"): (
+            "Callable[[object, SoInput], None]"
+        ),
+        ("SoDB", "registerHeader", "userdata"): "object | None",
+        ("SoDB", "addProgressCallback", "func"): (
+            "Callable[[object, SbName, float, bool], bool]"
+        ),
+        ("SoDB", "addProgressCallback", "userdata"): "object | None",
+        ("SoDB", "removeProgressCallback", "func"): (
+            "Callable[[object, SbName, float, bool], bool]"
+        ),
+        ("SoDB", "removeProgressCallback", "userdata"): "object | None",
         ("SoSensor", "setFunction", "callbackfunction"): (
             "Callable[[object, SoSensor], None]"
         ),
@@ -1374,7 +1406,6 @@ TRIAGED_INCOMPLETE_SITES = frozenset(
         ('parameter', 'SoDB', 'doSelect', 'readfds'),
         ('parameter', 'SoDB', 'doSelect', 'writefds'),
         ('parameter', 'SoDB', 'getHeaderData', 'userdata'),
-        ('parameter', 'SoDB', 'registerHeader', 'userdata'),
         ('parameter', 'SoField', 'addAuditor', 'f'),
         ('parameter', 'SoField', 'removeAuditor', 'f'),
         ('parameter', 'SoFieldContainer', 'getFieldsMemorySize', 'managed'),
