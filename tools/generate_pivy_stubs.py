@@ -77,6 +77,7 @@ try:
         SEQUENCE_VALUE_RETURN_TYPES,
         STRING_POINTER_PARAMETERS,
         field_method_type_overrides,
+        multifield_component_sequence_types,
         multifield_getvalues_types,
         multifield_iter_element_types,
         multifield_setvalues_types,
@@ -116,6 +117,7 @@ except ImportError:
         SEQUENCE_VALUE_RETURN_TYPES,
         STRING_POINTER_PARAMETERS,
         field_method_type_overrides,
+        multifield_component_sequence_types,
         multifield_getvalues_types,
         multifield_iter_element_types,
         multifield_setvalues_types,
@@ -123,6 +125,7 @@ except ImportError:
 
 
 FIELD_METHOD_TYPE_OVERRIDES = field_method_type_overrides()
+MULTIFIELD_COMPONENT_SEQUENCE_TYPES = multifield_component_sequence_types()
 MULTIFIELD_GETVALUES_TYPES = multifield_getvalues_types()
 MULTIFIELD_ITER_ELEMENT_TYPES = multifield_iter_element_types()
 MULTIFIELD_SETVALUES_TYPES = multifield_setvalues_types()
@@ -282,6 +285,14 @@ def callback_cpp_type_to_python(cpp_type):
 
 
 def sequence_parameter_type(class_name, method_name, cpp_arg):
+    component_sequence = MULTIFIELD_COMPONENT_SEQUENCE_TYPES.get(class_name)
+    if component_sequence and method_name in {"set1Value", "setValue"}:
+        sequence_type, width = component_sequence
+        normalized = normalize_cpp_type(cpp_arg.type)
+        dimensions = re.findall(r"\[\s*(\d*)\s*\]", normalized)
+        if dimensions == [str(width)]:
+            return sequence_type
+
     sequence_type = SEQUENCE_POINTER_PARAMETERS.get(
         (class_name, method_name, cpp_arg.name)
     )

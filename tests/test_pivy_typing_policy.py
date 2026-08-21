@@ -12,6 +12,7 @@ from tools.pivy_stub_typing_policy import (
     MULTIFIELD_TYPE_POLICIES,
     classify_incomplete,
     field_method_type_overrides,
+    multifield_component_sequence_types,
     multifield_getvalues_types,
     multifield_iter_element_types,
     multifield_setvalues_types,
@@ -90,6 +91,13 @@ class MultifieldTypePolicyTests(unittest.TestCase):
         self.assertEqual(getvalues_types["SoMFVec3f"], "SbVec3f")
         self.assertEqual(getvalues_types["SoMFName"], "str")
         self.assertNotIn("SoMFDouble", getvalues_types)
+
+    def test_vector_component_sequence_types_are_derived_from_policy(self):
+        component_types = multifield_component_sequence_types()
+
+        self.assertEqual(component_types["SoMFVec2s"], ("Sequence[int]", 2))
+        self.assertEqual(component_types["SoMFVec3d"], ("Sequence[float]", 3))
+        self.assertEqual(component_types["SoMFVec4ui32"], ("Sequence[int]", 4))
 
 
 class IncompletePolicyTests(unittest.TestCase):

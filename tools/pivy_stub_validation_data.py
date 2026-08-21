@@ -4,7 +4,11 @@ from dataclasses import dataclass
 from enum import Enum
 import os
 
-from tools.pivy_stub_typing_policy import multifield_iter_element_types
+from tools.pivy_stub_typing_policy import (
+    multifield_component_sequence_types,
+    multifield_iter_element_types,
+    multifield_setvalues_types,
+)
 
 GENERATED_HEADER = (
     "# SPDX-License-Identifier: ISC\n"
@@ -669,10 +673,6 @@ UNSUPPORTED_ARRAY_METHOD_CHECKS = {
         ("SbDPMatrix", "LUDecomposition", "index", "Sequence[int]"),
         ("SoSFVec2s", "setValue", "xy", "Sequence[int]"),
         ("SoSFVec3s", "setValue", "xyz", "Sequence[int]"),
-        ("SoMFVec2s", "set1Value", "xy", "Sequence[int]"),
-        ("SoMFVec2s", "setValue", "xy", "Sequence[int]"),
-        ("SoMFVec3s", "set1Value", "xyz", "Sequence[int]"),
-        ("SoMFVec3s", "setValue", "xyz", "Sequence[int]"),
     ),
 }
 RUNTIME_UNSUPPORTED_METHOD_CHECKS = {
@@ -1601,6 +1601,47 @@ OPERATOR_METHOD_CHECKS = {
         ),
     ),
 }
+def _policy_multifield_method_checks():
+    checks = []
+    setvalues_types = multifield_setvalues_types()
+    component_types = multifield_component_sequence_types()
+    component_names = {2: "xy", 3: "xyz", 4: "xyzw"}
+
+    for class_name, (component_type, width) in component_types.items():
+        for element_type in setvalues_types[class_name]:
+            checks.append(
+                (
+                    class_name,
+                    "setValues",
+                    {
+                        "start": "int",
+                        "num": "int",
+                        "values": "Sequence[%s]" % element_type,
+                    },
+                    "None",
+                )
+            )
+        component_name = component_names[width]
+        checks.extend(
+            (
+                (
+                    class_name,
+                    "set1Value",
+                    {"idx": "int", component_name: component_type},
+                    "None",
+                ),
+                (
+                    class_name,
+                    "setValue",
+                    {component_name: component_type},
+                    "None",
+                ),
+            )
+        )
+
+    return tuple(checks)
+
+
 MULTIFIELD_METHOD_CHECKS = {
     "coin.pyi": (
         (
@@ -1663,7 +1704,7 @@ MULTIFIELD_METHOD_CHECKS = {
             {"start": "int", "num": "int", "values": "Sequence[Sequence[float]]"},
             "None",
         ),
-    ),
+    ) + _policy_multifield_method_checks(),
 }
 PYTHON_HELPER_METHOD_CHECKS = {
     "coin.pyi": (

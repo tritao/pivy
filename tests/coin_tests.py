@@ -824,7 +824,57 @@ class FieldSetValue(unittest.TestCase):
         t.setValues([[0,0,1,0],[1,0,0,0]])
         self.assertEqual(t.getValues(), [m2,m])
         t.setValue([0,0,1,0])
-        self.assertEqual(t.getValues(), [m2])        
+        self.assertEqual(t.getValues(), [m2])
+
+    def testMFFixedWidthVectors(self):
+        """check the shared binding for fixed-width vector multifields"""
+        cases = (
+            (SoMFVec2b, SbVec2b, (1, 2)),
+            (SoMFVec2s, SbVec2s, (1, 2)),
+            (SoMFVec2i32, SbVec2i32, (1, 2)),
+            (SoMFVec2d, SbVec2d, (1.0, 2.0)),
+            (SoMFVec3b, SbVec3b, (1, 2, 3)),
+            (SoMFVec3s, SbVec3s, (1, 2, 3)),
+            (SoMFVec3i32, SbVec3i32, (1, 2, 3)),
+            (SoMFVec4b, SbVec4b, (1, 2, 3, 4)),
+            (SoMFVec4ub, SbVec4ub, (1, 2, 3, 4)),
+            (SoMFVec4s, SbVec4s, (1, 2, 3, 4)),
+            (SoMFVec4us, SbVec4us, (1, 2, 3, 4)),
+            (SoMFVec4i32, SbVec4i32, (1, 2, 3, 4)),
+            (SoMFVec4ui32, SbVec4ui32, (1, 2, 3, 4)),
+            (SoMFVec4d, SbVec4d, (1.0, 2.0, 3.0, 4.0)),
+        )
+        for field_type, vector_type, components in cases:
+            field = field_type()
+            value = vector_type(*components)
+            second_components = tuple(component + 1 for component in components)
+            second = vector_type(*second_components)
+
+            def assert_values(expected):
+                self.assertEqual(field.getNum(), len(expected))
+                for index, expected_value in enumerate(expected):
+                    self.assertEqual(field.find(expected_value), index)
+
+            field.setValues([value, second])
+            assert_values([value, second])
+            self.assertEqual(len(field.getValues(1)), 1)
+            self.assertEqual(field.find(field[0]), 0)
+            self.assertEqual([field.find(item) for item in field], [0, 1])
+
+            field.setValues([components, second_components])
+            assert_values([value, second])
+            field.setValue(components)
+            assert_values([value])
+            field.set1Value(0, components)
+            assert_values([value])
+
+            with self.assertRaises(TypeError):
+                field.setValues([value, components])
+            assert_values([value])
+
+            with self.assertRaises(ValueError):
+                field.setValues([components, (3,)])
+            assert_values([value])
 
 
 class SbStringMethods(unittest.TestCase):
