@@ -189,6 +189,19 @@ def check_render_and_scene_callbacks() -> None:
     gl_action.addPreRenderCallback(gl_callback, None)
     gl_action.removePreRenderCallback(gl_callback, None)
 
+    def sorted_object_callback(
+        data: object,
+        action: coin.SoGLRenderAction,
+    ) -> float:
+        return 0.0
+
+    gl_action.setSortedObjectOrderStrategy(
+        coin.SoGLRenderAction.CUSTOM_CALLBACK,
+        sorted_object_callback,
+        None,
+    )
+    gl_action.setSortedObjectOrderStrategy(coin.SoGLRenderAction.BBOX_CENTER)
+
     def scene_callback(data: Any, manager: coin.SoSceneManager) -> None:
         pass
 

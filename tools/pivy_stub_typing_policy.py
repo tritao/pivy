@@ -668,6 +668,12 @@ PYTHON_SHADOW_METHOD_TYPES = {
         "func: Callable[[object, int], None], userdata: object | None = ...",
         "None",
     ),
+    ("SoGLRenderAction", "setSortedObjectOrderStrategy"): (
+        "self, strategy: int, "
+        "cb: Callable[[object, SoGLRenderAction], float] | None = ..., "
+        "closure: object | None = ...",
+        "None",
+    ),
     ("SoDB", "registerHeader"): (
         "headerstring: SbString, isbinary: bool, ivversion: float, "
         "precallback: Callable[[object, SoInput], None], "
@@ -720,6 +726,12 @@ CALLBACK_PARAMETER_TYPE_OVERRIDES.update(
             "Callable[[object, int], None]"
         ),
         ("SoContextHandler", "removeContextDestructionCallback", "userdata"): (
+            "object | None"
+        ),
+        ("SoGLRenderAction", "setSortedObjectOrderStrategy", "cb"): (
+            "Callable[[object, SoGLRenderAction], float] | None"
+        ),
+        ("SoGLRenderAction", "setSortedObjectOrderStrategy", "closure"): (
             "object | None"
         ),
         ("SoDB", "registerHeader", "precallback"): (
@@ -1455,7 +1467,6 @@ TRIAGED_INCOMPLETE_SITES = frozenset(
         ('parameter', 'SoGLLazyElement', 'updateColorVBO', 'vbo'),
         ('parameter', 'SoGLMultiTextureCoordinateElement', 'initRender', 'enabled'),
         ('parameter', 'SoGLMultiTextureImageElement', 'get', 'model'),
-        ('parameter', 'SoGLRenderAction', 'setSortedObjectOrderStrategy', 'closure'),
         ('parameter', 'SoGLVBOElement', 'setColorVBO', 'vbo'),
         ('parameter', 'SoGLVBOElement', 'setNormalVBO', 'vbo'),
         ('parameter', 'SoGLVBOElement', 'setTexCoordVBO', 'vbo'),

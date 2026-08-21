@@ -384,6 +384,15 @@ CALLBACK_METHOD_CHECKS = {
         ),
         (
             "SoGLRenderAction",
+            "setSortedObjectOrderStrategy",
+            {
+                "cb": "Callable[[object, SoGLRenderAction], float] | None",
+                "closure": "object | None",
+            },
+            "None",
+        ),
+        (
+            "SoGLRenderAction",
             "setPassCallback",
             {"pyfunc": "Callable[[Any], None]", "userdata": "Any"},
             "None",

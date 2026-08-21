@@ -1584,6 +1584,28 @@ class ZZContextHandlerCallbackTests(unittest.TestCase):
             SoContextHandler.addContextDestructionCallback(None)
 
 
+class ZZGLCallbackTests(unittest.TestCase):
+    def testSortedObjectOrderCallback(self):
+        action = SoGLRenderAction(SbViewportRegion())
+
+        def callback(data, action):
+            return 0.0
+
+        action.setSortedObjectOrderStrategy(
+            SoGLRenderAction.CUSTOM_CALLBACK,
+            callback,
+            "sort-data",
+        )
+        action.setSortedObjectOrderStrategy(SoGLRenderAction.BBOX_CENTER)
+
+        with self.assertRaises(TypeError):
+            action.setSortedObjectOrderStrategy(
+                SoGLRenderAction.CUSTOM_CALLBACK,
+                42,
+                "sort-data",
+            )
+
+
 class SbVecTests(unittest.TestCase):
     def setUp(self):
         self.sbvec3f = coin.SbVec3f(1, 1, 1)

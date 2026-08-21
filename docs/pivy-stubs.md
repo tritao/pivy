@@ -74,6 +74,10 @@ same Python object supplied to `invokeCallbacks`.
 accepts `(userdata, contextid)` callables. The callback registration and
 removal methods match callbacks by Python object identity.
 
+`SoGLRenderAction.setSortedObjectOrderStrategy` accepts an optional
+`(userdata, SoGLRenderAction) -> float` callback. The callback closure is kept
+alive by the action and is cleared when a non-callback strategy is selected.
+
 Known pointer-buffer surfaces:
 
 - `SoMFDouble.getValues`
