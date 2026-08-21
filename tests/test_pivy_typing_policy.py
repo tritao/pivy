@@ -236,6 +236,30 @@ class IncompletePolicyTests(unittest.TestCase):
                 )
 
 
+class CallbackTypePolicyTests(unittest.TestCase):
+    def test_error_callbacks_use_python_callable_overrides(self):
+        expected = "Callable[[object, SoError], None]"
+
+        for class_name in (
+            "SoError",
+            "SoDebugError",
+            "SoMemoryError",
+            "SoReadError",
+        ):
+            self.assertEqual(
+                policy.CALLBACK_PARAMETER_TYPE_OVERRIDES[
+                    (class_name, "setHandlerCallback", "pyfunc")
+                ],
+                expected,
+            )
+            self.assertEqual(
+                policy.CALLBACK_PARAMETER_TYPE_OVERRIDES[
+                    (class_name, "setHandlerCallback", "data")
+                ],
+                "object",
+            )
+
+
 class PolicyBoundaryTests(unittest.TestCase):
     def test_factory_policy_matches_swig_inventory(self):
         interface_classes = set()

@@ -44,13 +44,17 @@ until the binding grows a Python-level wrapper or typemap.
 
 Known callback-pointer surfaces:
 
-- `SoError.setHandlerCallback`
-- `SoDebugError.setHandlerCallback`
-- `SoMemoryError.setHandlerCallback`
-- `SoReadError.setHandlerCallback`
+- `SoError.{getHandlerCallback,getHandlerData}`
+- `SoDebugError.{getHandlerCallback,getHandlerData}`
+- `SoMemoryError.{getHandlerCallback,getHandlerData}`
+- `SoReadError.{getHandlerCallback,getHandlerData}`
 - `SoSensor.setFunction`
 - `SoDataSensor.setDeleteCallback`
 - `SoGLImage.setEndFrameCallback`
+
+The four error-handler setters now use a SWIG-side adapter and accept a Python
+callable with `(userdata, SoError)` arguments. The getter methods still expose
+Coin's raw callback and data pointers and remain intentionally incomplete.
 
 Known pointer-buffer surfaces:
 

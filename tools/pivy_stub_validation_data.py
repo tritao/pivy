@@ -91,6 +91,30 @@ ITER_CONTAINER_TYPES.update(vector_iter_element_types())
 CALLBACK_METHOD_CHECKS = {
     "coin.pyi": (
         (
+            "SoError",
+            "setHandlerCallback",
+            {"pyfunc": "Callable[[object, SoError], None]", "data": "object"},
+            "None",
+        ),
+        (
+            "SoDebugError",
+            "setHandlerCallback",
+            {"pyfunc": "Callable[[object, SoError], None]", "data": "object"},
+            "None",
+        ),
+        (
+            "SoMemoryError",
+            "setHandlerCallback",
+            {"pyfunc": "Callable[[object, SoError], None]", "data": "object"},
+            "None",
+        ),
+        (
+            "SoReadError",
+            "setHandlerCallback",
+            {"pyfunc": "Callable[[object, SoError], None]", "data": "object"},
+            "None",
+        ),
+        (
             "SoSensorManager",
             "setChangedCallback",
             {"pyfunc": "Callable[[Any], None]", "data": "Any"},
@@ -661,30 +685,6 @@ UNSUPPORTED_ARRAY_METHOD_CHECKS = {
 RUNTIME_UNSUPPORTED_METHOD_CHECKS = {
     "coin.pyi": (
         (
-            "SoError",
-            "setHandlerCallback",
-            {"func": "Incomplete", "data": "Incomplete"},
-            "None",
-        ),
-        (
-            "SoDebugError",
-            "setHandlerCallback",
-            {"function": "Incomplete", "data": "Incomplete"},
-            "None",
-        ),
-        (
-            "SoMemoryError",
-            "setHandlerCallback",
-            {"callback": "Incomplete", "data": "Incomplete"},
-            "None",
-        ),
-        (
-            "SoReadError",
-            "setHandlerCallback",
-            {"function": "Incomplete", "data": "Incomplete"},
-            "None",
-        ),
-        (
             "SoSensor",
             "setFunction",
             {"callbackfunction": "Incomplete"},
@@ -712,20 +712,6 @@ RUNTIME_UNSUPPORTED_METHOD_CHECKS = {
             "SoMFDouble",
             "setValues",
             {"start": "int", "num": "int", "newvals": "Incomplete"},
-            "None",
-        ),
-    ),
-    os.path.join("gui", "soqt.pyi"): (
-        (
-            "SoError",
-            "setHandlerCallback",
-            {"func": "Incomplete", "data": "Incomplete"},
-            "None",
-        ),
-        (
-            "SoDebugError",
-            "setHandlerCallback",
-            {"function": "Incomplete", "data": "Incomplete"},
             "None",
         ),
     ),

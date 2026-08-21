@@ -49,6 +49,7 @@ try:
         CALLBACK_DATA_PARAMETER_NAMES,
         CALLBACK_HANDLE_PARAMETER_NAMES,
         CALLBACK_PARAMETER_NAMES,
+        CALLBACK_PARAMETER_TYPE_OVERRIDES,
         CALLBACK_TYPE_SIGNATURES,
         COMPARISON_METHODS,
         factory_method_return_type,
@@ -91,6 +92,7 @@ except ImportError:
         CALLBACK_DATA_PARAMETER_NAMES,
         CALLBACK_HANDLE_PARAMETER_NAMES,
         CALLBACK_PARAMETER_NAMES,
+        CALLBACK_PARAMETER_TYPE_OVERRIDES,
         CALLBACK_TYPE_SIGNATURES,
         COMPARISON_METHODS,
         factory_method_return_type,
@@ -610,9 +612,11 @@ def render_python_signature(
         parameter_name = sanitize_parameter_name(
             cpp_arg.name, used_names, "arg%d" % position
         )
-        parameter_type = None
+        parameter_type = CALLBACK_PARAMETER_TYPE_OVERRIDES.get(
+            (class_name, name, cpp_arg.name)
+        )
         cpp_base = base_cpp_type(cpp_arg.type)
-        if cpp_base == "PyObject":
+        if parameter_type is None and cpp_base == "PyObject":
             match pyobject_argument_role(cpp_arg.name):
                 case PyObjectArgumentRole.CALLBACK:
                     parameter_type = callback_types.get(position)

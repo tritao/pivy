@@ -1439,6 +1439,26 @@ class SoOutputTests(unittest.TestCase):
         self.assertIsNone(SoOutput().getCurrentProto())
 
 
+class ZZErrorCallbackTests(unittest.TestCase):
+    def testPythonErrorHandlerCallback(self):
+        events = []
+
+        def callback(data, error):
+            events.append((data, type(error).__name__))
+
+        SoError.initClasses()
+        SoError.setHandlerCallback(callback, "error-data")
+        SoError.post("pivy callback test")
+        self.assertEqual(events, [("error-data", "SoError")])
+
+        SoDebugError.setHandlerCallback(callback, "debug-data")
+        SoMemoryError.setHandlerCallback(callback, None)
+        SoReadError.setHandlerCallback(callback, None)
+
+        with self.assertRaises(TypeError):
+            SoError.setHandlerCallback(None, None)
+
+
 class SbVecTests(unittest.TestCase):
     def setUp(self):
         self.sbvec3f = coin.SbVec3f(1, 1, 1)

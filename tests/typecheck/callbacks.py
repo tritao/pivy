@@ -189,3 +189,13 @@ def check_other_callback_domains() -> None:
     intersection_action.setFilterCallback(filter_callback)
     intersection_action.addIntersectionCallback(intersection_callback)
     intersection_action.removeIntersectionCallback(intersection_callback)
+
+
+def check_error_callbacks() -> None:
+    def error_callback(data: object, error: coin.SoError) -> None:
+        pass
+
+    coin.SoError.setHandlerCallback(error_callback, {"source": "test"})
+    coin.SoDebugError.setHandlerCallback(error_callback, None)
+    coin.SoMemoryError.setHandlerCallback(error_callback, None)
+    coin.SoReadError.setHandlerCallback(error_callback, None)

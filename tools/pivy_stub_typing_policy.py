@@ -640,7 +640,21 @@ CALLBACK_TYPE_SIGNATURES = {
         "Callable[[Any, SoCallbackAction, SoPrimitiveVertex, "
         "SoPrimitiveVertex, SoPrimitiveVertex], None]"
     ),
+    "SoErrorCB": "Callable[[object, SoError], None]",
     "SoQtRenderAreaEventCB": "Callable[[Any, QEvent], Any]",
+}
+CALLBACK_PARAMETER_TYPE_OVERRIDES = {
+    (class_name, "setHandlerCallback", parameter_name): annotation
+    for class_name in (
+        "SoError",
+        "SoDebugError",
+        "SoMemoryError",
+        "SoReadError",
+    )
+    for parameter_name, annotation in (
+        ("pyfunc", "Callable[[object, SoError], None]"),
+        ("data", "object"),
+    )
 }
 FUNCTION_POINTER_TYPE_SIGNATURES = {"void(*)(void*)": "Callable[[Any], None]"}
 SENSOR_CALLBACK_CLASSES = {
@@ -671,18 +685,10 @@ RUNTIME_UNSUPPORTED_NOTE = (
 RUNTIME_UNSUPPORTED_METHOD_NOTES = {
     "pivy.coin": {
         ("SoDataSensor", "setDeleteCallback"),
-        ("SoDebugError", "setHandlerCallback"),
-        ("SoError", "setHandlerCallback"),
         ("SoGLImage", "setEndFrameCallback"),
         ("SoMFDouble", "getValues"),
         ("SoMFDouble", "setValues"),
-        ("SoMemoryError", "setHandlerCallback"),
-        ("SoReadError", "setHandlerCallback"),
         ("SoSensor", "setFunction"),
-    },
-    "pivy.gui.soqt": {
-        ("SoDebugError", "setHandlerCallback"),
-        ("SoError", "setHandlerCallback"),
     },
 }
 GENERATED_HEADER = (
