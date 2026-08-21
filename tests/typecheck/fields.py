@@ -40,6 +40,40 @@ def check_value_fields() -> None:
     rotation.setValue([0.0, 0.0, 1.0, 1.5708])
 
 
+def check_field_attribute_inventory() -> None:
+    material = coin.SoMaterial()
+    assert_type(material.ambientColor, coin.SoMFColor)
+    assert_type(material.emissiveColor, coin.SoMFColor)
+    assert_type(material.specularColor, coin.SoMFColor)
+    assert_type(material.shininess, coin.SoMFFloat)
+
+    transform = coin.SoTransform()
+    assert_type(transform.center, coin.SoSFVec3f)
+    assert_type(transform.scaleFactor, coin.SoSFVec3f)
+    assert_type(transform.translation, coin.SoSFVec3f)
+    assert_type(transform.rotation, coin.SoSFRotation)
+    assert_type(transform.scaleOrientation, coin.SoSFRotation)
+
+    camera = coin.SoCamera()
+    assert_type(camera.aspectRatio, coin.SoSFFloat)
+    assert_type(camera.farDistance, coin.SoSFFloat)
+    assert_type(camera.focalDistance, coin.SoSFFloat)
+    assert_type(camera.nearDistance, coin.SoSFFloat)
+    assert_type(camera.orientation, coin.SoSFRotation)
+    assert_type(camera.position, coin.SoSFVec3f)
+    assert_type(camera.viewportMapping, coin.SoSFEnum)
+
+    light = coin.SoLight()
+    assert_type(light.color, coin.SoSFColor)
+    assert_type(light.intensity, coin.SoSFFloat)
+    assert_type(light.on, coin.SoSFBool)
+
+    assert_type(coin.SoSphere().radius, coin.SoSFFloat)
+    assert_type(coin.SoCylinder().parts, coin.SoSFBitMask)
+    assert_type(coin.SoCone().parts, coin.SoSFBitMask)
+    assert_type(coin.SoDirectionalLight().direction, coin.SoSFVec3f)
+
+
 def check_nullable_fields() -> None:
     node = coin.SoSFNode()
     assert_type(node.getValue(), coin.SoNode | None)

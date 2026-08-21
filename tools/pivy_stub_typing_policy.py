@@ -1252,6 +1252,10 @@ MULTIFIELD_TYPE_POLICIES = {
         set_values_types=("int",),
         get_values_type="int",
     ),
+    "SoMFBitMask": MultifieldTypePolicy(
+        element_type="int",
+        set_values_types=("int",),
+    ),
     "SoMFFloat": MultifieldTypePolicy(
         element_type="float",
         set_values_types=("float",),

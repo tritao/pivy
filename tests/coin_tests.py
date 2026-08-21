@@ -478,6 +478,15 @@ class FieldSetValue(unittest.TestCase):
         self.assertTrue(t.getValues() == [0],
                         'setValues with empty list on SoMFEnum failed')
 
+    def testMFBitMask(self):
+        """check the inherited integer sequence API for SoMFBitMask"""
+        field = SoMFBitMask()
+        field.setValues(0, 2, [1, 2])
+        self.assertEqual(field.getValues(), [1, 2])
+        self.assertEqual(field[0], 1)
+        field[0] = 3
+        self.assertEqual(list(field), [3, 2])
+
     def testMFString(self):
         """check setValue(s) for SoMFString"""
         t = SoMFString()

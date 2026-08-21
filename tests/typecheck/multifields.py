@@ -19,6 +19,16 @@ def check_scalar_multifield() -> None:
     assert_type(values[0], float)
 
 
+def check_bitmask_multifield() -> None:
+    values = coin.SoMFBitMask()
+
+    values.setValues(0, 2, [1, 2])
+    assert_type(values[0], int)
+    assert_type(values.getValues(), list[int])
+    assert_type(iter(values), Iterator[int])
+    values[0] = 3
+
+
 def check_vector_multifield() -> None:
     values = coin.SoMFVec3f()
     vectors: Sequence[coin.SbVec3f] = [coin.SbVec3f()]
