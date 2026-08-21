@@ -1565,6 +1565,25 @@ class ZZCallbackListTests(unittest.TestCase):
             callback_list.addCallback(None)
 
 
+class ZZContextHandlerCallbackTests(unittest.TestCase):
+    def testPythonCallbacks(self):
+        events = []
+
+        def callback(data, contextid):
+            events.append((data, contextid))
+
+        SoContextHandler.addContextDestructionCallback(callback, "context-data")
+        SoContextHandler.destructingContext(41)
+        self.assertEqual(events, [("context-data", 41)])
+
+        SoContextHandler.removeContextDestructionCallback(callback, "context-data")
+        SoContextHandler.destructingContext(42)
+        self.assertEqual(events, [("context-data", 41)])
+
+        with self.assertRaises(TypeError):
+            SoContextHandler.addContextDestructionCallback(None)
+
+
 class SbVecTests(unittest.TestCase):
     def setUp(self):
         self.sbvec3f = coin.SbVec3f(1, 1, 1)

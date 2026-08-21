@@ -76,6 +76,14 @@ def check_callback_list() -> None:
     callback_list.invokeCallbacks({"source": "typing"})
 
 
+def check_context_handler_callbacks() -> None:
+    def callback(data: object, contextid: int) -> None:
+        pass
+
+    coin.SoContextHandler.addContextDestructionCallback(callback, None)
+    coin.SoContextHandler.removeContextDestructionCallback(callback, None)
+
+
 def check_callback_action_callbacks() -> None:
     def node_callback(
         data: Any,

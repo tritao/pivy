@@ -70,6 +70,10 @@ output callback pointers remain intentionally incomplete.
 accepts `(userdata, callbackdata)` callables. Callback data is passed as the
 same Python object supplied to `invokeCallbacks`.
 
+`SoContextHandler` uses SWIG adapters for context destruction callbacks and
+accepts `(userdata, contextid)` callables. The callback registration and
+removal methods match callbacks by Python object identity.
+
 Known pointer-buffer surfaces:
 
 - `SoMFDouble.getValues`

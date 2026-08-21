@@ -109,6 +109,24 @@ CALLBACK_METHOD_CHECKS = {
             "None",
         ),
         (
+            "SoContextHandler",
+            "addContextDestructionCallback",
+            {
+                "func": "Callable[[object, int], None]",
+                "userdata": "object | None",
+            },
+            "None",
+        ),
+        (
+            "SoContextHandler",
+            "removeContextDestructionCallback",
+            {
+                "func": "Callable[[object, int], None]",
+                "userdata": "object | None",
+            },
+            "None",
+        ),
+        (
             "SoDB",
             "registerHeader",
             {

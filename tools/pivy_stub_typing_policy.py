@@ -660,6 +660,14 @@ PYTHON_SHADOW_METHOD_TYPES = {
         "self, callbackdata: object",
         "None",
     ),
+    ("SoContextHandler", "addContextDestructionCallback"): (
+        "func: Callable[[object, int], None], userdata: object | None = ...",
+        "None",
+    ),
+    ("SoContextHandler", "removeContextDestructionCallback"): (
+        "func: Callable[[object, int], None], userdata: object | None = ...",
+        "None",
+    ),
     ("SoDB", "registerHeader"): (
         "headerstring: SbString, isbinary: bool, ivversion: float, "
         "precallback: Callable[[object, SoInput], None], "
@@ -702,6 +710,18 @@ CALLBACK_PARAMETER_TYPE_OVERRIDES = {
 }
 CALLBACK_PARAMETER_TYPE_OVERRIDES.update(
     {
+        ("SoContextHandler", "addContextDestructionCallback", "func"): (
+            "Callable[[object, int], None]"
+        ),
+        ("SoContextHandler", "addContextDestructionCallback", "userdata"): (
+            "object | None"
+        ),
+        ("SoContextHandler", "removeContextDestructionCallback", "func"): (
+            "Callable[[object, int], None]"
+        ),
+        ("SoContextHandler", "removeContextDestructionCallback", "userdata"): (
+            "object | None"
+        ),
         ("SoDB", "registerHeader", "precallback"): (
             "Callable[[object, SoInput], None]"
         ),
