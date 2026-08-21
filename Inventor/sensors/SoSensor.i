@@ -48,7 +48,7 @@ SoSensorPythonCB(void * data, SoSensor * sensor)
 }
 %}
 
-%typemap(in) SoSensorCB * func {
+%typemap(in) SoSensorCB * {
   if (!PyCallable_Check($input)) {
     PyErr_SetString(PyExc_TypeError, "need a callable object!");
     return NULL;
@@ -56,7 +56,7 @@ SoSensorPythonCB(void * data, SoSensor * sensor)
   $1 = SoSensorPythonCB;
 }
 
-%typemap(typecheck) SoSensorCB * func {
+%typemap(typecheck) SoSensorCB * {
   $1 = PyCallable_Check($input) ? 1 : 0;
 }
 
@@ -73,3 +73,34 @@ SoSensorPythonCB(void * data, SoSensor * sensor)
 %typemap(typecheck) void * data {
   $1 = PyTuple_Check($input) ? 1 : 0;
 }
+
+%typemap(in) void * callbackdata {
+  if (!PyTuple_Check($input)) {
+    PyErr_SetString(PyExc_TypeError, "tuple expected!");
+    return NULL;
+  }
+
+  Py_INCREF($input);
+  $1 = (void *)$input;
+}
+
+%typemap(typecheck) void * callbackdata {
+  $1 = PyTuple_Check($input) ? 1 : 0;
+}
+
+%feature("shadow") SoSensor::setFunction %{
+def setFunction(self, callbackfunction):
+   """setFunction(SoSensor self, SoSensorCB * callbackfunction)"""
+   if not callable(callbackfunction):
+      raise TypeError("need a callable object!")
+
+   callback_data = getattr(self, "_pivy_sensor_callback_data", None)
+   if callback_data is None:
+      callback_data = (callbackfunction, None, type(self).__name__ + " *")
+   else:
+      callback_data = (callbackfunction, callback_data[1], callback_data[2])
+
+   self._pivy_sensor_callback_data = callback_data
+   _coin.SoSensor_setData(self, callback_data)
+   return _coin.SoSensor_setFunction(self, callbackfunction)
+%}

@@ -640,8 +640,20 @@ CALLBACK_TYPE_SIGNATURES = {
         "Callable[[Any, SoCallbackAction, SoPrimitiveVertex, "
         "SoPrimitiveVertex, SoPrimitiveVertex], None]"
     ),
+    "SoSensorCB": "Callable[[object, SoSensor], None]",
     "SoErrorCB": "Callable[[object, SoError], None]",
     "SoQtRenderAreaEventCB": "Callable[[Any, QEvent], Any]",
+}
+PYTHON_SHADOW_METHOD_TYPES = {
+    ("SoSensor", "setFunction"): (
+        "self, callbackfunction: Callable[[object, SoSensor], None]",
+        "None",
+    ),
+    ("SoDataSensor", "setDeleteCallback"): (
+        "self, function: Callable[[object, SoSensor], None], "
+        "data: object | None = ...",
+        "None",
+    ),
 }
 CALLBACK_PARAMETER_TYPE_OVERRIDES = {
     (class_name, "setHandlerCallback", parameter_name): annotation
@@ -656,6 +668,17 @@ CALLBACK_PARAMETER_TYPE_OVERRIDES = {
         ("data", "object"),
     )
 }
+CALLBACK_PARAMETER_TYPE_OVERRIDES.update(
+    {
+        ("SoSensor", "setFunction", "callbackfunction"): (
+            "Callable[[object, SoSensor], None]"
+        ),
+        ("SoDataSensor", "setDeleteCallback", "function"): (
+            "Callable[[object, SoSensor], None]"
+        ),
+        ("SoDataSensor", "setDeleteCallback", "data"): "object | None",
+    }
+)
 FUNCTION_POINTER_TYPE_SIGNATURES = {"void(*)(void*)": "Callable[[Any], None]"}
 SENSOR_CALLBACK_CLASSES = {
     "SoAlarmSensor",
@@ -684,11 +707,9 @@ RUNTIME_UNSUPPORTED_NOTE = (
 )
 RUNTIME_UNSUPPORTED_METHOD_NOTES = {
     "pivy.coin": {
-        ("SoDataSensor", "setDeleteCallback"),
         ("SoGLImage", "setEndFrameCallback"),
         ("SoMFDouble", "getValues"),
         ("SoMFDouble", "setValues"),
-        ("SoSensor", "setFunction"),
     },
 }
 GENERATED_HEADER = (

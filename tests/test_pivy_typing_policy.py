@@ -60,6 +60,23 @@ class FieldTypePolicyTests(unittest.TestCase):
             ("self, name: str", "SoField | SoEngineOutput"),
         )
 
+    def test_sensor_shadow_methods_have_python_signatures(self):
+        self.assertEqual(
+            policy.PYTHON_SHADOW_METHOD_TYPES[("SoSensor", "setFunction")],
+            (
+                "self, callbackfunction: Callable[[object, SoSensor], None]",
+                "None",
+            ),
+        )
+        self.assertEqual(
+            policy.PYTHON_SHADOW_METHOD_TYPES[("SoDataSensor", "setDeleteCallback")],
+            (
+                "self, function: Callable[[object, SoSensor], None], "
+                "data: object | None = ...",
+                "None",
+            ),
+        )
+
     def test_int32_references_use_the_existing_integer_pointer_helper(self):
         self.assertEqual(policy.SCALAR_REFERENCE_HELPER_TYPES["int32_t"], "intp")
 
@@ -258,6 +275,26 @@ class CallbackTypePolicyTests(unittest.TestCase):
                 ],
                 "object",
             )
+
+    def test_sensor_callbacks_use_python_callable_overrides(self):
+        self.assertEqual(
+            policy.CALLBACK_PARAMETER_TYPE_OVERRIDES[
+                ("SoSensor", "setFunction", "callbackfunction")
+            ],
+            "Callable[[object, SoSensor], None]",
+        )
+        self.assertEqual(
+            policy.CALLBACK_PARAMETER_TYPE_OVERRIDES[
+                ("SoDataSensor", "setDeleteCallback", "function")
+            ],
+            "Callable[[object, SoSensor], None]",
+        )
+        self.assertEqual(
+            policy.CALLBACK_PARAMETER_TYPE_OVERRIDES[
+                ("SoDataSensor", "setDeleteCallback", "data")
+            ],
+            "object | None",
+        )
 
 
 class PolicyBoundaryTests(unittest.TestCase):

@@ -68,6 +68,7 @@ try:
         POINTER_HELPER_TYPES,
         PRIVATE_EXTENSION_STUB,
         PYTHON_HELPER_METHOD_TYPES,
+        PYTHON_SHADOW_METHOD_TYPES,
         RUNTIME_UNSUPPORTED_METHOD_NOTES,
         RUNTIME_UNSUPPORTED_NOTE,
         SCALAR_POINTER_HELPER_PARAMETERS,
@@ -111,6 +112,7 @@ except ImportError:
         POINTER_HELPER_TYPES,
         PRIVATE_EXTENSION_STUB,
         PYTHON_HELPER_METHOD_TYPES,
+        PYTHON_SHADOW_METHOD_TYPES,
         RUNTIME_UNSUPPORTED_METHOD_NOTES,
         RUNTIME_UNSUPPORTED_NOTE,
         SCALAR_POINTER_HELPER_PARAMETERS,
@@ -1427,6 +1429,35 @@ def normalize_callback_helpers(text):
     return "\n".join(updated) + "\n"
 
 
+def normalize_shadow_methods(text):
+    lines = text.splitlines()
+    updated = []
+    current_class = None
+
+    for line in lines:
+        class_match = re.match(r"^class\s+([A-Za-z_]\w*)", line)
+        if class_match:
+            current_class = class_match.group(1)
+        elif current_class and is_top_level_statement(line):
+            current_class = None
+
+        match = DEF_RE.match(line)
+        signature = PYTHON_SHADOW_METHOD_TYPES.get(
+            (current_class, match.group("name")) if match else None
+        )
+        if signature is not None:
+            args, return_type = signature
+            updated.append(
+                "%sdef %s(%s) -> %s: ..."
+                % (match.group("indent"), match.group("name"), args, return_type)
+            )
+            continue
+
+        updated.append(line)
+
+    return "\n".join(updated) + "\n"
+
+
 def is_scalar_division_class(class_name):
     return class_name is not None and (
         class_name.startswith("SbVec") or class_name == "SbColor4f"
@@ -1853,6 +1884,7 @@ def postprocess_stub(path, module, output_dir):
     processed = normalize_swig_helpers(processed)
     processed = normalize_container_helpers(processed)
     processed = normalize_callback_helpers(processed)
+    processed = normalize_shadow_methods(processed)
     processed = remove_swig_meta_classmethod(processed)
     processed = add_runtime_unsupported_notes(processed, module)
     processed = add_typing_import(processed, "Any")

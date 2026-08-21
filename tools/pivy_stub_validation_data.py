@@ -91,6 +91,21 @@ ITER_CONTAINER_TYPES.update(vector_iter_element_types())
 CALLBACK_METHOD_CHECKS = {
     "coin.pyi": (
         (
+            "SoSensor",
+            "setFunction",
+            {"callbackfunction": "Callable[[object, SoSensor], None]"},
+            "None",
+        ),
+        (
+            "SoDataSensor",
+            "setDeleteCallback",
+            {
+                "function": "Callable[[object, SoSensor], None]",
+                "data": "object | None",
+            },
+            "None",
+        ),
+        (
             "SoError",
             "setHandlerCallback",
             {"pyfunc": "Callable[[object, SoError], None]", "data": "object"},
@@ -684,18 +699,6 @@ UNSUPPORTED_ARRAY_METHOD_CHECKS = {
 }
 RUNTIME_UNSUPPORTED_METHOD_CHECKS = {
     "coin.pyi": (
-        (
-            "SoSensor",
-            "setFunction",
-            {"callbackfunction": "Incomplete"},
-            "None",
-        ),
-        (
-            "SoDataSensor",
-            "setDeleteCallback",
-            {"function": "Incomplete", "data": "Incomplete | None"},
-            "None",
-        ),
         (
             "SoGLImage",
             "setEndFrameCallback",

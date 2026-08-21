@@ -30,6 +30,7 @@
 from pivy.coin import *
 import unittest
 import math
+import gc
 
 class Autocasting(unittest.TestCase):
     def testFieldAutocast(self):
@@ -1457,6 +1458,37 @@ class ZZErrorCallbackTests(unittest.TestCase):
 
         with self.assertRaises(TypeError):
             SoError.setHandlerCallback(None, None)
+
+
+class ZZSensorCallbackTests(unittest.TestCase):
+    def testPythonSensorCallbacks(self):
+        events = []
+
+        def callback(data, sensor):
+            events.append((data, type(sensor).__name__))
+
+        sensor = SoTimerSensor()
+        sensor.setFunction(callback)
+        sensor.trigger()
+        self.assertEqual(events, [(None, "SoTimerSensor")])
+
+        sensor_with_data = SoTimerSensor(callback, "sensor-data")
+        sensor_with_data.setFunction(callback)
+        sensor_with_data.trigger()
+        self.assertEqual(events[-1], ("sensor-data", "SoTimerSensor"))
+
+        data_sensor = SoFieldSensor()
+        data_sensor.setDeleteCallback(callback, "delete-data")
+        watched_field = SoSFFloat()
+        data_sensor.attach(watched_field)
+        del watched_field
+        gc.collect()
+        self.assertEqual(events[-1], ("delete-data", "SoFieldSensor"))
+
+        with self.assertRaises(TypeError):
+            sensor.setFunction(None)
+        with self.assertRaises(TypeError):
+            data_sensor.setDeleteCallback(None)
 
 
 class SbVecTests(unittest.TestCase):

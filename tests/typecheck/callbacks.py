@@ -23,6 +23,16 @@ def check_sensor_callbacks() -> None:
     assert_type(field, coin.SoFieldSensor)
     assert_type(node, coin.SoNodeSensor)
 
+    def base_sensor_callback(data: object, sensor: coin.SoSensor) -> None:
+        pass
+
+    plain_timer = coin.SoTimerSensor()
+    plain_timer.setFunction(base_sensor_callback)
+
+    data_sensor = coin.SoFieldSensor()
+    data_sensor.setDeleteCallback(base_sensor_callback, {"source": "test"})
+    data_sensor.setDeleteCallback(base_sensor_callback)
+
     def changed_callback(data: Any) -> None:
         pass
 
