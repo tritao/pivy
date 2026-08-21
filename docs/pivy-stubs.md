@@ -87,6 +87,11 @@ Coin dispatches the scheduled deletion callback, then released.
 `(userdata, SoState, enabled) -> None`. Both retain their callback closures on
 the Python proxy and accept `None` to clear the native callback.
 
+`SoProto.setFetchExternProtoCallback` accepts
+`(userdata, SoInput, urls, numurls) -> SoProto | None`. The URL array is
+presented as a Python list of borrowed `SbString` proxies, and the static
+callback closure is retained until replaced or cleared.
+
 Known pointer-buffer surfaces:
 
 - `SoMFDouble.getValues`

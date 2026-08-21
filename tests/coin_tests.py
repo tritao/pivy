@@ -1629,6 +1629,15 @@ class ZZGraphicsCallbackSetterTests(unittest.TestCase):
         with self.assertRaises(TypeError):
             shader_program.setEnableCallback(42)
 
+        def fetch_proto_callback(data, input, urls, numurls):
+            return None
+
+        SoProto.setFetchExternProtoCallback(fetch_proto_callback, "proto-data")
+        SoProto.setFetchExternProtoCallback(None)
+
+        with self.assertRaises(TypeError):
+            SoProto.setFetchExternProtoCallback(42)
+
 
 class ZZGLCallbackTests(unittest.TestCase):
     def testSortedObjectOrderCallback(self):

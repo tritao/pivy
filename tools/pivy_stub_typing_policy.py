@@ -690,6 +690,11 @@ PYTHON_SHADOW_METHOD_TYPES = {
         "closure: object | None = ...",
         "None",
     ),
+    ("SoProto", "setFetchExternProtoCallback"): (
+        "cb: Callable[[object, SoInput, list[SbString], int], SoProto | None] | None, "
+        "closure: object | None = ...",
+        "None",
+    ),
     ("SoDB", "registerHeader"): (
         "headerstring: SbString, isbinary: bool, ivversion: float, "
         "precallback: Callable[[object, SoInput], None], "
@@ -764,6 +769,12 @@ CALLBACK_PARAMETER_TYPE_OVERRIDES.update(
             "Callable[[object, SoState, bool], None] | None"
         ),
         ("SoShaderProgram", "setEnableCallback", "closure"): (
+            "object | None"
+        ),
+        ("SoProto", "setFetchExternProtoCallback", "cb"): (
+            "Callable[[object, SoInput, list[SbString], int], SoProto | None] | None"
+        ),
+        ("SoProto", "setFetchExternProtoCallback", "closure"): (
             "object | None"
         ),
         ("SoDB", "registerHeader", "precallback"): (

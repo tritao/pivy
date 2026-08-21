@@ -105,6 +105,17 @@ def check_graphics_callback_setters() -> None:
     shader_program.setEnableCallback(enable_callback, None)
     shader_program.setEnableCallback(None)
 
+    def fetch_proto_callback(
+        data: object,
+        input: coin.SoInput,
+        urls: list[coin.SbString],
+        numurls: int,
+    ) -> coin.SoProto | None:
+        return None if numurls != len(urls) else None
+
+    coin.SoProto.setFetchExternProtoCallback(fetch_proto_callback, None)
+    coin.SoProto.setFetchExternProtoCallback(None)
+
 
 def check_callback_action_callbacks() -> None:
     def node_callback(

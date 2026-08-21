@@ -197,6 +197,18 @@ CALLBACK_METHOD_CHECKS = {
             "None",
         ),
         (
+            "SoProto",
+            "setFetchExternProtoCallback",
+            {
+                "cb": (
+                    "Callable[[object, SoInput, list[SbString], int], "
+                    "SoProto | None] | None"
+                ),
+                "closure": "object | None",
+            },
+            "None",
+        ),
+        (
             "SoError",
             "setHandlerCallback",
             {"pyfunc": "Callable[[object, SoError], None]", "data": "object"},

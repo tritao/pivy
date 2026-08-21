@@ -157,6 +157,16 @@ class FieldTypePolicyTests(unittest.TestCase):
                 "None",
             ),
         )
+        self.assertEqual(
+            policy.PYTHON_SHADOW_METHOD_TYPES[
+                ("SoProto", "setFetchExternProtoCallback")
+            ],
+            (
+                "cb: Callable[[object, SoInput, list[SbString], int], "
+                "SoProto | None] | None, closure: object | None = ...",
+                "None",
+            ),
+        )
 
     def test_int32_references_use_the_existing_integer_pointer_helper(self):
         self.assertEqual(policy.SCALAR_REFERENCE_HELPER_TYPES["int32_t"], "intp")
