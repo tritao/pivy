@@ -51,6 +51,7 @@ try:
         CALLBACK_PARAMETER_NAMES,
         CALLBACK_TYPE_SIGNATURES,
         COMPARISON_METHODS,
+        element_factory_method_return_type,
         EXTEND_HELPER_METHOD_TYPES,
         FLOAT_TYPES,
         FUNCTION_POINTER_TYPE_SIGNATURES,
@@ -88,6 +89,7 @@ except ImportError:
         CALLBACK_PARAMETER_NAMES,
         CALLBACK_TYPE_SIGNATURES,
         COMPARISON_METHODS,
+        element_factory_method_return_type,
         EXTEND_HELPER_METHOD_TYPES,
         FLOAT_TYPES,
         FUNCTION_POINTER_TYPE_SIGNATURES,
@@ -630,6 +632,7 @@ def render_python_signature(
         return_type = "bool"
     else:
         cpp_return = signature.return_type
+        factory_return_type = element_factory_method_return_type(class_name, name)
         if (
             name in {"getValue", "getHSVValue"}
             and class_name in SEQUENCE_VALUE_RETURN_TYPES
@@ -644,6 +647,8 @@ def render_python_signature(
             return_type = MATRIX_VALUE_RETURN_TYPES[class_name]
         elif name == "__getitem__" and class_name in MATRIX_ROW_RETURN_TYPES:
             return_type = MATRIX_ROW_RETURN_TYPES[class_name]
+        elif factory_return_type is not None:
+            return_type = factory_return_type
         elif (class_name, name) in METHOD_RETURN_TYPE_OVERRIDES:
             return_type = METHOD_RETURN_TYPE_OVERRIDES[(class_name, name)]
         elif cpp_return and name == "addEventCallback" and callback_types:

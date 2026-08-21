@@ -73,6 +73,18 @@ class Autocasting(unittest.TestCase):
                         'SoField.getContainer is not casted correctly')
 
 
+class ElementFactoryTests(unittest.TestCase):
+    def testElementFactoryAutocastAndOwnership(self):
+        element = SoShapeHintsElement.createInstance()
+        self.assertIsInstance(element, SoShapeHintsElement)
+        self.assertIsInstance(element, SoElement)
+        self.assertTrue(element.thisown)
+
+        model_matrix = SoModelMatrixElement.createInstance()
+        self.assertIsInstance(model_matrix, SoModelMatrixElement)
+        self.assertTrue(model_matrix.thisown)
+
+
 class EngineOutputTests(unittest.TestCase):
     def testEngineOutputContract(self):
         engine = SoBoolOperation()

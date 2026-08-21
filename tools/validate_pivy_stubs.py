@@ -10,6 +10,7 @@ import tempfile
 from pathlib import Path
 
 from tools.report_pivy_typing import collect_report
+from tools.pivy_stub_typing_policy import ELEMENT_FACTORY_CLASSES
 
 from tools.pivy_stub_validation_data import (
     ARRAY_METHOD_CHECKS,
@@ -425,6 +426,26 @@ def assert_method_return_types(path, tree, checks):
         assert_method_signature(path, classes, class_name, method_name, {}, return_type)
 
 
+def assert_element_factory_methods(path, tree):
+    if not path.endswith("coin.pyi"):
+        return
+
+    classes = class_map(tree)
+    for class_name in sorted(ELEMENT_FACTORY_CLASSES):
+        node = classes.get(class_name)
+        if node is None:
+            raise AssertionError("%s is missing %s" % (path, class_name))
+
+        methods = methods_named(node, "createInstance")
+        if not any(
+            annotation_text(method.returns) == class_name for method in methods
+        ):
+            raise AssertionError(
+                "%s has an unexpected %s.createInstance return annotation"
+                % (path, class_name)
+            )
+
+
 def assert_property_attributes(path, tree, checks):
     classes = class_map(tree)
     for class_name, attribute_name, attribute_type in checks:
@@ -615,6 +636,7 @@ def validate_stub_files(package_dir):
                 assert_method_return_types(
                     path, tree, METHOD_RETURN_TYPE_CHECKS.get(relative, ())
                 )
+                assert_element_factory_methods(path, tree)
                 assert_property_attributes(
                     path, tree, PROPERTY_ATTRIBUTE_CHECKS.get(relative, ())
                 )

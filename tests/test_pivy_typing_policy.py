@@ -1,3 +1,4 @@
+import re
 import unittest
 from pathlib import Path
 
@@ -8,6 +9,7 @@ from tools.pivy_stub_typing_policy import (
     FIELD_TYPE_POLICIES,
     MULTIFIELD_TYPE_POLICIES,
     classify_incomplete,
+    element_factory_method_return_type,
     field_method_type_overrides,
     multifield_iter_element_types,
     multifield_setvalues_types,
@@ -150,6 +152,23 @@ class IncompletePolicyTests(unittest.TestCase):
 
 
 class PolicyBoundaryTests(unittest.TestCase):
+    def test_element_factory_policy_matches_swig_inventory(self):
+        text = Path("Inventor/elements/SoElement.i").read_text()
+        interface_classes = {
+            class_name
+            for class_name in re.findall(
+                r"PIVY_ELEMENT_FACTORY_OUT\(([^)]+)\)", text
+            )
+            if class_name != "_class_"
+        }
+
+        self.assertEqual(interface_classes, policy.ELEMENT_FACTORY_CLASSES)
+        for class_name in interface_classes:
+            self.assertEqual(
+                element_factory_method_return_type(class_name, "createInstance"),
+                class_name,
+            )
+
     def test_generation_data_is_a_compatibility_reexport(self):
         self.assertIs(
             compatibility_policy.METHOD_RETURN_TYPE_OVERRIDES,

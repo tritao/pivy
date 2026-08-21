@@ -23,6 +23,14 @@ def check_vectors() -> None:
     vector.setValue([7.0, 8.0, 9.0])
 
 
+def check_element_factory_contract() -> None:
+    element = coin.SoShapeHintsElement.createInstance()
+    assert_type(element, coin.SoShapeHintsElement)
+
+    model_matrix = coin.SoModelMatrixElement.createInstance()
+    assert_type(model_matrix, coin.SoModelMatrixElement)
+
+
 def check_colors() -> None:
     color = coin.SbColor([0.2, 0.4, 0.8])
 

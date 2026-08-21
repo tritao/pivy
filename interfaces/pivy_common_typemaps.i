@@ -29,7 +29,8 @@ typedef int Py_ssize_t;
 #endif
 
 PyObject *
-cast_internal(PyObject * self, PyObject * obj, const char * type_name, Py_ssize_t type_len)
+cast_internal(PyObject * self, PyObject * obj, const char * type_name, Py_ssize_t type_len,
+              int own = 0)
 {
   swig_type_info * swig_type = 0;
   void * cast_obj = 0;
@@ -66,7 +67,7 @@ cast_internal(PyObject * self, PyObject * obj, const char * type_name, Py_ssize_
   SWIG_ConvertPtr(obj, (void**)&cast_obj, NULL, SWIG_POINTER_EXCEPTION | 0);
   if (SWIG_arg_fail(1)) { SWIG_fail; }
 
-  return SWIG_NewPointerObj((void*)cast_obj, swig_type, 0);
+  return SWIG_NewPointerObj((void*)cast_obj, swig_type, own ? SWIG_POINTER_OWN : 0);
 fail:
   return NULL;
 }
@@ -211,6 +212,7 @@ autocast_event(SoEvent * event)
 
   return result;
 }
+
 %}
 
 /* typemaps for autocasting types through the Inventor type system */

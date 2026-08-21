@@ -57,12 +57,13 @@ Known pointer-buffer surfaces:
 - `SoMFDouble.getValues`
 - `SoMFDouble.setValues`
 
+Resolved binding-backed surfaces:
+
+- Class-specific static `createInstance()` methods for Coin elements now
+  return owned, concrete element wrappers through a SWIG typemap.
+
 High-volume `Incomplete` clusters that still need SWIG-side work:
 
-- Class-specific static `createInstance()` methods where SWIG reports
-  `void *`. Runtime returns a raw `SwigPyObject` pointer, unlike the
-  Python-level `SoType.createInstance()` helper which is already typed as
-  `SoBase | SoField | SoPath | None`.
 - Raw callback registration tables and function-pointer fields, including
   `addMethod` action dispatch hooks, `SoActionMethodList`, `SbHeapFuncs`, and
   `SbOctTreeFuncs`.
