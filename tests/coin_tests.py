@@ -1310,6 +1310,42 @@ class SbBaseClasses(unittest.TestCase):
             for j in range(i):
                 self.assertEqual(d[i][j], v[j])
 
+    def testAllFixedWidthVectorBindings(self):
+        vectors = (
+            (SbVec2b, [1, 2]),
+            (SbVec2s, [1, 2]),
+            (SbVec2i32, [1, 2]),
+            (SbVec2f, [1.0, 2.0]),
+            (SbVec2d, [1.0, 2.0]),
+            (SbVec3b, [1, 2, 3]),
+            (SbVec3s, [1, 2, 3]),
+            (SbVec3i32, [1, 2, 3]),
+            (SbVec3f, [1.0, 2.0, 3.0]),
+            (SbVec3d, [1.0, 2.0, 3.0]),
+            (SbVec4b, [1, 2, 3, 4]),
+            (SbVec4ub, [1, 2, 3, 4]),
+            (SbVec4s, [1, 2, 3, 4]),
+            (SbVec4us, [1, 2, 3, 4]),
+            (SbVec4i32, [1, 2, 3, 4]),
+            (SbVec4ui32, [1, 2, 3, 4]),
+            (SbVec4f, [1.0, 2.0, 3.0, 4.0]),
+            (SbVec4d, [1.0, 2.0, 3.0, 4.0]),
+        )
+
+        for vector_type, values in vectors:
+            vector = vector_type(values)
+            self.assertEqual(list(vector), values)
+            self.assertEqual(list(vector.getValue()), values)
+
+            vector.setValue(values)
+            vector[-1] = values[-1]
+            self.assertEqual(list(vector), values)
+
+            with self.assertRaises((TypeError, ValueError, OverflowError)):
+                vector_type(values[:-1])
+            with self.assertRaises((TypeError, ValueError, OverflowError)):
+                vector_type([object()] * len(values))
+
     def testVecdDBMatrixOperators(self):
         """tests operators between vec and matrix classes, double precision"""
         v = SbVec3d(1,0,0)

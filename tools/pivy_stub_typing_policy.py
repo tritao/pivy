@@ -5,6 +5,87 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 
+@dataclass(frozen=True)
+class VectorTypePolicy:
+    """Python-facing policy for one fixed-width Coin vector value."""
+
+    scalar_cpp_type: str
+    component_type: str
+    width: int
+
+
+VECTOR_TYPE_POLICIES = {
+    "SbVec2b": VectorTypePolicy("int8_t", "int", 2),
+    "SbVec2s": VectorTypePolicy("short", "int", 2),
+    "SbVec2i32": VectorTypePolicy("int32_t", "int", 2),
+    "SbVec2f": VectorTypePolicy("float", "float", 2),
+    "SbVec2d": VectorTypePolicy("double", "float", 2),
+    "SbVec3b": VectorTypePolicy("int8_t", "int", 3),
+    "SbVec3s": VectorTypePolicy("short", "int", 3),
+    "SbVec3i32": VectorTypePolicy("int32_t", "int", 3),
+    "SbVec3f": VectorTypePolicy("float", "float", 3),
+    "SbVec3d": VectorTypePolicy("double", "float", 3),
+    "SbVec4b": VectorTypePolicy("int8_t", "int", 4),
+    "SbVec4ub": VectorTypePolicy("uint8_t", "int", 4),
+    "SbVec4s": VectorTypePolicy("short", "int", 4),
+    "SbVec4us": VectorTypePolicy("unsigned short", "int", 4),
+    "SbVec4i32": VectorTypePolicy("int32_t", "int", 4),
+    "SbVec4ui32": VectorTypePolicy("uint32_t", "int", 4),
+    "SbVec4f": VectorTypePolicy("float", "float", 4),
+    "SbVec4d": VectorTypePolicy("double", "float", 4),
+}
+
+
+def vector_sequence_array_parameters():
+    """Return constructor/setter sequence policies for Coin vectors."""
+
+    return {
+        (class_name, method_name, "v"): (
+            "Sequence[%s]" % policy.component_type,
+            str(policy.width),
+        )
+        for class_name, policy in VECTOR_TYPE_POLICIES.items()
+        for method_name in ("__init__", "setValue")
+    }
+
+
+def vector_value_return_types():
+    """Return zero-argument getValue annotations for Coin vectors."""
+
+    return {
+        class_name: "Sequence[%s]" % policy.component_type
+        for class_name, policy in VECTOR_TYPE_POLICIES.items()
+    }
+
+
+def vector_iter_element_types():
+    """Return iterator component annotations for Coin vectors."""
+
+    return {
+        class_name: policy.component_type
+        for class_name, policy in VECTOR_TYPE_POLICIES.items()
+    }
+
+
+def vector_output_parameter_types():
+    """Return scalar pointer-helper parameters for vector output overloads."""
+
+    pointer_types = {
+        "float": "floatp",
+        "double": "doublep",
+    }
+    return {
+        class_name: tuple(
+            "%s: %s" % (
+                component,
+                pointer_types.get(policy.scalar_cpp_type, "intp"),
+            )
+            for component in "xyzw"[: policy.width]
+        )
+        for class_name, policy in VECTOR_TYPE_POLICIES.items()
+    }
+
+
 # Generator normalization policy.  These tables describe the Python-facing
 # type chosen for a C++/SWIG surface; keeping them beside the semantic policy
 # below makes the generator and validator consume one source of truth.
@@ -74,10 +155,7 @@ SEQUENCE_POINTER_PARAMETERS = {
     ("SoQt", "init", "argv"): "Sequence[str]",
 }
 SEQUENCE_ARRAY_PARAMETERS = {
-    ("SbVec2s", "__init__", "v"): ("Sequence[int]", "2"),
-    ("SbVec2s", "setValue", "v"): ("Sequence[int]", "2"),
-    ("SbVec3s", "__init__", "v"): ("Sequence[int]", "3"),
-    ("SbVec3s", "setValue", "v"): ("Sequence[int]", "3"),
+    **vector_sequence_array_parameters(),
 }
 BOOL_SEQUENCE_ARRAY_PARAMETERS = {
     ("SoQtViewer", "setAnaglyphStereoColorMasks", "left"): (
@@ -101,13 +179,7 @@ SEQUENCE_VALUE_RETURN_TYPES = {
     "SbColor4f": "Sequence[float]",
     "SbDPRotation": "Sequence[float]",
     "SbRotation": "Sequence[float]",
-    "SbVec2d": "Sequence[float]",
-    "SbVec2f": "Sequence[float]",
-    "SbVec2s": "Sequence[int]",
-    "SbVec3d": "Sequence[float]",
-    "SbVec3f": "Sequence[float]",
-    "SbVec4d": "Sequence[float]",
-    "SbVec4f": "Sequence[float]",
+    **vector_value_return_types(),
 }
 MATRIX_VALUE_RETURN_TYPES = {
     "SbDPMatrix": "Sequence[Sequence[float]]",
@@ -576,14 +648,7 @@ KNOWN_ITER_ELEMENT_TYPES = {
     "SbName": "str",
     "SbPList": "Any",
     "SbString": "str",
-    "SbVec2d": "float",
-    "SbVec2f": "float",
-    "SbVec2s": "int",
-    "SbVec3d": "float",
-    "SbVec3f": "float",
-    "SbVec3s": "int",
-    "SbVec4d": "float",
-    "SbVec4f": "float",
+    **vector_iter_element_types(),
     "SoMField": "Any",
     "SoNodeKitPath": "SoNode",
     "SoPath": "SoNode",
@@ -1188,6 +1253,22 @@ TRIAGED_INCOMPLETE_SITES = frozenset(
         ('parameter', 'SbBox3s', 'getSize', 'sizeX'),
         ('parameter', 'SbBox3s', 'getSize', 'sizeY'),
         ('parameter', 'SbBox3s', 'getSize', 'sizeZ'),
+        # Coin exposes cross-width vector conversions for these legacy
+        # wrappers, but the corresponding source vector types are not public
+        # Pivy classes. Keep those overloads explicit until the conversion
+        # surface is modelled as a first-class binding policy.
+        ('parameter', 'SbVec2b', '__init__', 'v'),
+        ('parameter', 'SbVec2b', 'setValue', 'v'),
+        ('parameter', 'SbVec2i32', '__init__', 'v'),
+        ('parameter', 'SbVec2i32', 'setValue', 'v'),
+        ('parameter', 'SbVec2s', '__init__', 'v'),
+        ('parameter', 'SbVec2s', 'setValue', 'v'),
+        ('parameter', 'SbVec3b', '__init__', 'v'),
+        ('parameter', 'SbVec3b', 'setValue', 'v'),
+        ('parameter', 'SbVec3i32', '__init__', 'v'),
+        ('parameter', 'SbVec3i32', 'setValue', 'v'),
+        ('parameter', 'SbVec3s', '__init__', 'v'),
+        ('parameter', 'SbVec3s', 'setValue', 'v'),
         ('parameter', 'SbClip', '__init__', 'userdata'),
         ('parameter', 'SbClip', 'addVertex', 'vdata'),
         ('parameter', 'SbClip', 'getVertex', 'vdata'),
@@ -1234,61 +1315,6 @@ TRIAGED_INCOMPLETE_SITES = frozenset(
         ('parameter', 'SbTime', 'getValue', 'sec'),
         ('parameter', 'SbTime', 'getValue', 'tv'),
         ('parameter', 'SbTime', 'setValue', 'tv'),
-        ('parameter', 'SbVec2b', '__init__', 'v'),
-        ('parameter', 'SbVec2b', 'getValue', 'x'),
-        ('parameter', 'SbVec2b', 'getValue', 'y'),
-        ('parameter', 'SbVec2b', 'setValue', 'v'),
-        ('parameter', 'SbVec2i32', '__init__', 'v'),
-        ('parameter', 'SbVec2i32', 'getValue', 'x'),
-        ('parameter', 'SbVec2i32', 'getValue', 'y'),
-        ('parameter', 'SbVec2i32', 'setValue', 'v'),
-        ('parameter', 'SbVec2s', '__init__', 'v'),
-        ('parameter', 'SbVec2s', 'setValue', 'v'),
-        ('parameter', 'SbVec3b', '__init__', 'v'),
-        ('parameter', 'SbVec3b', 'getValue', 'x'),
-        ('parameter', 'SbVec3b', 'getValue', 'y'),
-        ('parameter', 'SbVec3b', 'getValue', 'z'),
-        ('parameter', 'SbVec3b', 'setValue', 'v'),
-        ('parameter', 'SbVec3i32', '__init__', 'v'),
-        ('parameter', 'SbVec3i32', 'getValue', 'x'),
-        ('parameter', 'SbVec3i32', 'getValue', 'y'),
-        ('parameter', 'SbVec3i32', 'getValue', 'z'),
-        ('parameter', 'SbVec3i32', 'setValue', 'v'),
-        ('parameter', 'SbVec3s', '__init__', 'v'),
-        ('parameter', 'SbVec3s', 'setValue', 'v'),
-        ('parameter', 'SbVec4b', '__init__', 'v'),
-        ('parameter', 'SbVec4b', 'getValue', 'w'),
-        ('parameter', 'SbVec4b', 'getValue', 'x'),
-        ('parameter', 'SbVec4b', 'getValue', 'y'),
-        ('parameter', 'SbVec4b', 'getValue', 'z'),
-        ('parameter', 'SbVec4b', 'setValue', 'v'),
-        ('parameter', 'SbVec4i32', '__init__', 'v'),
-        ('parameter', 'SbVec4i32', 'getValue', 'w'),
-        ('parameter', 'SbVec4i32', 'getValue', 'x'),
-        ('parameter', 'SbVec4i32', 'getValue', 'y'),
-        ('parameter', 'SbVec4i32', 'getValue', 'z'),
-        ('parameter', 'SbVec4i32', 'setValue', 'v'),
-        ('parameter', 'SbVec4s', '__init__', 'v'),
-        ('parameter', 'SbVec4s', 'getValue', 'w'),
-        ('parameter', 'SbVec4s', 'setValue', 'v'),
-        ('parameter', 'SbVec4ub', '__init__', 'v'),
-        ('parameter', 'SbVec4ub', 'getValue', 'w'),
-        ('parameter', 'SbVec4ub', 'getValue', 'x'),
-        ('parameter', 'SbVec4ub', 'getValue', 'y'),
-        ('parameter', 'SbVec4ub', 'getValue', 'z'),
-        ('parameter', 'SbVec4ub', 'setValue', 'v'),
-        ('parameter', 'SbVec4ui32', '__init__', 'v'),
-        ('parameter', 'SbVec4ui32', 'getValue', 'w'),
-        ('parameter', 'SbVec4ui32', 'getValue', 'x'),
-        ('parameter', 'SbVec4ui32', 'getValue', 'y'),
-        ('parameter', 'SbVec4ui32', 'getValue', 'z'),
-        ('parameter', 'SbVec4ui32', 'setValue', 'v'),
-        ('parameter', 'SbVec4us', '__init__', 'v'),
-        ('parameter', 'SbVec4us', 'getValue', 'w'),
-        ('parameter', 'SbVec4us', 'getValue', 'x'),
-        ('parameter', 'SbVec4us', 'getValue', 'y'),
-        ('parameter', 'SbVec4us', 'getValue', 'z'),
-        ('parameter', 'SbVec4us', 'setValue', 'v'),
         ('parameter', 'ScXMLDocument', 'readXMLData', 'xmldoc'),
         ('parameter', 'ScXMLEltReader', 'read', 'elt'),
         ('parameter', 'ScXMLEvent', 'getAssociationKeys', 'keys'),

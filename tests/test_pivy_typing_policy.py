@@ -16,6 +16,10 @@ from tools.pivy_stub_typing_policy import (
     multifield_getvalues_types,
     multifield_iter_element_types,
     multifield_setvalues_types,
+    vector_iter_element_types,
+    vector_output_parameter_types,
+    vector_sequence_array_parameters,
+    vector_value_return_types,
 )
 
 
@@ -98,6 +102,36 @@ class MultifieldTypePolicyTests(unittest.TestCase):
         self.assertEqual(component_types["SoMFVec2s"], ("Sequence[int]", 2))
         self.assertEqual(component_types["SoMFVec3d"], ("Sequence[float]", 3))
         self.assertEqual(component_types["SoMFVec4ui32"], ("Sequence[int]", 4))
+
+
+class VectorTypePolicyTests(unittest.TestCase):
+    def test_vector_array_inputs_are_derived_from_one_policy(self):
+        array_types = vector_sequence_array_parameters()
+
+        self.assertEqual(
+            array_types[("SbVec2b", "__init__", "v")],
+            ("Sequence[int]", "2"),
+        )
+        self.assertEqual(
+            array_types[("SbVec3d", "setValue", "v")],
+            ("Sequence[float]", "3"),
+        )
+        self.assertEqual(
+            array_types[("SbVec4ui32", "setValue", "v")],
+            ("Sequence[int]", "4"),
+        )
+
+    def test_vector_outputs_and_iterators_are_derived_from_policy(self):
+        self.assertEqual(vector_value_return_types()["SbVec4ub"], "Sequence[int]")
+        self.assertEqual(vector_iter_element_types()["SbVec3f"], "float")
+        self.assertEqual(
+            vector_output_parameter_types()["SbVec3i32"],
+            ("x: intp", "y: intp", "z: intp"),
+        )
+        self.assertEqual(
+            vector_output_parameter_types()["SbVec4d"],
+            ("x: doublep", "y: doublep", "z: doublep", "w: doublep"),
+        )
 
 
 class IncompletePolicyTests(unittest.TestCase):

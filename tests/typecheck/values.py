@@ -23,6 +23,18 @@ def check_vectors() -> None:
     vector.setValue([7.0, 8.0, 9.0])
 
 
+def check_fixed_width_integer_vectors() -> None:
+    vector = coin.SbVec4ui32([1, 2, 3, 4])
+
+    assert_type(vector.getValue(), Sequence[int])
+    assert_type(vector[0], int)
+    assert_type(iter(vector), Iterator[int])
+    assert_type(len(vector), int)
+
+    vector[0] = 5
+    vector.setValue([5, 6, 7, 8])
+
+
 def check_element_factory_contract() -> None:
     element = coin.SoShapeHintsElement.createInstance()
     assert_type(element, coin.SoShapeHintsElement)

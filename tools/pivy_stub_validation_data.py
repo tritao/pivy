@@ -8,6 +8,7 @@ from tools.pivy_stub_typing_policy import (
     multifield_component_sequence_types,
     multifield_iter_element_types,
     multifield_setvalues_types,
+    vector_iter_element_types,
 )
 
 GENERATED_HEADER = (
@@ -85,6 +86,7 @@ ITER_CONTAINER_TYPES = {
     "SoPathList": "SoPath",
 }
 ITER_CONTAINER_TYPES.update(multifield_iter_element_types())
+ITER_CONTAINER_TYPES.update(vector_iter_element_types())
 CALLBACK_METHOD_CHECKS = {
     "coin.pyi": (
         (
@@ -649,26 +651,6 @@ ARRAY_METHOD_CHECKS = {
 }
 UNSUPPORTED_ARRAY_METHOD_CHECKS = {
     "coin.pyi": (
-        ("SbVec2b", "__init__", "v", "Sequence[int]"),
-        ("SbVec2b", "setValue", "v", "Sequence[int]"),
-        ("SbVec2i32", "__init__", "v", "Sequence[int]"),
-        ("SbVec2i32", "setValue", "v", "Sequence[int]"),
-        ("SbVec3b", "__init__", "v", "Sequence[int]"),
-        ("SbVec3b", "setValue", "v", "Sequence[int]"),
-        ("SbVec3i32", "__init__", "v", "Sequence[int]"),
-        ("SbVec3i32", "setValue", "v", "Sequence[int]"),
-        ("SbVec4b", "__init__", "v", "Sequence[int]"),
-        ("SbVec4b", "setValue", "v", "Sequence[int]"),
-        ("SbVec4ub", "__init__", "v", "Sequence[int]"),
-        ("SbVec4ub", "setValue", "v", "Sequence[int]"),
-        ("SbVec4s", "__init__", "v", "Sequence[int]"),
-        ("SbVec4s", "setValue", "v", "Sequence[int]"),
-        ("SbVec4us", "__init__", "v", "Sequence[int]"),
-        ("SbVec4us", "setValue", "v", "Sequence[int]"),
-        ("SbVec4i32", "__init__", "v", "Sequence[int]"),
-        ("SbVec4i32", "setValue", "v", "Sequence[int]"),
-        ("SbVec4ui32", "__init__", "v", "Sequence[int]"),
-        ("SbVec4ui32", "setValue", "v", "Sequence[int]"),
         ("SbMatrix", "LUDecomposition", "index", "Sequence[int]"),
         ("SbDPMatrix", "LUDecomposition", "index", "Sequence[int]"),
         ("SoSFVec2s", "setValue", "xy", "Sequence[int]"),
@@ -1525,17 +1507,6 @@ UNSUPPORTED_REFERENCE_METHOD_CHECKS = {
                 "ymin": "Incomplete",
                 "xmax": "Incomplete",
                 "ymax": "Incomplete",
-            },
-            "None",
-        ),
-        (
-            "SbVec4us",
-            "getValue",
-            {
-                "x": "Incomplete",
-                "y": "Incomplete",
-                "z": "Incomplete",
-                "w": "Incomplete",
             },
             "None",
         ),

@@ -76,6 +76,7 @@ try:
         SEQUENCE_POINTER_PARAMETERS,
         SEQUENCE_VALUE_RETURN_TYPES,
         STRING_POINTER_PARAMETERS,
+        vector_output_parameter_types,
         field_method_type_overrides,
         multifield_component_sequence_types,
         multifield_getvalues_types,
@@ -116,6 +117,7 @@ except ImportError:
         SEQUENCE_POINTER_PARAMETERS,
         SEQUENCE_VALUE_RETURN_TYPES,
         STRING_POINTER_PARAMETERS,
+        vector_output_parameter_types,
         field_method_type_overrides,
         multifield_component_sequence_types,
         multifield_getvalues_types,
@@ -129,6 +131,7 @@ MULTIFIELD_COMPONENT_SEQUENCE_TYPES = multifield_component_sequence_types()
 MULTIFIELD_GETVALUES_TYPES = multifield_getvalues_types()
 MULTIFIELD_ITER_ELEMENT_TYPES = multifield_iter_element_types()
 MULTIFIELD_SETVALUES_TYPES = multifield_setvalues_types()
+VECTOR_OUTPUT_PARAMETER_TYPES = vector_output_parameter_types()
 
 
 def stub_path(output_dir, module):
@@ -318,7 +321,7 @@ def sequence_parameter_type(class_name, method_name, cpp_arg):
         normalized = normalize_cpp_type(cpp_arg.type)
         base = re.sub(r"\s*\[\s*\d*\s*\]", "", normalized).strip()
         dimensions = re.findall(r"\[\s*(\d*)\s*\]", normalized)
-        if base in {"short", "short int"} and dimensions == [expected_dimension]:
+        if base in FLOAT_TYPES | INT_TYPES and dimensions == [expected_dimension]:
             return sequence_type
 
     sequence_type = MATRIX_SEQUENCE_PARAMETERS.get(
@@ -1551,6 +1554,41 @@ def normalize_multifield_getvalues(text):
     return "\n".join(updated) + "\n"
 
 
+def normalize_vector_getvalue_helpers(text):
+    lines = text.splitlines()
+    updated = []
+    current_class = None
+
+    for line in lines:
+        class_match = re.match(r"^class\s+([A-Za-z_]\w*)", line)
+        if class_match:
+            current_class = class_match.group(1)
+        elif current_class and is_top_level_statement(line):
+            current_class = None
+
+        match = re.match(
+            r"(?P<indent>\s*)def getValue\(self, \*args\): \.\.\.$", line
+        )
+        output_parameters = VECTOR_OUTPUT_PARAMETER_TYPES.get(current_class)
+        if match and output_parameters is not None:
+            indent = match.group("indent")
+            updated.extend(
+                [
+                    "%s@overload" % indent,
+                    "%sdef getValue(self) -> %s: ..."
+                    % (indent, SEQUENCE_VALUE_RETURN_TYPES[current_class]),
+                    "%s@overload" % indent,
+                    "%sdef getValue(self, %s) -> None: ..."
+                    % (indent, ", ".join(output_parameters)),
+                ]
+            )
+            continue
+
+        updated.append(line)
+
+    return "\n".join(updated) + "\n"
+
+
 def normalize_python_helpers(text):
     lines = text.splitlines()
     updated = []
@@ -1781,6 +1819,7 @@ def postprocess_stub(path, module, output_dir):
     processed = normalize_operator_helpers(processed)
     processed = normalize_multifield_helpers(processed)
     processed = normalize_multifield_getvalues(processed)
+    processed = normalize_vector_getvalue_helpers(processed)
     processed = normalize_python_helpers(processed)
     processed = normalize_extend_helpers(processed)
     processed = normalize_property_attributes(
