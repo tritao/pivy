@@ -1606,6 +1606,30 @@ class ZZGLCacheCallbackTests(unittest.TestCase):
             SoGLCacheContextElement.scheduleDeleteCallback(42, 42)
 
 
+class ZZGraphicsCallbackSetterTests(unittest.TestCase):
+    def testPythonCallbackSetters(self):
+        image = SoGLImage()
+
+        def end_frame_callback(data):
+            pass
+
+        image.setEndFrameCallback(end_frame_callback, "image-data")
+        image.setEndFrameCallback(None)
+
+        shader_program = SoShaderProgram()
+
+        def enable_callback(data, state, enable):
+            pass
+
+        shader_program.setEnableCallback(enable_callback, "shader-data")
+        shader_program.setEnableCallback(None)
+
+        with self.assertRaises(TypeError):
+            image.setEndFrameCallback(42)
+        with self.assertRaises(TypeError):
+            shader_program.setEnableCallback(42)
+
+
 class ZZGLCallbackTests(unittest.TestCase):
     def testSortedObjectOrderCallback(self):
         action = SoGLRenderAction(SbViewportRegion())

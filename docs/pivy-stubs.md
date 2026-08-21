@@ -82,6 +82,11 @@ alive by the action and is cleared when a non-callback strategy is selected.
 `(userdata, contextid) -> None` callback. Its Python closure is retained until
 Coin dispatches the scheduled deletion callback, then released.
 
+`SoGLImage.setEndFrameCallback` accepts `(userdata) -> None`, while
+`SoShaderProgram.setEnableCallback` accepts
+`(userdata, SoState, enabled) -> None`. Both retain their callback closures on
+the Python proxy and accept `None` to clear the native callback.
+
 Known pointer-buffer surfaces:
 
 - `SoMFDouble.getValues`

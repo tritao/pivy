@@ -179,6 +179,24 @@ CALLBACK_METHOD_CHECKS = {
             "None",
         ),
         (
+            "SoGLImage",
+            "setEndFrameCallback",
+            {
+                "cb": "Callable[[object], None] | None",
+                "closure": "object | None",
+            },
+            "None",
+        ),
+        (
+            "SoShaderProgram",
+            "setEnableCallback",
+            {
+                "cb": "Callable[[object, SoState, bool], None] | None",
+                "closure": "object | None",
+            },
+            "None",
+        ),
+        (
             "SoError",
             "setHandlerCallback",
             {"pyfunc": "Callable[[object, SoError], None]", "data": "object"},
@@ -781,12 +799,6 @@ UNSUPPORTED_ARRAY_METHOD_CHECKS = {
 }
 RUNTIME_UNSUPPORTED_METHOD_CHECKS = {
     "coin.pyi": (
-        (
-            "SoGLImage",
-            "setEndFrameCallback",
-            {"cb": "Incomplete", "closure": "Incomplete"},
-            "None",
-        ),
         (
             "SoMFDouble",
             "getValues",

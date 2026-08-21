@@ -86,6 +86,26 @@ def check_context_handler_callbacks() -> None:
     coin.SoGLCacheContextElement.scheduleDeleteCallback(41, callback, None)
 
 
+def check_graphics_callback_setters() -> None:
+    def end_frame_callback(data: object) -> None:
+        pass
+
+    image = coin.SoGLImage()
+    image.setEndFrameCallback(end_frame_callback, None)
+    image.setEndFrameCallback(None)
+
+    def enable_callback(
+        data: object,
+        state: coin.SoState,
+        enable: bool,
+    ) -> None:
+        pass
+
+    shader_program = coin.SoShaderProgram()
+    shader_program.setEnableCallback(enable_callback, None)
+    shader_program.setEnableCallback(None)
+
+
 def check_callback_action_callbacks() -> None:
     def node_callback(
         data: Any,

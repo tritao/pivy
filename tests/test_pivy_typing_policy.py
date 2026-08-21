@@ -136,6 +136,28 @@ class FieldTypePolicyTests(unittest.TestCase):
             ),
         )
 
+    def test_graphics_callback_setters_have_python_signatures(self):
+        self.assertEqual(
+            policy.PYTHON_SHADOW_METHOD_TYPES[
+                ("SoGLImage", "setEndFrameCallback")
+            ],
+            (
+                "self, cb: Callable[[object], None] | None, "
+                "closure: object | None = ...",
+                "None",
+            ),
+        )
+        self.assertEqual(
+            policy.PYTHON_SHADOW_METHOD_TYPES[
+                ("SoShaderProgram", "setEnableCallback")
+            ],
+            (
+                "self, cb: Callable[[object, SoState, bool], None] | None, "
+                "closure: object | None = ...",
+                "None",
+            ),
+        )
+
     def test_int32_references_use_the_existing_integer_pointer_helper(self):
         self.assertEqual(policy.SCALAR_REFERENCE_HELPER_TYPES["int32_t"], "intp")
 

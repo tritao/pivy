@@ -680,6 +680,16 @@ PYTHON_SHADOW_METHOD_TYPES = {
         "closure: object | None = ...",
         "None",
     ),
+    ("SoGLImage", "setEndFrameCallback"): (
+        "self, cb: Callable[[object], None] | None, "
+        "closure: object | None = ...",
+        "None",
+    ),
+    ("SoShaderProgram", "setEnableCallback"): (
+        "self, cb: Callable[[object, SoState, bool], None] | None, "
+        "closure: object | None = ...",
+        "None",
+    ),
     ("SoDB", "registerHeader"): (
         "headerstring: SbString, isbinary: bool, ivversion: float, "
         "precallback: Callable[[object, SoInput], None], "
@@ -746,6 +756,16 @@ CALLBACK_PARAMETER_TYPE_OVERRIDES.update(
         ("SoGLCacheContextElement", "scheduleDeleteCallback", "closure"): (
             "object | None"
         ),
+        ("SoGLImage", "setEndFrameCallback", "cb"): (
+            "Callable[[object], None] | None"
+        ),
+        ("SoGLImage", "setEndFrameCallback", "closure"): "object | None",
+        ("SoShaderProgram", "setEnableCallback", "cb"): (
+            "Callable[[object, SoState, bool], None] | None"
+        ),
+        ("SoShaderProgram", "setEnableCallback", "closure"): (
+            "object | None"
+        ),
         ("SoDB", "registerHeader", "precallback"): (
             "Callable[[object, SoInput], None]"
         ),
@@ -798,7 +818,6 @@ RUNTIME_UNSUPPORTED_NOTE = (
 )
 RUNTIME_UNSUPPORTED_METHOD_NOTES = {
     "pivy.coin": {
-        ("SoGLImage", "setEndFrameCallback"),
         ("SoMFDouble", "getValues"),
         ("SoMFDouble", "setValues"),
     },
