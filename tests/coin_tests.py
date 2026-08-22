@@ -1660,6 +1660,41 @@ class ZZSensorCallbackTests(unittest.TestCase):
             data_sensor.setDeleteCallback(None)
 
 
+class ZZCallbackActionTextureTests(unittest.TestCase):
+    def testTextureSnapshotAdapters(self):
+        action = SoCallbackAction()
+
+        pixels2, size2, components2 = action.getTextureImage2dValue()
+        self.assertIsNone(pixels2)
+        self.assertEqual(tuple(size2), (0, 0))
+        self.assertEqual(components2, 0)
+
+        pixels3, size3, components3 = action.getTextureImage3dValue()
+        self.assertIsNone(pixels3)
+        self.assertEqual(tuple(size3), (0, 0, 0))
+        self.assertEqual(components3, 0)
+
+        seen = []
+
+        def callback(data, current, node):
+            pixels2, size2, components2 = current.getTextureImage2dValue()
+            pixels3, size3, components3 = current.getTextureImage3dValue()
+            self.assertIsNone(pixels2)
+            self.assertEqual(tuple(size2), (0, 0))
+            self.assertEqual(components2, 0)
+            self.assertIsNone(pixels3)
+            self.assertEqual(tuple(size3), (0, 0, 0))
+            self.assertEqual(components3, 0)
+            seen.append(type(node).__name__)
+            return current.CONTINUE
+
+        action.addPreCallback(SoType.fromName("SoTexture2"), callback, None)
+        root = SoSeparator()
+        root.addChild(SoTexture2())
+        action.apply(root)
+        self.assertEqual(seen, ["SoTexture2"])
+
+
 class ZZSoDBCallbackTests(unittest.TestCase):
     def testPythonDatabaseCallbacks(self):
         progress_events = []

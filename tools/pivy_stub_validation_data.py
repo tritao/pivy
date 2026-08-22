@@ -1664,6 +1664,16 @@ METHOD_RETURN_TYPE_CHECKS = {
         ("SoOutput", "getCurrentProto", "SoProto | None"),
         ("SoEngine", "getOutput", "SoEngineOutput | None"),
         ("SoEngine", "getOutputNameValue", "tuple[bool, str]"),
+        (
+            "SoCallbackAction",
+            "getTextureImage2dValue",
+            "tuple[bytes | None, SbVec2s, int]",
+        ),
+        (
+            "SoCallbackAction",
+            "getTextureImage3dValue",
+            "tuple[bytes | None, SbVec3s, int]",
+        ),
         ("SoEngineOutput", "getContainer", "SoEngine | None"),
         ("SoEngineOutput", "getFieldContainer", "SoFieldContainer | None"),
         ("SoEngineOutput", "getNodeContainer", "SoNodeEngine | None"),

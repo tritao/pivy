@@ -240,6 +240,14 @@ PYTHON_HELPER_METHOD_TYPES = {
         "self, output: SoEngineOutput",
         "tuple[bool, str]",
     ),
+    ("SoCallbackAction", "getTextureImage2dValue"): (
+        "self",
+        "tuple[bytes | None, SbVec2s, int]",
+    ),
+    ("SoCallbackAction", "getTextureImage3dValue"): (
+        "self",
+        "tuple[bytes | None, SbVec3s, int]",
+    ),
     ("SoEngine", "__setattr__"): ("self, name: str, value: Any", "None"),
     ("SoFieldContainer", "__dir__"): ("self", "list[str]"),
     ("SoFieldContainer", "__getattr__"): ("self, name: str", "SoField"),

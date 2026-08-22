@@ -134,6 +134,108 @@ SoPointPythonCB(void * userdata, SoCallbackAction * action, const SoPrimitiveVer
                                       const int index = 0) const;
 
 %extend SoCallbackAction {
+  /* Snapshot the borrowed texture pointer into an owned Python bytes object.
+     The explicit dimensional methods avoid exposing SbVec output references
+     and preserve the distinction between 2D and 3D textures. */
+  PyObject *getTextureImage2dValue() {
+    SbVec2s size(0, 0);
+    int numcomps = 0;
+    const unsigned char *pixels = NULL;
+    PyObject *pixel_object = NULL;
+    PyObject *size_object = NULL;
+    PyObject *result = NULL;
+
+    if (self->getNodeAppliedTo() == NULL) {
+      size_object = SWIG_NewPointerObj(
+        (void *)new SbVec2s(size),
+        SWIGTYPE_p_SbVec2s,
+        SWIG_POINTER_OWN);
+      if (size_object == NULL) {
+        return NULL;
+      }
+      result = Py_BuildValue("(OOi)", Py_None, size_object, 0);
+      Py_DECREF(size_object);
+      return result;
+    }
+
+    pixels = self->getTextureImage(size, numcomps);
+    if (pixels == NULL) {
+      Py_INCREF(Py_None);
+      pixel_object = Py_None;
+    } else {
+      pixel_object = PyBytes_FromStringAndSize(
+        (const char *)pixels,
+        (Py_ssize_t)size[0] * (Py_ssize_t)size[1] * numcomps);
+      if (pixel_object == NULL) {
+        return NULL;
+      }
+    }
+
+    size_object = SWIG_NewPointerObj(
+      (void *)new SbVec2s(size),
+      SWIGTYPE_p_SbVec2s,
+      SWIG_POINTER_OWN);
+    if (size_object == NULL) {
+      Py_DECREF(pixel_object);
+      return NULL;
+    }
+
+    result = Py_BuildValue("(OOi)", pixel_object, size_object, numcomps);
+    Py_DECREF(pixel_object);
+    Py_DECREF(size_object);
+    return result;
+  }
+
+  PyObject *getTextureImage3dValue() {
+    SbVec3s size(0, 0, 0);
+    int numcomps = 0;
+    const unsigned char *pixels = NULL;
+    PyObject *pixel_object = NULL;
+    PyObject *size_object = NULL;
+    PyObject *result = NULL;
+
+    if (self->getNodeAppliedTo() == NULL) {
+      size_object = SWIG_NewPointerObj(
+        (void *)new SbVec3s(size),
+        SWIGTYPE_p_SbVec3s,
+        SWIG_POINTER_OWN);
+      if (size_object == NULL) {
+        return NULL;
+      }
+      result = Py_BuildValue("(OOi)", Py_None, size_object, 0);
+      Py_DECREF(size_object);
+      return result;
+    }
+
+    pixels = self->getTextureImage(size, numcomps);
+    if (pixels == NULL) {
+      Py_INCREF(Py_None);
+      pixel_object = Py_None;
+    } else {
+      pixel_object = PyBytes_FromStringAndSize(
+        (const char *)pixels,
+        (Py_ssize_t)size[0] * (Py_ssize_t)size[1] *
+          (Py_ssize_t)size[2] * numcomps);
+      if (pixel_object == NULL) {
+        return NULL;
+      }
+    }
+
+    size_object = SWIG_NewPointerObj(
+      (void *)new SbVec3s(size),
+      SWIGTYPE_p_SbVec3s,
+      SWIG_POINTER_OWN);
+    if (size_object == NULL) {
+      Py_DECREF(pixel_object);
+      return NULL;
+    }
+
+    result = Py_BuildValue("(OOi)", pixel_object, size_object, numcomps);
+    Py_DECREF(pixel_object);
+    Py_DECREF(size_object);
+    return result;
+  }
+
   /* return a list for the out getMaterial() parameters */
   PyObject * getMaterial(const int index = 0) {
     SbColor * ambient = new SbColor;

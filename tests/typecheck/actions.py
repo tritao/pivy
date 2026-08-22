@@ -47,6 +47,14 @@ def check_callback_action_values() -> None:
     assert_type(action.getTextureCoordinate3(0), coin.SbVec3f)
     assert_type(action.getTextureCoordinate4(0), coin.SbVec4f)
     assert_type(action.getTextureMatrix(), coin.SbMatrix)
+    assert_type(
+        action.getTextureImage2dValue(),
+        tuple[bytes | None, coin.SbVec2s, int],
+    )
+    assert_type(
+        action.getTextureImage3dValue(),
+        tuple[bytes | None, coin.SbVec3s, int],
+    )
     assert_type(action.getModelMatrix(), coin.SbMatrix)
     assert_type(action.getProjectionMatrix(), coin.SbMatrix)
     assert_type(action.getViewingMatrix(), coin.SbMatrix)
