@@ -95,7 +95,14 @@ ITER_CONTAINER_TYPES = {
 ITER_CONTAINER_TYPES.update(multifield_iter_element_types())
 ITER_CONTAINER_TYPES.update(vector_iter_element_types())
 CALLBACK_METHOD_CHECKS = {
-    "coin.pyi": callback_method_checks()
+    "coin.pyi": callback_method_checks(
+        excluded_classes={
+            "SoQt",
+            "SoQtComponent",
+            "SoQtViewer",
+            "SoQtPopupMenu",
+        }
+    )
     + (
         (
             "SoSensorManager",
@@ -375,9 +382,65 @@ CALLBACK_METHOD_CHECKS = {
             "None",
         ),
         (
+            "SoQtComponent",
+            "setWindowCloseCallback",
+            {
+                "func": "SoQtComponentCallback",
+                "user": "object | None",
+            },
+            "None",
+        ),
+        (
             "SoQtViewer",
             "addStartCallback",
-            {"func": "Incomplete", "data": "Incomplete | None"},
+            {"func": "SoQtViewerCallback", "data": "object | None"},
+            "None",
+        ),
+        (
+            "SoQtViewer",
+            "addFinishCallback",
+            {"func": "SoQtViewerCallback", "data": "object | None"},
+            "None",
+        ),
+        (
+            "SoQtViewer",
+            "removeStartCallback",
+            {"func": "SoQtViewerCallback", "data": "object | None"},
+            "None",
+        ),
+        (
+            "SoQtViewer",
+            "removeFinishCallback",
+            {"func": "SoQtViewerCallback", "data": "object | None"},
+            "None",
+        ),
+        (
+            "SoQtViewer",
+            "setAutoClippingStrategy",
+            {
+                "strategy": "int",
+                "value": "float",
+                "cb": "Callable[[object, SbVec2f], SbVec2f] | None",
+                "cbuserdata": "object | None",
+            },
+            "None",
+        ),
+        (
+            "SoQtPopupMenu",
+            "addMenuSelectionCallback",
+            {
+                "callback": "Callable[[int, object], None]",
+                "data": "object",
+            },
+            "None",
+        ),
+        (
+            "SoQtPopupMenu",
+            "removeMenuSelectionCallback",
+            {
+                "callback": "Callable[[int, object], None]",
+                "data": "object",
+            },
             "None",
         ),
     ),
@@ -737,50 +800,11 @@ DEFERRED_RAW_METHOD_CHECKS = {
         (
             "SoQt",
             "setFatalErrorHandler",
-            {"cb": "Incomplete", "userdata": "Incomplete"},
-            "Incomplete",
-        ),
-        (
-            "SoQtComponent",
-            "setWindowCloseCallback",
-            {"func": "Incomplete", "user": "Incomplete | None"},
-            "None",
-        ),
-        (
-            "SoQtViewer",
-            "addStartCallback",
-            {"func": "Incomplete", "data": "Incomplete | None"},
-            "None",
-        ),
-        (
-            "SoQtViewer",
-            "addFinishCallback",
-            {"func": "Incomplete", "data": "Incomplete | None"},
-            "None",
-        ),
-        (
-            "SoQtViewer",
-            "removeStartCallback",
-            {"func": "Incomplete", "data": "Incomplete | None"},
-            "None",
-        ),
-        (
-            "SoQtViewer",
-            "removeFinishCallback",
-            {"func": "Incomplete", "data": "Incomplete | None"},
-            "None",
-        ),
-        (
-            "SoQtPopupMenu",
-            "addMenuSelectionCallback",
-            {"callback": "Incomplete", "data": "Incomplete"},
-            "None",
-        ),
-        (
-            "SoQtPopupMenu",
-            "removeMenuSelectionCallback",
-            {"callback": "Incomplete", "data": "Incomplete"},
-            "None",
+            {
+                "cb": "Callable[[SbString, int, object], None]",
+                "userdata": "object",
+            },
+            "Callable[[SbString, int, object], None] | None",
         ),
     ),
 }

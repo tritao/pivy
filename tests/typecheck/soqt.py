@@ -1,5 +1,6 @@
 # pyright: reportMissingModuleSource=false
 
+from typing import Callable
 from typing_extensions import assert_type
 
 from pivy import coin
@@ -18,6 +19,16 @@ def check_soqt_lifecycle_contract() -> None:
     assert_type(soqt.SoQt.getTopLevelWidget(), soqt.QWidget)
     assert_type(soqt.SoQt.getShellWidget(widget), soqt.QWidget)
     assert_type(soqt.SoQt.getWidgetSize(widget), coin.SbVec2s)
+
+    def fatal_error_callback(
+        message: coin.SbString, code: int, data: object
+    ) -> None:
+        del message, code, data
+
+    previous_handler: Callable[[coin.SbString, int, object], None] | None = (
+        soqt.SoQt.setFatalErrorHandler(fatal_error_callback, None)
+    )
+    assert_type(previous_handler, Callable[[coin.SbString, int, object], None] | None)
 
 
 def check_soqt_render_area_contract() -> None:
@@ -50,6 +61,11 @@ def check_soqt_render_area_contract() -> None:
 
 def check_soqt_component_and_gl_widget_contract() -> None:
     component = soqt.SoQtComponent()
+
+    def window_close_callback(user: object, closed: soqt.SoQtComponent) -> None:
+        del user, closed
+
+    component.setWindowCloseCallback(window_close_callback)
     assert_type(component.getWidget(), soqt.QWidget)
     assert_type(component.getBaseWidget(), soqt.QWidget)
     assert_type(component.getShellWidget(), soqt.QWidget)
@@ -100,6 +116,12 @@ def check_soqt_devices_and_utility_contract() -> None:
     assert_type(device.translateEvent(soqt.QEvent()), coin.SoEvent)
 
     popup = soqt.SoQtPopupMenu()
+
+    def menu_callback(item_id: int, data: object) -> None:
+        del item_id, data
+
+    popup.addMenuSelectionCallback(menu_callback, None)
+    popup.removeMenuSelectionCallback(menu_callback, None)
     assert_type(popup.newMenu("File"), int)
     assert_type(popup.getMenuTitle(1), str)
     assert_type(popup.getMenuItemEnabled(1), bool)
@@ -115,6 +137,21 @@ def check_soqt_devices_and_utility_contract() -> None:
 
 def check_soqt_viewer_contract() -> None:
     viewer = soqt.SoQtExaminerViewer()
+
+    def viewer_callback(data: object, callback_viewer: soqt.SoQtViewer) -> None:
+        del data, callback_viewer
+
+    def auto_clipping_callback(
+        data: object, nearfar: coin.SbVec2f
+    ) -> coin.SbVec2f:
+        del data
+        return nearfar
+
+    viewer.setAutoClippingStrategy(0, cb=auto_clipping_callback)
+    viewer.addStartCallback(viewer_callback)
+    viewer.addFinishCallback(viewer_callback)
+    viewer.removeStartCallback(viewer_callback)
+    viewer.removeFinishCallback(viewer_callback)
 
     assert_type(viewer.getCamera(), coin.SoCamera | None)
     assert_type(viewer.getHeadlight(), coin.SoDirectionalLight)

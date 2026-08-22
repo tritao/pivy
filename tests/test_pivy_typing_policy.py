@@ -697,7 +697,13 @@ class CallbackTypePolicyTests(unittest.TestCase):
 
     def test_adapted_callback_protocols_are_emitted_in_public_stubs(self):
         coin_stub = Path("pivy/coin.pyi").read_text()
-        for name, _, _ in policy.CALLBACK_PROTOCOL_DEFINITIONS:
+        coin_protocols = {
+            "SoSensorCallback",
+            "SoErrorCallback",
+            "ScXMLStateMachineDeleteCallback",
+            "ScXMLStateChangeCallback",
+        }
+        for name in coin_protocols:
             with self.subTest(name=name):
                 self.assertIn("class %s(Protocol" % name, coin_stub)
 
@@ -705,6 +711,8 @@ class CallbackTypePolicyTests(unittest.TestCase):
         self.assertNotIn("class SoErrorCallback(Protocol):", soqt_stub)
         self.assertNotIn("class SoEvent:", soqt_stub)
         self.assertNotIn("class SbVec2s:", soqt_stub)
+        self.assertIn("class SoQtComponentCallback(Protocol):", soqt_stub)
+        self.assertIn("class SoQtViewerCallback(Protocol):", soqt_stub)
         self.assertIn("SoEvent", soqt_stub.splitlines()[7])
         self.assertIn("SbVec2s", soqt_stub.splitlines()[7])
 

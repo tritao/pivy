@@ -720,6 +720,22 @@ CALLBACK_PROTOCOL_DEFINITIONS = (
         "        /,\n"
         "    ) -> None: ...",
     ),
+    (
+        "SoQtComponentCallback",
+        ("SoQtComponent",),
+        "class SoQtComponentCallback(Protocol):\n"
+        "    def __call__(\n"
+        "        self, user: object, component: SoQtComponent, /\n"
+        "    ) -> None: ...",
+    ),
+    (
+        "SoQtViewerCallback",
+        ("SoQtViewer",),
+        "class SoQtViewerCallback(Protocol):\n"
+        "    def __call__(\n"
+        "        self, data: object, viewer: SoQtViewer, /\n"
+        "    ) -> None: ...",
+    ),
 )
 CALLBACK_TYPE_SIGNATURES = {
     "ScXMLStateChangeCB": "ScXMLStateChangeCallback",
@@ -759,6 +775,11 @@ CALLBACK_TYPE_SIGNATURES = {
     "SoSensorCB": "SoSensorCallback[SoSensor]",
     "SoErrorCB": "SoErrorCallback",
     "SoQtRenderAreaEventCB": "Callable[[object, QEvent], object]",
+    "SoQtFatalErrorCB": "Callable[[SbString, int, object], None]",
+    "SoQtComponentCB": "SoQtComponentCallback",
+    "SoQtViewerCB": "SoQtViewerCallback",
+    "SoQtAutoClippingCB": "Callable[[object, SbVec2f], SbVec2f]",
+    "SoQtMenuSelectionCallback": "Callable[[int, object], None]",
 }
 
 
@@ -891,6 +912,59 @@ class CallbackMethodPolicy:
 
 
 CALLBACK_METHOD_POLICIES = {
+    ("SoQt", "setFatalErrorHandler"): CallbackMethodPolicy(
+        (
+            ("cb", "Callable[[SbString, int, object], None]"),
+            ("userdata", "object"),
+        ),
+        (
+            "cb: Callable[[SbString, int, object], None], "
+            "userdata: object",
+            "Callable[[SbString, int, object], None] | None",
+        ),
+    ),
+    ("SoQtComponent", "setWindowCloseCallback"): CallbackMethodPolicy(
+        (
+            ("func", "SoQtComponentCallback"),
+            ("user", "object | None"),
+        ),
+        (
+            "self, func: SoQtComponentCallback, user: object | None = ...",
+            "None",
+        ),
+    ),
+    ("SoQtViewer", "setAutoClippingStrategy"): CallbackMethodPolicy(
+        (
+            ("cb", "Callable[[object, SbVec2f], SbVec2f] | None"),
+            ("cbuserdata", "object | None"),
+        ),
+        (
+            "self, strategy: int, value: float = ..., "
+            "cb: Callable[[object, SbVec2f], SbVec2f] | None = ..., "
+            "cbuserdata: object | None = ...",
+            "None",
+        ),
+    ),
+    ("SoQtPopupMenu", "addMenuSelectionCallback"): CallbackMethodPolicy(
+        (
+            ("callback", "Callable[[int, object], None]"),
+            ("data", "object"),
+        ),
+        (
+            "self, callback: Callable[[int, object], None], data: object",
+            "None",
+        ),
+    ),
+    ("SoQtPopupMenu", "removeMenuSelectionCallback"): CallbackMethodPolicy(
+        (
+            ("callback", "Callable[[int, object], None]"),
+            ("data", "object"),
+        ),
+        (
+            "self, callback: Callable[[int, object], None], data: object",
+            "None",
+        ),
+    ),
     ("SoError", "setHandlerCallback"): CallbackMethodPolicy(
         (
             ("pyfunc", "SoErrorCallback"),
@@ -1308,6 +1382,25 @@ CALLBACK_METHOD_POLICIES.update(
     }
 )
 
+for _soqt_viewer_callback_name in (
+    "addStartCallback",
+    "removeStartCallback",
+    "addFinishCallback",
+    "removeFinishCallback",
+):
+    CALLBACK_METHOD_POLICIES[("SoQtViewer", _soqt_viewer_callback_name)] = (
+        CallbackMethodPolicy(
+            (
+                ("func", "SoQtViewerCallback"),
+                ("data", "object | None"),
+            ),
+            (
+                "self, func: SoQtViewerCallback, data: object | None = ...",
+                "None",
+            ),
+        )
+    )
+
 
 PYTHON_SHADOW_METHOD_TYPES = {
     key: policy.shadow_signature
@@ -1332,7 +1425,7 @@ CALLBACK_PARAMETER_TYPE_OVERRIDES = {
 }
 
 
-def callback_method_checks():
+def callback_method_checks(*, excluded_classes=()):
     """Return validator expectations derived from callback policy metadata."""
 
     return tuple(
@@ -1344,6 +1437,7 @@ def callback_method_checks():
         )
         for (class_name, method_name), method_policy in CALLBACK_METHOD_POLICIES.items()
         if method_policy.shadow_signature is not None
+        and class_name not in set(excluded_classes)
     )
 FUNCTION_POINTER_TYPE_SIGNATURES = {"void(*)(void*)": "Callable[[Any], None]"}
 SENSOR_CALLBACK_CLASSES = {
