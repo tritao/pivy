@@ -1711,6 +1711,15 @@ class OpaqueReturnAudit:
 
 
 @dataclass(frozen=True)
+class RawPointerAudit:
+    """Review record for one intentionally raw C-pointer boundary."""
+
+    disposition: str
+    rationale: str
+    next_action: str
+
+
+@dataclass(frozen=True)
 class FieldTypePolicy:
     """Python-level value policy for a single-value Coin field."""
 
@@ -2659,6 +2668,183 @@ OPAQUE_RETURN_AUDIT = {
         next_action=(
             "Add a copying adapter or a lifetime-bound view with explicit "
             "ownership semantics."
+        ),
+    ),
+}
+
+
+def _raw_pointer_audits(
+    keys: tuple[tuple[str, str, str, str], ...],
+    *,
+    disposition: str,
+    rationale: str,
+    next_action: str,
+) -> dict[tuple[str, str, str, str], RawPointerAudit]:
+    return {
+        key: RawPointerAudit(
+            disposition=disposition,
+            rationale=rationale,
+            next_action=next_action,
+        )
+        for key in keys
+    }
+
+
+# Every current ``raw C pointers`` site has an explicit review record.  The
+# keys are intentionally listed one by one: a broad classifier may recognize
+# a new SWIG pointer-shaped signature, but it must not silently make that
+# boundary part of the supported API.
+RAW_POINTER_AUDIT = {
+    **_raw_pointer_audits(
+        (
+            ("parameter", "SbBSPTree", "setUserData", "data"),
+            ("parameter", "SbByteBuffer", "__init__", "buffer"),
+            ("parameter", "SbHeap", "buildHeap", "data"),
+            ("parameter", "SbImage", "__init__", "bytes"),
+            ("parameter", "SbOctTree", "debugTree", "fp"),
+            ("parameter", "SbTesselator", "__init__", "data"),
+            ("parameter", "SbTesselator", "addVertex", "data"),
+            ("parameter", "SoByteStream", "unconvert", "data"),
+            ("parameter", "SoGLImage", "setData", "bytes"),
+            ("parameter", "SoMarkerSet", "addMarker", "bytes"),
+            ("parameter", "SoMarkerSet", "getMarker", "bytes"),
+            ("parameter", "SoMultiTextureImageElement", "set", "bytes"),
+            ("parameter", "SoMultiTextureImageElement", "setElt", "bytes"),
+            ("parameter", "SoSFImage", "setSubValue", "pixels"),
+            ("parameter", "SoSFImage", "setSubValues", "pixelblocks"),
+            ("parameter", "SoTexture2", "readImage", "bytes"),
+            ("parameter", "SoTextureCubeMap", "readImage", "bytes"),
+            ("parameter", "SoVRMLAudioClip", "read", "buffer"),
+        ),
+        disposition="intentional native input boundary",
+        rationale=(
+            "SWIG accepts a borrowed native buffer or pointer whose Python "
+            "ownership and lifetime are not represented by the binding."
+        ),
+        next_action=(
+            "Add a copying or owning Python adapter after confirming the "
+            "native buffer layout and lifetime."
+        ),
+    ),
+    **_raw_pointer_audits(
+        (
+            ("parameter", "SbBox3d", "output", "file"),
+            ("parameter", "SbBox3f", "output", "file"),
+            ("parameter", "SbCylinder", "output", "file"),
+            ("parameter", "SbDPLine", "output", "file"),
+            ("parameter", "SbDPMatrix", "output", "fp"),
+            ("parameter", "SbDPPlane", "output", "file"),
+            ("parameter", "SbDPRotation", "output", "fp"),
+            ("parameter", "SbDPViewVolume", "output", "fp"),
+            ("parameter", "SbLine", "output", "file"),
+            ("parameter", "SbMatrix", "output", "fp"),
+            ("parameter", "SbPlane", "output", "file"),
+            ("parameter", "SbRotation", "output", "fp"),
+            ("parameter", "SbSphere", "output", "file"),
+            ("parameter", "SbTime", "output", "fp"),
+            ("parameter", "SbVec2d", "output", "fp"),
+            ("parameter", "SbVec2f", "output", "fp"),
+            ("parameter", "SbVec2i32", "output", "fp"),
+            ("parameter", "SbVec2s", "output", "fp"),
+            ("parameter", "SbVec3d", "output", "fp"),
+            ("parameter", "SbVec3f", "output", "fp"),
+            ("parameter", "SbVec3s", "output", "fp"),
+            ("parameter", "SbVec4d", "output", "fp"),
+            ("parameter", "SbVec4f", "output", "fp"),
+            ("parameter", "SbViewVolume", "output", "fp"),
+            ("parameter", "SbViewportRegion", "output", "file"),
+            ("parameter", "SbXfBox3f", "output", "file"),
+            ("parameter", "SoCoordinateElement", "output", "file"),
+            ("parameter", "SoElement", "output", "file"),
+            ("parameter", "SoEnvironmentElement", "output", "file"),
+            ("parameter", "SoFloatElement", "output", "file"),
+            ("parameter", "SoFontNameElement", "output", "file"),
+            ("parameter", "SoInt32Element", "output", "file"),
+            ("parameter", "SoLightAttenuationElement", "output", "file"),
+            ("parameter", "SoListenerDopplerElement", "output", "file"),
+            ("parameter", "SoListenerOrientationElement", "output", "file"),
+            ("parameter", "SoListenerPositionElement", "output", "file"),
+            ("parameter", "SoNotList", "output", "file"),
+            ("parameter", "SoNotRec", "output", "file"),
+            ("parameter", "SoOverrideElement", "output", "file"),
+            ("parameter", "SoReplacedElement", "output", "file"),
+            ("parameter", "SoShapeHintsElement", "output", "file"),
+            ("parameter", "SoSoundElement", "output", "file"),
+            ("parameter", "SoState", "output", "file"),
+            ("parameter", "SoTextureOverrideElement", "output", "fp"),
+            ("parameter", "SoViewportRegionElement", "output", "file"),
+        ),
+        disposition="intentional native output boundary",
+        rationale=(
+            "Coin writes to a native FILE-like sink or ABI-level pointer; "
+            "the Python binding does not own or model that sink."
+        ),
+        next_action=(
+            "Provide a Python file-like or serialized-value adapter only "
+            "after confirming the native output contract."
+        ),
+    ),
+    **_raw_pointer_audits(
+        (
+            ("parameter", "SoAction", "getPathCode", "indices"),
+            ("parameter", "SoAction", "usePathCode", "indices"),
+            ("parameter", "SoFieldData", "getEnumData", "values"),
+            ("parameter", "SoInput", "readBinaryArray", "c"),
+            ("parameter", "SoInput", "readBinaryArray", "d"),
+            ("parameter", "SoInput", "readBinaryArray", "f"),
+            ("parameter", "SoInput", "readBinaryArray", "l"),
+            ("parameter", "SoInput", "resetFilePointer", "fptr"),
+            ("parameter", "SoInput", "setBuffer", "bufpointer"),
+            ("parameter", "SoInput", "setFilePointer", "newFP"),
+            ("parameter", "SoInput", "setStringArray", "strings"),
+            ("parameter", "SoOutput", "getBuffer", "bufPointer"),
+            ("parameter", "SoOutput", "getBuffer", "nBytes"),
+            ("parameter", "SoOutput", "setBuffer", "bufPointer"),
+            ("parameter", "SoOutput", "setFilePointer", "newFP"),
+            ("parameter", "SoOutput", "writeBinaryArray", "c"),
+            ("parameter", "SoOutput", "writeBinaryArray", "d"),
+            ("parameter", "SoOutput", "writeBinaryArray", "f"),
+            ("parameter", "SoOutput", "writeBinaryArray", "l"),
+            ("parameter", "SoSensorManager", "doSelect", "userTimeOut"),
+            ("parameter", "SoDB", "doSelect", "usertimeout"),
+            ("parameter", "SoMFDouble", "setValues", "newvals"),
+            ("parameter", "SoOffscreenRenderer", "writeToPostScript", "fp"),
+            ("parameter", "SoOffscreenRenderer", "writeToRGB", "fp"),
+        ),
+        disposition="intentional ABI boundary",
+        rationale=(
+            "The parameter is a pointer-to-pointer, output array, file "
+            "descriptor, or mutable native storage handle rather than a "
+            "stable Python value."
+        ),
+        next_action=(
+            "Add a typed output tuple, buffer protocol, or lifetime-bound "
+            "view only after testing the native ownership semantics."
+        ),
+    ),
+    **_raw_pointer_audits(
+        (
+            ("return", "SoDiffuseColorElement", "getPackedArrayPtr", "return"),
+            ("return", "SoInput", "getCurFile", "return"),
+            ("return", "SoLazyElement", "getColorIndexPointer", "return"),
+            ("return", "SoLazyElement", "getPackedColors", "return"),
+            ("return", "SoLazyElement", "getTransparencyPointer", "return"),
+            ("return", "SoMFDouble", "getValues", "return"),
+            ("return", "SoMultiTextureImageElement", "get", "return"),
+            ("return", "SoMultiTextureImageElement", "getDefault", "return"),
+            ("return", "SoMultiTextureImageElement", "getImage", "return"),
+            ("return", "SoOutput", "getFilePointer", "return"),
+            ("return", "SoSFImage", "getSubTexture", "return"),
+            ("return", "SoVectorOutput", "getFilePointer", "return"),
+        ),
+        disposition="intentional borrowed native return",
+        rationale=(
+            "The wrapper returns borrowed native storage or a platform "
+            "pointer without an independent Python owner."
+        ),
+        next_action=(
+            "Add an owning copy or an explicit lifetime-bound view before "
+            "exposing a concrete Python return type."
         ),
     ),
 }

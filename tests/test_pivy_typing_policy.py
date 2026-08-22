@@ -18,6 +18,8 @@ from tools.report_pivy_typing import (
     collect_report,
     opaque_return_audit_issues,
     opaque_return_audit_summary,
+    raw_pointer_audit_issues,
+    raw_pointer_audit_summary,
     quality_regressions,
     report_to_dict,
 )
@@ -830,7 +832,7 @@ class PolicyBoundaryTests(unittest.TestCase):
         payload = report_to_dict(report, stub_path)
 
         json.dumps(payload)
-        self.assertEqual(payload["schema_version"], 2)
+        self.assertEqual(payload["schema_version"], 3)
         self.assertEqual(payload["annotation_sites"], report.annotation_sites)
         self.assertEqual(
             payload["incomplete_categories"]["uncategorized"]["count"],
@@ -843,6 +845,9 @@ class PolicyBoundaryTests(unittest.TestCase):
         self.assertEqual(
             payload["opaque_return_audit"], opaque_return_audit_summary(report)
         )
+        self.assertEqual(
+            payload["raw_pointer_audit"], raw_pointer_audit_summary(report)
+        )
 
     def test_opaque_pointer_return_audit_is_complete(self):
         report = collect_report(Path("pivy/coin.pyi"))
@@ -851,6 +856,12 @@ class PolicyBoundaryTests(unittest.TestCase):
         for key in policy.OPAQUE_RETURN_AUDIT:
             with self.subTest(key=key):
                 self.assertIn(key, policy.TRIAGED_INCOMPLETE_SITES)
+
+    def test_raw_pointer_audit_is_complete(self):
+        report = collect_report(Path("pivy/coin.pyi"))
+        self.assertEqual(raw_pointer_audit_issues(report), ())
+        self.assertEqual(len(policy.RAW_POINTER_AUDIT), 99)
+        self.assertEqual(raw_pointer_audit_summary(report)["observed"], 99)
 
     def test_policy_managed_fields_are_covered(self):
         self.assertEqual(policy_coverage_errors(Path("pivy/coin.pyi")), ())

@@ -17,6 +17,7 @@ from tools.pivy_stub_typing_policy import (
     INCOMPLETE_CATEGORY_ACTIONS,
     INCOMPLETE_CATEGORY_POLICIES,
     OPAQUE_RETURN_AUDIT,
+    RAW_POINTER_AUDIT,
     classify_incomplete,
     classify_dynamic_runtime_site,
 )
@@ -348,7 +349,7 @@ def report_to_dict(report: TypingReport, stub_path: Path) -> dict[str, object]:
         }
 
     payload = {
-        "schema_version": 2,
+        "schema_version": 3,
         "stub": str(stub_path),
         "classes": report.classes,
         "methods": report.methods,
@@ -365,6 +366,7 @@ def report_to_dict(report: TypingReport, stub_path: Path) -> dict[str, object]:
     }
     if stub_path.name == "coin.pyi":
         payload["opaque_return_audit"] = opaque_return_audit_summary(report)
+        payload["raw_pointer_audit"] = raw_pointer_audit_summary(report)
     return payload
 
 
@@ -397,6 +399,45 @@ def opaque_return_sites(report: TypingReport) -> set[tuple[str, str, str, str]]:
             method_name=site.method_name,
         )
         == "opaque pointer/object returns"
+    }
+
+
+def raw_pointer_sites(report: TypingReport) -> set[tuple[str, str, str, str]]:
+    """Return the unique sites classified as raw C-pointer boundaries."""
+
+    return {
+        (site.kind, site.class_name, site.method_name or "", site.name)
+        for site, category in report.incomplete_sites
+        if category == "raw C pointers"
+    }
+
+
+def raw_pointer_audit_issues(report: TypingReport) -> tuple[str, ...]:
+    """Return missing or stale entries in the reviewed raw-pointer audit."""
+
+    observed = raw_pointer_sites(report)
+    audited = set(RAW_POINTER_AUDIT)
+    issues = []
+    for key in sorted(observed - audited):
+        issues.append("raw pointer is not audited: %s" % format_site_key(key))
+    for key in sorted(audited - observed):
+        issues.append("raw pointer audit entry is stale: %s" % format_site_key(key))
+    return tuple(issues)
+
+
+def raw_pointer_audit_summary(report: TypingReport) -> dict[str, object]:
+    """Return a compact machine-readable raw-pointer audit summary."""
+
+    observed = raw_pointer_sites(report)
+    dispositions = Counter(
+        RAW_POINTER_AUDIT[key].disposition
+        for key in observed
+        if key in RAW_POINTER_AUDIT
+    )
+    return {
+        "observed": len(observed),
+        "audited": len(observed & set(RAW_POINTER_AUDIT)),
+        "dispositions": dict(sorted(dispositions.items())),
     }
 
 
@@ -445,6 +486,22 @@ def format_opaque_return_audit(report: TypingReport) -> str:
     return "\n".join(lines)
 
 
+def format_raw_pointer_audit(report: TypingReport) -> str:
+    lines = ["", "Raw C-pointer audit", "--------------------"]
+    for key in sorted(raw_pointer_sites(report)):
+        audit = RAW_POINTER_AUDIT[key]
+        lines.append(
+            "%s: %s; %s; next: %s"
+            % (
+                format_site_key(key),
+                audit.disposition,
+                audit.rationale,
+                audit.next_action,
+            )
+        )
+    return "\n".join(lines)
+
+
 def format_uncategorized(report: TypingReport) -> str:
     sites = [
         site
@@ -475,6 +532,11 @@ def parse_args() -> argparse.Namespace:
         "--show-opaque-returns",
         action="store_true",
         help="list the reviewed opaque pointer/object return audit",
+    )
+    parser.add_argument(
+        "--show-raw-pointers",
+        action="store_true",
+        help="list the reviewed raw C-pointer audit",
     )
     parser.add_argument(
         "--check-baseline",
@@ -514,6 +576,8 @@ def main() -> int:
             )
         if args.show_opaque_returns:
             output += format_opaque_return_audit(report)
+        if args.show_raw_pointers:
+            output += format_raw_pointer_audit(report)
         print(output)
     uncategorized = report.incomplete_categories["uncategorized"]
     if uncategorized:
@@ -526,6 +590,11 @@ def main() -> int:
         audit_issues = opaque_return_audit_issues(report)
         if audit_issues:
             for issue in audit_issues:
+                print("error: typing audit: %s" % issue, file=sys.stderr)
+            return 1
+        raw_pointer_issues = raw_pointer_audit_issues(report)
+        if raw_pointer_issues:
+            for issue in raw_pointer_issues:
                 print("error: typing audit: %s" % issue, file=sys.stderr)
             return 1
     if args.check_baseline:
