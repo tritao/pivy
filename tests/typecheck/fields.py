@@ -136,3 +136,8 @@ def check_field_factory_contract() -> None:
     assert_type(coin.SoSFFloat.createInstance(), coin.SoSFFloat)
     assert_type(coin.SoMFVec3f.createInstance(), coin.SoMFVec3f)
     assert_type(coin.SoSFBox3d.createInstance(), coin.SoSFBox3d)
+
+
+def check_enum_declaration_sequences() -> None:
+    field = coin.SoSFEnum()
+    field.setEnums(2, [0, 1], ["ZERO", coin.SbName("ONE")])

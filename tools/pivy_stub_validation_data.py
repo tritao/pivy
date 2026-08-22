@@ -384,6 +384,16 @@ ARRAY_METHOD_CHECKS = {
             "None",
         ),
         (
+            "SoSFEnum",
+            "setEnums",
+            {
+                "num": "int",
+                "vals": "Sequence[int]",
+                "names": "SbName | Sequence[SbName | str]",
+            },
+            "None",
+        ),
+        (
             "SbVec2s",
             "getValue",
             {},

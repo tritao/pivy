@@ -287,6 +287,8 @@ PYTHON_PARAMETER_TYPE_OVERRIDES = {
     ("SoSFImage", "setValue", "pixels"): "str | bytes",
     ("SoSFImage3", "setValue", "bytes"): "str | bytes",
     ("SoSFImage3", "setValue", "pixels"): "str | bytes",
+    ("SoSFEnum", "setEnums", "vals"): "Sequence[int]",
+    ("SoSFEnum", "setEnums", "names"): "SbName | Sequence[SbName | str]",
     ("SoQtRenderArea", "setEventCallback", "user"): "object",
 }
 
@@ -1123,6 +1125,11 @@ PYTHON_SHADOW_METHOD_TYPES = {
     if policy.shadow_signature is not None
 }
 PYTHON_SHADOW_METHOD_TYPES[("SoMFEnum", "setEnums")] = (
+    "self, num: int, vals: Sequence[int], "
+    "names: SbName | Sequence[SbName | str]",
+    "None",
+)
+PYTHON_SHADOW_METHOD_TYPES[("SoSFEnum", "setEnums")] = (
     "self, num: int, vals: Sequence[int], "
     "names: SbName | Sequence[SbName | str]",
     "None",

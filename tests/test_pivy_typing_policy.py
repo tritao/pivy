@@ -162,6 +162,20 @@ class FieldTypePolicyTests(unittest.TestCase):
             "object",
         )
 
+    def test_single_enum_sequence_policy(self):
+        self.assertEqual(
+            policy.PYTHON_PARAMETER_TYPE_OVERRIDES[
+                ("SoSFEnum", "setEnums", "vals")
+            ],
+            "Sequence[int]",
+        )
+        self.assertEqual(
+            policy.PYTHON_PARAMETER_TYPE_OVERRIDES[
+                ("SoSFEnum", "setEnums", "names")
+            ],
+            "SbName | Sequence[SbName | str]",
+        )
+
     def test_database_shadow_methods_have_python_signatures(self):
         self.assertEqual(
             policy.PYTHON_SHADOW_METHOD_TYPES[("SoDB", "registerHeader")],
@@ -574,7 +588,7 @@ class PolicyBoundaryTests(unittest.TestCase):
         baseline = replace(
             TYPING_QUALITY_BASELINE,
             max_incomplete_by_category=(
-                ("dynamic/runtime API", 394),
+                ("dynamic/runtime API", 393),
             ),
         )
         violations = quality_regressions(report, baseline)

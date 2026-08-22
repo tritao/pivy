@@ -235,6 +235,17 @@ class FieldSetValue(unittest.TestCase):
         self.assertTrue(t.getValue() == s.getValue(), 
                         'setValue other SoSFName on SoSFName failed')
 
+    def testSFEnum(self):
+        """check sequence enum declarations for SoSFEnum"""
+        field = SoSFEnum()
+        field.setEnums(2, [0, 1], ["ZERO", SbName("ONE")])
+        self.assertEqual(field.getNumEnums(), 2)
+        field.setValue("ONE")
+        self.assertEqual(field.getValue(), 1)
+
+        with self.assertRaises(ValueError):
+            field.setEnums(2, [0], ["ZERO", "ONE"])
+
     def testSFNode(self):
         """check setValue for SoSFNode"""
         t = SoSFNode()
