@@ -93,6 +93,24 @@ if (init_file_emulator() < 0) {
 %include pivy_common_typemaps.i
 %ignore SoDepthBufferElement::get;
 %include coin_header_includes.h
+
+/* Expose SbByteBuffer::data() as an owned Python bytes snapshot.  SWIG's
+   default char * conversion treats the pointer as text and can leak both
+   embedded NULs and the buffer's lifetime semantics into Python. */
+%extend SbByteBuffer {
+  PyObject *_pivy_data_bytes() {
+    const size_t size = self->size();
+    if (size > (size_t)PY_SSIZE_T_MAX) {
+      PyErr_SetString(PyExc_OverflowError, "SbByteBuffer is too large");
+      return NULL;
+    }
+    return PyBytes_FromStringAndSize(self->data(), (Py_ssize_t)size);
+  }
+}
+
+%pythoncode %{
+SbByteBuffer.data = lambda self: self._pivy_data_bytes()
+%}
 %include "Inventor/nodes/SoExtSelection.i"
 
 /* Coin's enum reference is represented by its underlying integer in the

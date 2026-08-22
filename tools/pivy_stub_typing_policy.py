@@ -1248,6 +1248,7 @@ PYTHON_SHADOW_METHOD_TYPES[("SoSFEnum", "setEnums")] = (
     "names: SbName | Sequence[SbName | str]",
     "None",
 )
+PYTHON_SHADOW_METHOD_TYPES[("SbByteBuffer", "data")] = ("self", "bytes")
 CALLBACK_PARAMETER_TYPE_OVERRIDES = {
     (class_name, method_name, parameter_name): annotation
     for (class_name, method_name), method_policy in CALLBACK_METHOD_POLICIES.items()
@@ -2189,7 +2190,6 @@ TRIAGED_INCOMPLETE_SITES = frozenset(
         ('parameter', 'SoWindowElement', 'set', 'display'),
         ('parameter', 'SoWindowElement', 'set', 'window'),
         ('return', 'SbBSPTree', 'getUserData', 'return'),
-        ('return', 'SbByteBuffer', 'data', 'return'),
         ('return', 'SbClip', 'getVertexData', 'return'),
         ('return', 'SbHeap', 'extractMin', 'return'),
         ('return', 'SbHeap', 'getMin', 'return'),

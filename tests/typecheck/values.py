@@ -23,6 +23,11 @@ def check_vectors() -> None:
     vector.setValue([7.0, 8.0, 9.0])
 
 
+def check_byte_buffer_snapshot() -> None:
+    buffer = coin.SbByteBuffer(4, "a\x00cd")
+    assert_type(buffer.data(), bytes)
+
+
 def check_fixed_width_integer_vectors() -> None:
     vector = coin.SbVec4ui32([1, 2, 3, 4])
 

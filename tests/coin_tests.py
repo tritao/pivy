@@ -1281,6 +1281,15 @@ class SoGroupMethods(unittest.TestCase):
 
 class SbBaseClasses(unittest.TestCase):
     """checks methods and operators of and between various Sb* classes"""
+    def testByteBufferDataSnapshot(self):
+        buffer = SbByteBuffer(4, "a\x00cd")
+        snapshot = buffer.data()
+        self.assertIsInstance(snapshot, bytes)
+        self.assertEqual(snapshot, b"a\x00cd")
+
+        buffer += SbByteBuffer("e")
+        self.assertEqual(snapshot, b"a\x00cd")
+
     def testConstructors(self):
         v1 = SbVec3f()
         v2 = SbVec3f(1,2,3)

@@ -1691,6 +1691,7 @@ EXTEND_HELPER_METHOD_CHECKS = {
 }
 METHOD_RETURN_TYPE_CHECKS = {
     "coin.pyi": (
+        ("SbByteBuffer", "data", "bytes"),
         ("SoBase", "getNamedBase", "SoBase | None"),
         ("SoFieldContainer", "getField", "SoField | None"),
         ("SoFieldContainer", "getEventIn", "SoField | None"),
