@@ -55,6 +55,7 @@ try:
         COMPARISON_METHODS,
         factory_method_return_type,
         EXTEND_HELPER_METHOD_TYPES,
+        FIELD_ATTRIBUTE_TYPE_POLICIES,
         FLOAT_TYPES,
         FUNCTION_POINTER_TYPE_SIGNATURES,
         GENERATED_HEADER,
@@ -104,6 +105,7 @@ except ImportError:
         COMPARISON_METHODS,
         factory_method_return_type,
         EXTEND_HELPER_METHOD_TYPES,
+        FIELD_ATTRIBUTE_TYPE_POLICIES,
         FLOAT_TYPES,
         FUNCTION_POINTER_TYPE_SIGNATURES,
         GENERATED_HEADER,
@@ -1053,6 +1055,59 @@ def normalize_module_cleanup_locals(text):
     # property cleanup loop from its last observed value. Keep its annotation
     # stable across runtime introspection results.
     return text.replace("\nname: str\nthing: tuple\n", "\nname: str\nthing: property\n")
+
+
+def normalize_field_attribute_policies(text):
+    """Add reviewed runtime fields omitted by stubgen."""
+
+    lines = text.splitlines()
+    updated = []
+    current_class = None
+    current_lines = []
+
+    def flush_class():
+        if current_class is None:
+            return
+        existing = {
+            match.group("name")
+            for line in current_lines
+            for match in [
+                re.match(r"\s*(?P<name>[A-Za-z_]\w*):\s*[^#]+", line)
+            ]
+            if match
+        }
+        missing = [
+            (name, annotation)
+            for name, annotation in FIELD_ATTRIBUTE_TYPE_POLICIES.get(
+                current_class, {}
+            ).items()
+            if name not in existing
+        ]
+        if missing:
+            current_lines.extend(
+                "    %s: %s" % (name, annotation)
+                for name, annotation in sorted(missing)
+            )
+        updated.extend(current_lines)
+
+    for line in lines:
+        class_match = re.match(r"^class\s+([A-Za-z_]\w*)", line)
+        if class_match:
+            flush_class()
+            current_class = class_match.group(1)
+            current_lines = [line]
+            continue
+        if current_class and is_top_level_statement(line):
+            flush_class()
+            current_class = None
+            current_lines = []
+        if current_class:
+            current_lines.append(line)
+        else:
+            updated.append(line)
+
+    flush_class()
+    return "\n".join(updated) + "\n"
 
 
 def add_type_imports(text, used_external_types, external_class_modules):
@@ -2055,6 +2110,7 @@ def postprocess_stub(path, module, output_dir):
             used_external_types,
         ),
     )
+    processed = normalize_field_attribute_policies(processed)
     processed = normalize_module_cleanup_locals(processed)
     processed = add_overload_import(processed)
     processed = add_missing_imports(processed)

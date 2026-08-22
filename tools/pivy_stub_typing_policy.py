@@ -1720,6 +1720,72 @@ class FieldTypePolicy:
     setter_parameter_name: str = "newvalue"
 
 
+# A small number of field attributes are not emitted by stubgen even though
+# Coin exposes them through the runtime field registry.  Keep these binding
+# names declarative so the generator and the coverage check share one list.
+# The runtime checker is deliberately broader than this table: it will report
+# newly exposed SoSF*/SoMF* fields instead of silently accepting drift.
+FIELD_ATTRIBUTE_TYPE_POLICIES = {
+    "SoNodeKitListPart": {
+        "containerTypeName": "SoSFName",
+        "childTypeNames": "SoMFName",
+        "containerNode": "SoSFNode",
+    },
+    "SoVRMLAnchor": {
+        "addChildren": "SoMFNode",
+        "removeChildren": "SoMFNode",
+    },
+    "SoVRMLAudioClip": {
+        "duration_changed": "SoSFTime",
+        "isActive": "SoSFBool",
+    },
+    "SoVRMLBackground": {
+        "set_bind": "SoSFBool",
+        "isBound": "SoSFBool",
+    },
+    "SoVRMLBillboard": {
+        "addChildren": "SoMFNode",
+        "removeChildren": "SoMFNode",
+    },
+    "SoVRMLCollision": {
+        "addChildren": "SoMFNode",
+        "removeChildren": "SoMFNode",
+    },
+    "SoVRMLFog": {
+        "set_bind": "SoSFBool",
+        "isBound": "SoSFBool",
+    },
+    "SoVRMLGroup": {
+        "addChildren": "SoMFNode",
+        "removeChildren": "SoMFNode",
+    },
+    "SoVRMLNavigationInfo": {
+        "set_bind": "SoSFBool",
+        "isBound": "SoSFBool",
+    },
+    "SoVRMLTimeSensor": {
+        "timeIn": "SoSFTime",
+    },
+    "SoVRMLTransform": {
+        "addChildren": "SoMFNode",
+        "removeChildren": "SoMFNode",
+    },
+    "SoVRMLViewpoint": {
+        "set_bind": "SoSFBool",
+        "bindTime": "SoSFTime",
+        "isBound": "SoSFBool",
+    },
+}
+
+# Python keywords cannot be used in dotted attribute access.  Coin retains
+# these native field names in its registry, while the generated SWIG module
+# exposes the established Python-safe aliases.
+FIELD_ATTRIBUTE_NAME_ALIASES = {
+    ("SoComposeRotationFromTo", "from"): "srcFrom",
+    ("SoComposeRotationFromTo", "to"): "destTo",
+}
+
+
 @dataclass(frozen=True)
 class MultifieldTypePolicy:
     """Python-level value policy for a multiple-value Coin field."""

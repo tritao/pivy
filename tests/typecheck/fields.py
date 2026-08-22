@@ -233,6 +233,57 @@ def check_extended_node_field_inventory() -> None:
     assert_type(coin.SoNormalBinding().value, coin.SoSFEnum)
 
 
+def check_runtime_registry_field_contracts() -> None:
+    part = coin.SoNodeKitListPart()
+    assert_type(part.containerTypeName, coin.SoSFName)
+    assert_type(part.childTypeNames, coin.SoMFName)
+    assert_type(part.containerNode, coin.SoSFNode)
+
+    anchor = coin.SoVRMLAnchor()
+    assert_type(anchor.addChildren, coin.SoMFNode)
+    assert_type(anchor.removeChildren, coin.SoMFNode)
+
+    audio = coin.SoVRMLAudioClip()
+    assert_type(audio.duration_changed, coin.SoSFTime)
+    assert_type(audio.isActive, coin.SoSFBool)
+
+    background = coin.SoVRMLBackground()
+    assert_type(background.set_bind, coin.SoSFBool)
+    assert_type(background.isBound, coin.SoSFBool)
+
+    billboard = coin.SoVRMLBillboard()
+    assert_type(billboard.addChildren, coin.SoMFNode)
+    assert_type(billboard.removeChildren, coin.SoMFNode)
+
+    collision = coin.SoVRMLCollision()
+    assert_type(collision.addChildren, coin.SoMFNode)
+    assert_type(collision.removeChildren, coin.SoMFNode)
+
+    fog = coin.SoVRMLFog()
+    assert_type(fog.set_bind, coin.SoSFBool)
+    assert_type(fog.isBound, coin.SoSFBool)
+
+    group = coin.SoVRMLGroup()
+    assert_type(group.addChildren, coin.SoMFNode)
+    assert_type(group.removeChildren, coin.SoMFNode)
+
+    navigation = coin.SoVRMLNavigationInfo()
+    assert_type(navigation.set_bind, coin.SoSFBool)
+    assert_type(navigation.isBound, coin.SoSFBool)
+
+    timer = coin.SoVRMLTimeSensor()
+    assert_type(timer.timeIn, coin.SoSFTime)
+
+    transform = coin.SoVRMLTransform()
+    assert_type(transform.addChildren, coin.SoMFNode)
+    assert_type(transform.removeChildren, coin.SoMFNode)
+
+    viewpoint = coin.SoVRMLViewpoint()
+    assert_type(viewpoint.set_bind, coin.SoSFBool)
+    assert_type(viewpoint.bindTime, coin.SoSFTime)
+    assert_type(viewpoint.isBound, coin.SoSFBool)
+
+
 def check_nullable_fields() -> None:
     node = coin.SoSFNode()
     assert_type(node.getValue(), coin.SoNode | None)

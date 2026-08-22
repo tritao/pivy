@@ -4951,6 +4951,9 @@ class SoNodeKitListPart(SoNode):
     def getPrimitiveCount(self, action: SoGetPrimitiveCountAction) -> None: ...
     def getChildren(self) -> SoChildList: ...
 
+    childTypeNames: SoMFName
+    containerNode: SoSFNode
+    containerTypeName: SoSFName
 class SoNodeKitPath(SoPath):
     """Proxy of C++ SoNodeKitPath class."""
     thisown: bool
@@ -17777,6 +17780,8 @@ class SoVRMLAnchor(SoVRMLParent):
     def setFetchURLCallBack(arg1: Incomplete, closure: Incomplete) -> None: ...
     def handleEvent(self, action: SoHandleEventAction) -> None: ...
 
+    addChildren: SoMFNode
+    removeChildren: SoMFNode
 class SoVRMLAppearance(SoNode):
     """Proxy of C++ SoVRMLAppearance class."""
     material: SoSFNode
@@ -17838,6 +17843,8 @@ class SoVRMLAudioClip(SoNode):
     def close(self, datasource: Incomplete) -> int: ...
     def setCallbacks(self, opencb: Incomplete, readcb: Incomplete, seekcb: Incomplete, tellcb: Incomplete, closecb: Incomplete, userdataptr: Incomplete) -> None: ...
 
+    duration_changed: SoSFTime
+    isActive: SoSFBool
 class SoVRMLBackground(SoNode):
     """Proxy of C++ SoVRMLBackground class."""
     backUrl: SoMFString
@@ -17858,6 +17865,8 @@ class SoVRMLBackground(SoNode):
     def __init__(self) -> None: ...
     def GLRender(self, action: SoGLRenderAction) -> None: ...
 
+    isBound: SoSFBool
+    set_bind: SoSFBool
 class SoVRMLBillboard(SoVRMLParent):
     """Proxy of C++ SoVRMLBillboard class."""
     axisOfRotation: SoSFVec3f
@@ -17884,6 +17893,8 @@ class SoVRMLBillboard(SoVRMLParent):
     def GLRenderOffPath(self, action: SoGLRenderAction) -> None: ...
     def notify(self, list: SoNotList) -> None: ...
 
+    addChildren: SoMFNode
+    removeChildren: SoMFNode
 class SoVRMLGeometry(SoShape):
     """Proxy of C++ SoVRMLGeometry class."""
     def __init__(self, *args, **kwargs) -> None: ...
@@ -17947,6 +17958,8 @@ class SoVRMLGroup(SoVRMLParent):
     def GLRenderOffPath(self, action: SoGLRenderAction) -> None: ...
     def notify(self, list: SoNotList) -> None: ...
 
+    addChildren: SoMFNode
+    removeChildren: SoMFNode
 class SoVRMLCollision(SoVRMLGroup):
     """Proxy of C++ SoVRMLCollision class."""
     collide: SoSFBool
@@ -17964,6 +17977,8 @@ class SoVRMLCollision(SoVRMLGroup):
     def GLRender(self, action: SoGLRenderAction) -> None: ...
     def notify(self, list: SoNotList) -> None: ...
 
+    addChildren: SoMFNode
+    removeChildren: SoMFNode
 class SoVRMLColor(SoNode):
     """Proxy of C++ SoVRMLColor class."""
     color: SoMFColor
@@ -18187,6 +18202,8 @@ class SoVRMLFog(SoNode):
     def __init__(self) -> None: ...
     def GLRender(self, action: SoGLRenderAction) -> None: ...
 
+    isBound: SoSFBool
+    set_bind: SoSFBool
 class SoVRMLFontStyle(SoNode):
     """Proxy of C++ SoVRMLFontStyle class."""
     SERIF: ClassVar[int] = ...
@@ -18521,6 +18538,8 @@ class SoVRMLNavigationInfo(SoNode):
     def __init__(self) -> None: ...
     def GLRender(self, action: SoGLRenderAction) -> None: ...
 
+    isBound: SoSFBool
+    set_bind: SoSFBool
 class SoVRMLNormal(SoNode):
     """Proxy of C++ SoVRMLNormal class."""
     vector: SoMFVec3f
@@ -18940,6 +18959,7 @@ class SoVRMLTimeSensor(SoNodeEngine):
     def handleEvent(self, action: SoHandleEventAction) -> None: ...
     def write(self, action: SoWriteAction) -> None: ...
 
+    timeIn: SoSFTime
 class SoVRMLTouchSensor(SoNode):
     """Proxy of C++ SoVRMLTouchSensor class."""
     enabled: SoSFBool
@@ -18995,6 +19015,8 @@ class SoVRMLTransform(SoVRMLGroup):
     def GLRenderInPath(self, action: SoGLRenderAction) -> None: ...
     def notify(self, list: SoNotList) -> None: ...
 
+    addChildren: SoMFNode
+    removeChildren: SoMFNode
 class SoVRMLViewpoint(SoNode):
     """Proxy of C++ SoVRMLViewpoint class."""
     description: SoSFString
@@ -19010,6 +19032,9 @@ class SoVRMLViewpoint(SoNode):
     def __init__(self) -> None: ...
     def GLRender(self, action: SoGLRenderAction) -> None: ...
 
+    bindTime: SoSFTime
+    isBound: SoSFBool
+    set_bind: SoSFBool
 class SoVRMLVisibilitySensor(SoNode):
     """Proxy of C++ SoVRMLVisibilitySensor class."""
     center: SoSFVec3f

@@ -25,6 +25,7 @@ from tools.check_pivy_policy_coverage import policy_coverage_errors
 from tools.pivy_stub_typing_policy import (
     FACTORY_CLASSES,
     ENGINE_FACTORY_CLASSES,
+    FIELD_ATTRIBUTE_TYPE_POLICIES,
     FIELD_TYPE_POLICIES,
     INCOMPLETE_CATEGORIES,
     INCOMPLETE_CATEGORY_ACTIONS,
@@ -846,6 +847,18 @@ class PolicyBoundaryTests(unittest.TestCase):
 
     def test_policy_managed_fields_are_covered(self):
         self.assertEqual(policy_coverage_errors(Path("pivy/coin.pyi")), ())
+
+    def test_runtime_field_attribute_policy_is_explicit(self):
+        self.assertEqual(
+            sum(len(attributes) for attributes in FIELD_ATTRIBUTE_TYPE_POLICIES.values()),
+            25,
+        )
+        self.assertEqual(
+            policy.FIELD_ATTRIBUTE_NAME_ALIASES[
+                ("SoComposeRotationFromTo", "from")
+            ],
+            "srcFrom",
+        )
 
     def test_typing_matrix_covers_supported_python_targets(self):
         self.assertEqual(

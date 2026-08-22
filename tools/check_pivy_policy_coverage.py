@@ -8,6 +8,7 @@ from pathlib import Path
 
 from tools.pivy_stub_typing_policy import (
     FACTORY_CLASSES,
+    FIELD_ATTRIBUTE_TYPE_POLICIES,
     FIELD_TYPE_POLICIES,
     MULTIFIELD_TYPE_POLICIES,
 )
@@ -98,6 +99,32 @@ def policy_coverage_errors(stub_path: Path) -> tuple[str, ...]:
             setters = _check_method(errors, methods, class_name, "setValue")
             if setters and all(_has_incomplete(method) for method in setters):
                 errors.append("%s.setValue has no typed overload" % class_name)
+
+    for class_name, attributes in FIELD_ATTRIBUTE_TYPE_POLICIES.items():
+        node = next(
+            (candidate for candidate in tree.body
+             if isinstance(candidate, ast.ClassDef)
+             and candidate.name == class_name),
+            None,
+        )
+        if node is None:
+            errors.append("%s is missing" % class_name)
+            continue
+        declared = {
+            item.target.id: ast.unparse(item.annotation)
+            for item in node.body
+            if isinstance(item, ast.AnnAssign)
+            and isinstance(item.target, ast.Name)
+        }
+        for name, expected_type in attributes.items():
+            actual_type = declared.get(name)
+            if actual_type is None:
+                errors.append("%s.%s is missing" % (class_name, name))
+            elif actual_type != expected_type:
+                errors.append(
+                    "%s.%s has %s, expected %s"
+                    % (class_name, name, actual_type, expected_type)
+                )
 
     return tuple(errors)
 
