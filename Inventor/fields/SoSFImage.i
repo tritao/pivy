@@ -23,6 +23,64 @@
 }
 
 %extend SoSFImage {
+  /* Snapshot a borrowed subtexture pointer before it crosses into Python.
+     The native API exposes dimensions and offset through output references;
+     returning owned values keeps both the pixel lifetime and output storage
+     independent from the field. */
+  PyObject *getSubTextureValue(const int idx) {
+    SbVec2s image_size(0, 0);
+    SbVec2s dims(0, 0);
+    SbVec2s offset(0, 0);
+    int numcomps = 0;
+    const unsigned char *pixels = NULL;
+    Py_ssize_t pixel_count = 0;
+    PyObject *pixel_object = NULL;
+    PyObject *dims_object = NULL;
+    PyObject *offset_object = NULL;
+    PyObject *result = NULL;
+
+    self->getValue(image_size, numcomps);
+    pixels = self->getSubTexture(idx, dims, offset);
+    if (pixels == NULL) {
+      Py_INCREF(Py_None);
+      pixel_object = Py_None;
+    } else {
+      if (dims[0] > 0 && dims[1] > 0 && numcomps > 0) {
+        pixel_count = (Py_ssize_t)dims[0] * (Py_ssize_t)dims[1] * numcomps;
+      }
+      pixel_object = PyBytes_FromStringAndSize(
+        (const char *)pixels, pixel_count);
+      if (pixel_object == NULL) {
+        return NULL;
+      }
+    }
+
+    dims_object = SWIG_NewPointerObj(
+      (void *)new SbVec2s(dims),
+      SWIGTYPE_p_SbVec2s,
+      SWIG_POINTER_OWN);
+    if (dims_object == NULL) {
+      Py_DECREF(pixel_object);
+      return NULL;
+    }
+    offset_object = SWIG_NewPointerObj(
+      (void *)new SbVec2s(offset),
+      SWIGTYPE_p_SbVec2s,
+      SWIG_POINTER_OWN);
+    if (offset_object == NULL) {
+      Py_DECREF(pixel_object);
+      Py_DECREF(dims_object);
+      return NULL;
+    }
+
+    result = Py_BuildValue(
+      "(OOOi)", pixel_object, dims_object, offset_object, numcomps);
+    Py_DECREF(pixel_object);
+    Py_DECREF(dims_object);
+    Py_DECREF(offset_object);
+    return result;
+  }
+
   void setValue(const SbVec2s & size, const int nc, PyObject * pixels)
   {
     Py_ssize_t len = size[0] * size[1] * nc;

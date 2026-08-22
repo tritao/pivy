@@ -248,6 +248,10 @@ PYTHON_HELPER_METHOD_TYPES = {
         "self",
         "tuple[bytes | None, SbVec3s, int]",
     ),
+    ("SoSFImage", "getSubTextureValue"): (
+        "self, idx: int",
+        "tuple[bytes | None, SbVec2s, SbVec2s, int]",
+    ),
     ("SoEngine", "__setattr__"): ("self, name: str, value: Any", "None"),
     ("SoFieldContainer", "__dir__"): ("self", "list[str]"),
     ("SoFieldContainer", "__getattr__"): ("self, name: str", "SoField"),

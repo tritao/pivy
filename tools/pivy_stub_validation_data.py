@@ -1674,6 +1674,11 @@ METHOD_RETURN_TYPE_CHECKS = {
             "getTextureImage3dValue",
             "tuple[bytes | None, SbVec3s, int]",
         ),
+        (
+            "SoSFImage",
+            "getSubTextureValue",
+            "tuple[bytes | None, SbVec2s, SbVec2s, int]",
+        ),
         ("SoEngineOutput", "getContainer", "SoEngine | None"),
         ("SoEngineOutput", "getFieldContainer", "SoFieldContainer | None"),
         ("SoEngineOutput", "getNodeContainer", "SoNodeEngine | None"),

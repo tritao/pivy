@@ -268,11 +268,59 @@ def check_string_name_and_multifield_contracts() -> None:
     assert_type(iter(paths), Iterator[coin.SoPath])
 
 
+def check_numeric_multifield_contracts() -> None:
+    booleans = coin.SoMFBool()
+    booleans.setValues(0, 2, [True, False])
+    assert_type(len(booleans), int)
+    assert_type(booleans[0], bool)
+    booleans[0] = True
+    assert_type(booleans.getValues(), list[bool])
+    assert_type(iter(booleans), Iterator[bool])
+
+    integers = coin.SoMFInt32()
+    integers.setValues(0, 2, [1, 2])
+    assert_type(integers[0], int)
+    integers[0] = 3
+    assert_type(integers.getValues(), list[int])
+    assert_type(iter(integers), Iterator[int])
+
+    floats = coin.SoMFFloat()
+    floats.setValues(0, 2, [1.0, 2.0])
+    assert_type(floats[0], float)
+    floats[0] = 3.0
+    assert_type(floats.getValues(), list[float])
+    assert_type(iter(floats), Iterator[float])
+
+    colors = coin.SoMFColor()
+    colors.setValues(0, 1, [[0.1, 0.2, 0.3]])
+    assert_type(colors[0], coin.SbColor)
+    colors[0] = coin.SbColor()
+    assert_type(colors.getValues(), list[coin.SbColor])
+    assert_type(iter(colors), Iterator[coin.SbColor])
+
+    vectors = coin.SoMFVec3f()
+    vectors.setValues(0, 1, [[1.0, 2.0, 3.0]])
+    assert_type(vectors[0], coin.SbVec3f)
+    vectors[0] = coin.SbVec3f()
+    assert_type(vectors.getValues(), list[coin.SbVec3f])
+    assert_type(iter(vectors), Iterator[coin.SbVec3f])
+
+    rotations = coin.SoMFRotation()
+    rotations.setValues(0, 1, [[0.0, 0.0, 1.0, 0.0]])
+    assert_type(rotations[0], coin.SbRotation)
+    assert_type(rotations.getValues(), list[coin.SbRotation])
+    assert_type(iter(rotations), Iterator[coin.SbRotation])
+
+
 def check_image_fields() -> None:
     image = coin.SoSFImage()
     image.setValue(coin.SbVec2s(2, 2), 1, b"abcd")
     assert_type(image.getValue(), tuple[bytes, coin.SbVec2s, int])
     assert_type(image.startEditing(), tuple[bytes, coin.SbVec2s, int])
+    assert_type(
+        image.getSubTextureValue(0),
+        tuple[bytes | None, coin.SbVec2s, coin.SbVec2s, int],
+    )
     image.finishEditing()
 
     image3 = coin.SoSFImage3()

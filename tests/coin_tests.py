@@ -389,6 +389,11 @@ class FieldSetValue(unittest.TestCase):
         t.finishEditing()
         self.assertEqual(t.startEditing(), (b"abcd", SbVec2s(2,2), 1))
         t.finishEditing()
+        subpixels, subdims, suboffset, subcomponents = t.getSubTextureValue(0)
+        self.assertIsNone(subpixels)
+        self.assertEqual(tuple(subdims), (0, 0))
+        self.assertEqual(tuple(suboffset), (0, 0))
+        self.assertEqual(subcomponents, 1)
 
     def testSFImage3(self):
         """check setValue for SoSFImage3"""
