@@ -21,6 +21,13 @@ from tools.report_pivy_typing import (
     quality_regressions,
     report_to_dict,
 )
+from tools.report_pivy_verifytypes import (
+    VERIFYTYPES_BASELINES,
+    VerifyTypesReport,
+    parse_verifytypes_output,
+    report_to_dict as verifytypes_report_to_dict,
+    verifytypes_regressions,
+)
 from tools.check_pivy_policy_coverage import policy_coverage_errors
 from tools.pivy_stub_typing_policy import (
     FACTORY_CLASSES,
@@ -918,6 +925,52 @@ class PolicyBoundaryTests(unittest.TestCase):
                 "opaque field storage": 1,
             },
         )
+
+    def test_verifytypes_summary_parser(self):
+        output = """
+Symbols exported by "pivy.coin": 13752
+  With known type: 8394
+  With ambiguous type: 0
+  With unknown type: 5358
+
+Other symbols referenced but not exported by "pivy.coin": 0
+  With known type: 0
+  With ambiguous type: 0
+  With unknown type: 0
+
+Type completeness score: 61%
+"""
+        report = parse_verifytypes_output("pivy.coin", output, pyright_returncode=1)
+
+        self.assertEqual(
+            report,
+            VerifyTypesReport(
+                module="pivy.coin",
+                exported_symbols=13752,
+                known_symbols=8394,
+                ambiguous_symbols=0,
+                unknown_symbols=5358,
+                completeness_score=61.0,
+                pyright_returncode=1,
+            ),
+        )
+        self.assertEqual(verifytypes_regressions(report), ())
+        self.assertEqual(verifytypes_report_to_dict(report)["schema_version"], 1)
+
+    def test_verifytypes_baseline_detects_regression(self):
+        baseline = VERIFYTYPES_BASELINES["pivy.gui.soqt"]
+        report = VerifyTypesReport(
+            module="pivy.gui.soqt",
+            exported_symbols=521,
+            known_symbols=396,
+            ambiguous_symbols=1,
+            unknown_symbols=125,
+            completeness_score=76.1,
+            pyright_returncode=1,
+        )
+
+        violations = verifytypes_regressions(report, baseline)
+        self.assertEqual(len(violations), 4)
 
 
 if __name__ == "__main__":
