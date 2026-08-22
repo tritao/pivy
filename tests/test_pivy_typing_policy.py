@@ -31,6 +31,7 @@ from tools.report_pivy_verifytypes import (
     verifytypes_regressions,
 )
 from tools.check_pivy_policy_coverage import policy_coverage_errors
+from tools.check_pivy_stubtest import curated_runtime_errors
 from tools.pivy_stub_typing_policy import (
     FACTORY_CLASSES,
     ENGINE_FACTORY_CLASSES,
@@ -1043,6 +1044,20 @@ Type completeness score: 61%
 
         violations = verifytypes_regressions(report, baseline)
         self.assertEqual(len(violations), 2)
+
+    def test_curated_stubtest_filters_only_implementation_noise(self):
+        output = "\n".join(
+            (
+                "pivy.coin.SoBase.__swig_destroy__ variable differs from runtime type def (Any) -> Any",
+                "pivy.coin.SoBase.getTypeId is inconsistent",
+                "pivy.coin.SoBaseAccess is not present at runtime",
+                "pivy.coin.SoSphere.getTypeId is inconsistent",
+            )
+        )
+        self.assertEqual(
+            curated_runtime_errors(output),
+            ("pivy.coin.SoBase.getTypeId is inconsistent",),
+        )
 
 
 if __name__ == "__main__":

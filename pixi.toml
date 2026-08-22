@@ -73,4 +73,5 @@ typecheck_report = { cmd = ["python", "-m", "tools.report_pivy_typing", "--check
 typecheck_report_json = { cmd = ["python", "-m", "tools.report_pivy_typing", "--json", "pivy/coin.pyi"]}
 typecheck_verifytypes = { cmd = ["python", "-m", "tools.report_pivy_verifytypes", "--check-baseline"], depends-on = ["build"]}
 typecheck_verifytypes_json = { cmd = ["python", "-m", "tools.report_pivy_verifytypes", "--json"], depends-on = ["build"]}
-typecheck_quality = { depends-on = ["typecheck_stubs", "typecheck_negative", "typecheck_stubs_strict", "typecheck_stubs_matrix", "test_typing_policy", "check_typing_policy_coverage", "check_field_attribute_coverage", "typecheck_report", "typecheck_verifytypes"]}
+typecheck_stubtest = { cmd = ["python", "-m", "tools.check_pivy_stubtest"], depends-on = ["build"]}
+typecheck_quality = { depends-on = ["typecheck_stubs", "typecheck_negative", "typecheck_stubs_strict", "typecheck_stubs_matrix", "test_typing_policy", "check_typing_policy_coverage", "check_field_attribute_coverage", "typecheck_report", "typecheck_verifytypes", "typecheck_stubtest"]}
