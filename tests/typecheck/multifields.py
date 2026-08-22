@@ -15,6 +15,8 @@ def check_scalar_multifield() -> None:
     assert_type(values.getValues(0), list[float])
 
     values.setValues(0, 2, [1.0, 2.0])
+    values.setValues([3.0, 4.0])
+    values.setValues(1, [5.0])
     values.set1Value(0, 3.0)
     values[0] = 4.0
     assert_type(values[0], float)
@@ -101,6 +103,8 @@ def check_vector_multifield() -> None:
     assert_type(values.getValues(), list[coin.SbVec3f])
     values.setValues(0, 1, vectors)
     values.setValues(0, 1, coordinates)
+    values.setValues(vectors)
+    values.setValues(1, coordinates)
     values.set1Value(0, coordinates[0])
     values[0] = coin.SbVec3f()
 
@@ -114,6 +118,8 @@ def check_color_multifield() -> None:
     assert_type(values.getValues(), list[coin.SbColor])
     values.setValues(0, 1, [coin.SbColor()])
     values.setValues(0, 1, [rgb])
+    values.setValues([coin.SbColor()])
+    values.setValues(1, [rgb])
     values.set1Value(0, rgb)
     values[0] = rgb
 
@@ -128,6 +134,8 @@ def check_color_rgba_multifield() -> None:
     assert_type(values.getValues(), list[coin.SbColor4f])
     values.setValues(0, 1, colors)
     values.setValues(0, 1, rgba)
+    values.setValues(colors)
+    values.setValues(1, rgba)
     values.set1Value(0, rgba[0])
     values[0] = coin.SbColor4f()
     values[0] = rgba[0]
@@ -138,12 +146,16 @@ def check_object_multifields() -> None:
     node_values: Sequence[coin.SoNode] = [coin.SoCube()]
     assert_type(nodes[0], coin.SoNode)
     nodes.setValues(0, 1, node_values)
+    nodes.setValues(node_values)
+    nodes.setValues(1, node_values)
     nodes[0] = coin.SoSphere()
     assert_type(iter(nodes), Iterator[coin.SoNode])
 
     strings = coin.SoMFString()
     string_values: Sequence[coin.SbString | str] = ["pivy", coin.SbString()]
     strings.setValues(0, 2, string_values)
+    strings.setValues(string_values)
+    strings.setValues(1, string_values)
     assert_type(iter(strings), Iterator[coin.SbString])
     assert_type(strings[0], coin.SbString)
     assert_type(strings.getValues(), list[str])
@@ -152,6 +164,8 @@ def check_object_multifields() -> None:
 def check_string_multifields() -> None:
     names = coin.SoMFName()
     names.setValues(0, 2, ["pivy", coin.SbName("coin")])
+    names.setValues(["pivy", coin.SbName("coin")])
+    names.setValues(1, ["coin"])
     names.set1Value(0, "updated")
     names[1] = "again"
     assert_type(names.find("again"), int)
@@ -161,6 +175,8 @@ def check_string_multifields() -> None:
 
     strings = coin.SoMFString()
     strings.setValues(0, 2, ["pivy", coin.SbString("coin")])
+    strings.setValues(["pivy", coin.SbString("coin")])
+    strings.setValues(1, ["coin"])
     strings.set1Value(0, "updated")
     strings[1] = "again"
     assert_type(strings.find("again"), int)

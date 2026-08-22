@@ -1574,16 +1574,16 @@ def normalize_operator_helpers(text):
 def render_multifield_setvalues(indent, value_types):
     lines = []
     for value_type in value_types:
-        if len(value_types) > 1:
+        for arguments in (
+            "values: Sequence[%s]" % value_type,
+            "start: int, values: Sequence[%s]" % value_type,
+            "start: int, num: int, values: Sequence[%s]" % value_type,
+        ):
             lines.append("%s@overload" % indent)
-        lines.append(
-            (
-                "%sdef setValues("
-                "self, start: int, num: int, values: Sequence[%s]"
-                ") -> None: ..."
+            lines.append(
+                "%sdef setValues(self, %s) -> None: ..."
+                % (indent, arguments)
             )
-            % (indent, value_type)
-        )
     return lines
 
 
@@ -1591,24 +1591,54 @@ def normalize_multifield_helpers(text):
     lines = text.splitlines()
     updated = []
     current_class = None
+    rendered_setvalues_class = None
 
-    for line in lines:
+    index = 0
+    while index < len(lines):
+        line = lines[index]
         class_match = re.match(r"^class\s+([A-Za-z_]\w*)", line)
         if class_match:
             current_class = class_match.group(1)
+            rendered_setvalues_class = None
         elif current_class and is_top_level_statement(line):
             current_class = None
 
-        match = re.match(r"(?P<indent>\s*)def setValues\(self, \*args\): \.\.\.$", line)
+        match = re.match(
+            r"(?P<indent>\s*)def setValues\(self, "
+            r"(?:\*args|start: int, num: int, values: Sequence\[[^]]+\])"
+            r"\)(?: -> None)?: \.\.\.$",
+            line,
+        )
         if match and current_class in MULTIFIELD_SETVALUES_TYPES:
-            updated.extend(
-                render_multifield_setvalues(
-                    match.group("indent"), MULTIFIELD_SETVALUES_TYPES[current_class]
+            if rendered_setvalues_class != current_class:
+                if updated and updated[-1].strip() == "@overload":
+                    updated.pop()
+                updated.extend(
+                    render_multifield_setvalues(
+                        match.group("indent"),
+                        MULTIFIELD_SETVALUES_TYPES[current_class],
+                    )
                 )
+                rendered_setvalues_class = current_class
+            index += 1
+            continue
+
+        if (
+            rendered_setvalues_class == current_class
+            and line.strip() == "@overload"
+            and index + 1 < len(lines)
+            and re.match(
+                r"\s*def setValues\(self, "
+                r"(?:\*args|start: int, num: int, values: Sequence\[[^]]+\])"
+                r"\)(?: -> None)?: \.\.\.$",
+                lines[index + 1],
             )
+        ):
+            index += 1
             continue
 
         updated.append(line)
+        index += 1
 
     return "\n".join(updated) + "\n"
 

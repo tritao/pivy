@@ -41,6 +41,36 @@ def check_value_fields() -> None:
     rotation.setValue([0.0, 0.0, 1.0, 1.5708])
 
 
+def check_extended_single_value_fields() -> None:
+    trigger = coin.SoSFTrigger()
+    assert_type(trigger.getValue(), None)
+    trigger.setValue()
+
+    time = coin.SoSFTime()
+    assert_type(time.getValue(), coin.SbTime)
+    time.setValue(coin.SbTime(1.0))
+
+    plane = coin.SoSFPlane()
+    assert_type(plane.getValue(), coin.SbPlane)
+    plane.setValue(coin.SbPlane())
+
+    matrix = coin.SoSFMatrix()
+    assert_type(matrix.getValue(), coin.SbMatrix)
+    matrix.setValue(coin.SbMatrix())
+
+    box2 = coin.SoSFBox2f()
+    assert_type(box2.getValue(), coin.SbBox2f)
+    box2.setValue(0.0, 0.0, 1.0, 1.0)
+
+    box3 = coin.SoSFBox3s()
+    assert_type(box3.getValue(), coin.SbBox3s)
+    box3.setValue(0, 0, 0, 1, 1, 1)
+
+    rgba = coin.SoSFColorRGBA()
+    assert_type(rgba.getValue(), coin.SbColor4f)
+    rgba.setValue([0.2, 0.4, 0.8, 1.0])
+
+
 def check_field_attribute_inventory() -> None:
     material = coin.SoMaterial()
     assert_type(material.ambientColor, coin.SoMFColor)
