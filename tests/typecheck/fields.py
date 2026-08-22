@@ -73,6 +73,39 @@ def check_field_attribute_inventory() -> None:
     assert_type(coin.SoCone().parts, coin.SoSFBitMask)
     assert_type(coin.SoDirectionalLight().direction, coin.SoSFVec3f)
 
+    texture = coin.SoTexture2()
+    assert_type(texture.blendColor, coin.SoSFColor)
+    assert_type(texture.enableCompressedTexture, coin.SoSFBool)
+    assert_type(texture.filename, coin.SoSFString)
+    assert_type(texture.image, coin.SoSFImage)
+    assert_type(texture.model, coin.SoSFEnum)
+    assert_type(texture.wrapS, coin.SoSFEnum)
+    assert_type(texture.wrapT, coin.SoSFEnum)
+
+    assert_type(coin.SoCoordinate3().point, coin.SoMFVec3f)
+    assert_type(coin.SoNormal().vector, coin.SoMFVec3f)
+    assert_type(coin.SoTextureCoordinate2().point, coin.SoMFVec2f)
+
+    vertex = coin.SoVertexProperty()
+    assert_type(vertex.normal, coin.SoMFVec3f)
+    assert_type(vertex.texCoord, coin.SoMFVec2f)
+    assert_type(vertex.vertex, coin.SoMFVec3f)
+    assert_type(vertex.textureUnit, coin.SoMFInt32)
+
+    indexed = coin.SoIndexedFaceSet()
+    assert_type(indexed.coordIndex, coin.SoMFInt32)
+    assert_type(indexed.materialIndex, coin.SoMFInt32)
+    assert_type(indexed.normalIndex, coin.SoMFInt32)
+    assert_type(indexed.textureCoordIndex, coin.SoMFInt32)
+
+    hints = coin.SoShapeHints()
+    assert_type(hints.creaseAngle, coin.SoSFFloat)
+    assert_type(hints.faceType, coin.SoSFEnum)
+    assert_type(hints.shapeType, coin.SoSFEnum)
+    assert_type(hints.useVBO, coin.SoSFBool)
+    assert_type(hints.vertexOrdering, coin.SoSFEnum)
+    assert_type(hints.windingType, coin.SoSFEnum)
+
 
 def check_nullable_fields() -> None:
     node = coin.SoSFNode()
