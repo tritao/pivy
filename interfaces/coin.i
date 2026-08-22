@@ -94,6 +94,23 @@ if (init_file_emulator() < 0) {
 %ignore SoDepthBufferElement::get;
 %include coin_header_includes.h
 
+/* Return an owned Python snapshot instead of exposing SoColorPacker's
+   borrowed internal uint32_t array.  This extension is declared after the
+   aggregate Coin header so SWIG has seen the complete class definition. */
+%extend SoColorPacker {
+  PyObject *_pivy_getPackedColorsBytes() const {
+    return PyBytes_FromStringAndSize(
+      (const char *)self->getPackedColors(),
+      self->getSize() * sizeof(uint32_t));
+  }
+}
+
+%pythoncode %{
+SoColorPacker.getPackedColors = (
+    lambda self: self._pivy_getPackedColorsBytes()
+)
+%}
+
 /* Expose SbByteBuffer::data() as an owned Python bytes snapshot.  SWIG's
    default char * conversion treats the pointer as text and can leak both
    embedded NULs and the buffer's lifetime semantics into Python. */

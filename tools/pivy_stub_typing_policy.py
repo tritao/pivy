@@ -255,6 +255,9 @@ METHOD_RETURN_TYPE_OVERRIDES = {
     # SoOffscreenRenderer's SWIG extension copies the borrowed render buffer
     # into a Python bytes object before returning it.
     ("SoOffscreenRenderer", "getBuffer"): "bytes",
+    # SoColorPacker's SWIG extension snapshots the owned internal color array
+    # using getSize(), so callers never receive a borrowed C pointer.
+    ("SoColorPacker", "getPackedColors"): "bytes",
     # SWIG's image typemaps expose the native pixel pointer together with the
     # dimensions and component count as a Python tuple.
     ("SoSFImage", "getValue"): "tuple[str, SbVec2s, int]",
@@ -529,6 +532,7 @@ def factory_method_return_type(class_name, method_name):
     return None
 EXTEND_HELPER_METHOD_TYPES = {
     ("SoOffscreenRenderer", "getBuffer", "self"): ("self", "bytes"),
+    ("SoColorPacker", "getPackedColors", "self"): ("self", "bytes"),
     ("SoSensor", "getFunction", "self"): (
         "self",
         "SoSensorCallback[SoSensor] | None",

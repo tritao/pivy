@@ -49,3 +49,9 @@ def check_write_action_output() -> None:
 def check_offscreen_buffer_contract() -> None:
     renderer = coin.SoOffscreenRenderer(coin.SbViewportRegion(32, 32))
     assert_type(renderer.getBuffer(), bytes)
+
+
+def check_color_packer_buffer_contract() -> None:
+    packer = coin.SoColorPacker()
+    assert_type(packer.getPackedColors(), bytes)
+    assert_type(packer.getSize(), int)

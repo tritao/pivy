@@ -490,7 +490,21 @@ class IncompletePolicyTests(unittest.TestCase):
         )
         self.assertEqual(
             policy.EXTEND_HELPER_METHOD_TYPES[
-                ("SoOffscreenRenderer", "getBuffer", "self")
+            ("SoOffscreenRenderer", "getBuffer", "self")
+        ],
+        ("self", "bytes"),
+        )
+
+    def test_color_packer_snapshot_is_a_safe_python_value(self):
+        self.assertEqual(
+            policy.METHOD_RETURN_TYPE_OVERRIDES[
+                ("SoColorPacker", "getPackedColors")
+            ],
+            "bytes",
+        )
+        self.assertEqual(
+            policy.EXTEND_HELPER_METHOD_TYPES[
+                ("SoColorPacker", "getPackedColors", "self")
             ],
             ("self", "bytes"),
         )

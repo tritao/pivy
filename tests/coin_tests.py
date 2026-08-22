@@ -1318,6 +1318,14 @@ class SoGroupMethods(unittest.TestCase):
 class SbBaseClasses(unittest.TestCase):
     """checks methods and operators of and between various Sb* classes"""
 
+    def testColorPackerDataSnapshot(self):
+        packer = SoColorPacker()
+        packer.reallocate(2)
+        snapshot = packer.getPackedColors()
+
+        self.assertIsInstance(snapshot, bytes)
+        self.assertEqual(len(snapshot), 2 * 4)
+
     def testSbImageDataSnapshot(self):
         image = SbImage()
         pixels, size, components = image.getValue()
