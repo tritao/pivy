@@ -85,6 +85,7 @@ try:
         multifield_component_sequence_types,
         multifield_getvalues_types,
         multifield_iter_element_types,
+        multifield_single_value_types,
         multifield_setvalues_types,
     )
 except ImportError:
@@ -130,6 +131,7 @@ except ImportError:
         multifield_component_sequence_types,
         multifield_getvalues_types,
         multifield_iter_element_types,
+        multifield_single_value_types,
         multifield_setvalues_types,
     )
 
@@ -138,6 +140,7 @@ FIELD_METHOD_TYPE_OVERRIDES = field_method_type_overrides()
 MULTIFIELD_COMPONENT_SEQUENCE_TYPES = multifield_component_sequence_types()
 MULTIFIELD_GETVALUES_TYPES = multifield_getvalues_types()
 MULTIFIELD_ITER_ELEMENT_TYPES = multifield_iter_element_types()
+MULTIFIELD_SINGLE_VALUE_TYPES = multifield_single_value_types()
 MULTIFIELD_SETVALUES_TYPES = multifield_setvalues_types()
 VECTOR_OUTPUT_PARAMETER_TYPES = vector_output_parameter_types()
 
@@ -1605,6 +1608,46 @@ def normalize_multifield_getvalues(text):
     return "\n".join(updated) + "\n"
 
 
+def normalize_multifield_single_values(text):
+    """Apply Python string coercion to supported single-value MF operations."""
+
+    lines = text.splitlines()
+    updated = []
+    current_class = None
+
+    for line in lines:
+        class_match = re.match(r"^class\s+([A-Za-z_]\w*)", line)
+        if class_match:
+            current_class = class_match.group(1)
+        elif current_class and is_top_level_statement(line):
+            current_class = None
+
+        value_type = MULTIFIELD_SINGLE_VALUE_TYPES.get(current_class)
+        match = re.match(
+            r"(?P<indent>\s*)def (?P<method>find|set1Value|__setitem__)"
+            r"\((?P<args>[^)]*)\)(?P<suffix>.*)$",
+            line,
+        )
+        if value_type and match:
+            args, replaced = re.subn(
+                r"\bvalue:\s*[^,)]*",
+                "value: %s" % value_type,
+                match.group("args"),
+                count=1,
+            )
+            if replaced:
+                line = "%sdef %s(%s)%s" % (
+                    match.group("indent"),
+                    match.group("method"),
+                    args,
+                    match.group("suffix"),
+                )
+
+        updated.append(line)
+
+    return "\n".join(updated) + "\n"
+
+
 def normalize_vector_getvalue_helpers(text):
     lines = text.splitlines()
     updated = []
@@ -1870,6 +1913,7 @@ def postprocess_stub(path, module, output_dir):
     processed = normalize_operator_helpers(processed)
     processed = normalize_multifield_helpers(processed)
     processed = normalize_multifield_getvalues(processed)
+    processed = normalize_multifield_single_values(processed)
     processed = normalize_vector_getvalue_helpers(processed)
     processed = normalize_python_helpers(processed)
     processed = normalize_extend_helpers(processed)

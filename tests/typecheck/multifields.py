@@ -19,6 +19,40 @@ def check_scalar_multifield() -> None:
     assert_type(values[0], float)
 
 
+def check_integer_multifield_family() -> None:
+    int32 = coin.SoMFInt32()
+    int32.setValues(0, 2, [1, 2])
+    assert_type(int32[0], int)
+    assert_type(int32.getValues(), list[int])
+    assert_type(iter(int32), Iterator[int])
+    int32.set1Value(0, 3)
+    int32[0] = 4
+
+    short = coin.SoMFShort()
+    short.setValues(0, 2, [1, 2])
+    assert_type(short[0], int)
+    assert_type(short.getValues(), list[int])
+    assert_type(iter(short), Iterator[int])
+    short.set1Value(0, 3)
+    short[0] = 4
+
+    uint32 = coin.SoMFUInt32()
+    uint32.setValues(0, 2, [1, 2])
+    assert_type(uint32[0], int)
+    assert_type(uint32.getValues(), list[int])
+    assert_type(iter(uint32), Iterator[int])
+    uint32.set1Value(0, 3)
+    uint32[0] = 4
+
+    ushort = coin.SoMFUShort()
+    ushort.setValues(0, 2, [1, 2])
+    assert_type(ushort[0], int)
+    assert_type(ushort.getValues(), list[int])
+    assert_type(iter(ushort), Iterator[int])
+    ushort.set1Value(0, 3)
+    ushort[0] = 4
+
+
 def check_bitmask_multifield() -> None:
     values = coin.SoMFBitMask()
 
@@ -84,4 +118,24 @@ def check_object_multifields() -> None:
     strings.setValues(0, 2, string_values)
     assert_type(iter(strings), Iterator[coin.SbString])
     assert_type(strings[0], coin.SbString)
+    assert_type(strings.getValues(), list[str])
+
+
+def check_string_multifields() -> None:
+    names = coin.SoMFName()
+    names.setValues(0, 2, ["pivy", coin.SbName("coin")])
+    names.set1Value(0, "updated")
+    names[1] = "again"
+    assert_type(names.find("again"), int)
+    assert_type(names[0], coin.SbName)
+    assert_type(iter(names), Iterator[coin.SbName])
+    assert_type(names.getValues(), list[str])
+
+    strings = coin.SoMFString()
+    strings.setValues(0, 2, ["pivy", coin.SbString("coin")])
+    strings.set1Value(0, "updated")
+    strings[1] = "again"
+    assert_type(strings.find("again"), int)
+    assert_type(strings[0], coin.SbString)
+    assert_type(iter(strings), Iterator[coin.SbString])
     assert_type(strings.getValues(), list[str])

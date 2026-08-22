@@ -22,6 +22,7 @@ from tools.pivy_stub_typing_policy import (
     multifield_component_sequence_types,
     multifield_getvalues_types,
     multifield_iter_element_types,
+    multifield_single_value_types,
     multifield_setvalues_types,
     vector_iter_element_types,
     vector_output_parameter_types,
@@ -63,6 +64,12 @@ class FieldTypePolicyTests(unittest.TestCase):
         self.assertEqual(rgba.component_sequence_type, "Sequence[float]")
         self.assertEqual(rgba.component_width, 4)
         self.assertEqual(rgba.component_parameter_name, "rgba")
+
+    def test_string_multifield_single_value_policy(self):
+        single_value_types = multifield_single_value_types()
+
+        self.assertEqual(single_value_types["SoMFName"], "SbName | str")
+        self.assertEqual(single_value_types["SoMFString"], "SbString | str")
 
     def test_nullable_node_policy(self):
         policy = FIELD_TYPE_POLICIES["SoSFNode"]

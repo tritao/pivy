@@ -8,6 +8,7 @@ from tools.pivy_stub_typing_policy import (
     callback_method_checks,
     multifield_component_sequence_types,
     multifield_iter_element_types,
+    multifield_single_value_types,
     multifield_setvalues_types,
     MULTIFIELD_TYPE_POLICIES,
     vector_iter_element_types,
@@ -1328,6 +1329,7 @@ def _policy_multifield_method_checks():
     checks = []
     setvalues_types = multifield_setvalues_types()
     component_types = multifield_component_sequence_types()
+    single_value_types = multifield_single_value_types()
     component_names = {2: "xy", 3: "xyz", 4: "xyzw"}
 
     for class_name, (component_type, width) in component_types.items():
@@ -1360,6 +1362,30 @@ def _policy_multifield_method_checks():
                     class_name,
                     "setValue",
                     {component_name: component_type},
+                    "None",
+                ),
+            )
+        )
+
+    for class_name, value_type in single_value_types.items():
+        checks.extend(
+            (
+                (
+                    class_name,
+                    "find",
+                    {"value": value_type, "addifnotfound": "bool"},
+                    "int",
+                ),
+                (
+                    class_name,
+                    "set1Value",
+                    {"idx": "int", "value": value_type},
+                    "None",
+                ),
+                (
+                    class_name,
+                    "__setitem__",
+                    {"i": "int", "value": value_type},
                     "None",
                 ),
             )

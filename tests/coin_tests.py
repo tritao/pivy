@@ -535,6 +535,9 @@ class FieldSetValue(unittest.TestCase):
         t.setValues(2,1,[SbString('3'), SbString('4')])
         self.assertTrue(t.getValues() == ['1','2','3'],
                         'setValues with sequence of SbStrings on SoMFString failed')                    
+        t.set1Value(0, 'single')
+        t[1] = SbString('native')
+        self.assertEqual(t.getValues(), ['single', 'native', '3'])
 
 
     def testMFInt32(self):
@@ -648,6 +651,9 @@ class FieldSetValue(unittest.TestCase):
         t.setValues(2,1,[SbName('3'), SbName('4')])
         self.assertTrue(t.getValues() == ['1','2','3'],
                         'setValues with sequence of SbNames on SoMFName failed')                    
+        t.set1Value(0, 'single')
+        t[1] = SbName('native')
+        self.assertEqual(t.getValues(), ['single', 'native', '3'])
 
     def testMFNode(self):
         """check setValue(s) for SoMFNode"""

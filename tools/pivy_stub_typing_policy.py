@@ -1232,6 +1232,7 @@ class MultifieldTypePolicy:
     element_type: str
     set_values_types: tuple[str, ...] = ()
     get_values_type: str | None = None
+    single_value_type: str | None = None
     component_sequence_type: str | None = None
     component_width: int | None = None
     component_parameter_name: str | None = None
@@ -1256,6 +1257,7 @@ MULTIFIELD_TYPE_POLICIES = {
         element_type="SbName",
         set_values_types=("SbName | str",),
         get_values_type="str",
+        single_value_type="SbName | str",
     ),
     "SoMFBool": MultifieldTypePolicy(
         element_type="bool",
@@ -1287,6 +1289,7 @@ MULTIFIELD_TYPE_POLICIES = {
         element_type="SbString",
         set_values_types=("SbString | str",),
         get_values_type="str",
+        single_value_type="SbString | str",
     ),
     "SoMFVec2f": MultifieldTypePolicy(
         element_type="SbVec2f",
@@ -1505,6 +1508,16 @@ def multifield_getvalues_types():
         field_class: policy.get_values_type
         for field_class, policy in MULTIFIELD_TYPE_POLICIES.items()
         if policy.get_values_type
+    }
+
+
+def multifield_single_value_types():
+    """Return Python input types for single-value multifield operations."""
+
+    return {
+        field_class: policy.single_value_type
+        for field_class, policy in MULTIFIELD_TYPE_POLICIES.items()
+        if policy.single_value_type
     }
 
 
