@@ -260,6 +260,7 @@
 #include <Inventor/fields/SoMFBitMask.h>
 #include <Inventor/fields/SoMFBool.h>
 #include <Inventor/fields/SoMFColor.h>
+#include <Inventor/fields/SoMFColorRGBA.h>
 #include <Inventor/fields/SoMFEngine.h>
 #include <Inventor/fields/SoMFEnum.h>
 #include <Inventor/fields/SoMFFloat.h>

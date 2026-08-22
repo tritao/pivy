@@ -56,6 +56,21 @@ def check_color_multifield() -> None:
     values[0] = rgb
 
 
+def check_color_rgba_multifield() -> None:
+    values = coin.SoMFColorRGBA()
+    colors: Sequence[coin.SbColor4f] = [coin.SbColor4f()]
+    rgba: Sequence[Sequence[float]] = [(0.2, 0.4, 0.8, 1.0)]
+
+    assert_type(iter(values), Iterator[coin.SbColor4f])
+    assert_type(values[0], coin.SbColor4f)
+    assert_type(values.getValues(), list[coin.SbColor4f])
+    values.setValues(0, 1, colors)
+    values.setValues(0, 1, rgba)
+    values.set1Value(0, rgba[0])
+    values[0] = coin.SbColor4f()
+    values[0] = rgba[0]
+
+
 def check_object_multifields() -> None:
     nodes = coin.SoMFNode()
     node_values: Sequence[coin.SoNode] = [coin.SoCube()]

@@ -478,6 +478,18 @@ class FieldSetValue(unittest.TestCase):
         self.assertTrue(t.getValues() == [0],
                         'setValues with empty list on SoMFEnum failed')
 
+        t.setEnums(2, [0, 1], ["ZERO", SbName("ONE")])
+        name = SbName()
+        self.assertEqual(t.getEnum(0, name), 0)
+        self.assertEqual(name.getString(), "ZERO")
+        self.assertEqual(t.getEnum(1, name), 1)
+        self.assertEqual(name.getString(), "ONE")
+
+        with self.assertRaises(ValueError):
+            t.setEnums(2, [0, 1], ["ZERO"])
+        with self.assertRaises(ValueError):
+            t.setEnums(2, [0], ["ZERO", "ONE"])
+
     def testMFBitMask(self):
         """check the inherited integer sequence API for SoMFBitMask"""
         field = SoMFBitMask()
@@ -486,6 +498,25 @@ class FieldSetValue(unittest.TestCase):
         self.assertEqual(field[0], 1)
         field[0] = 3
         self.assertEqual(list(field), [3, 2])
+
+    def testMFColorRGBA(self):
+        """check sequence conversion for SoMFColorRGBA"""
+        field = SoMFColorRGBA()
+        field.setValues(
+            0,
+            2,
+            [SbColor4f(1, 0, 0, 1), SbColor4f(0, 1, 0, 1)],
+        )
+        self.assertEqual(len(field.getValues()), 2)
+        self.assertEqual(field[0], SbColor4f(1, 0, 0, 1))
+
+        field.setValues(0, 2, [[0, 0, 1, 1], [1, 1, 0, 1]])
+        self.assertEqual(field[0], SbColor4f(0, 0, 1, 1))
+        field[1] = [0, 1, 1, 1]
+        self.assertEqual(
+            list(field),
+            [SbColor4f(0, 0, 1, 1), SbColor4f(0, 1, 1, 1)],
+        )
 
     def testMFString(self):
         """check setValue(s) for SoMFString"""

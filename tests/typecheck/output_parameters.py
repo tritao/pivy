@@ -47,3 +47,4 @@ def check_numeric_sequence_inputs() -> None:
 
     field = coin.SoMFEnum()
     assert_type(field.setEnums(1, [0], coin.SbName("ZERO")), None)
+    assert_type(field.setEnums(2, [0, 1], ["ZERO", coin.SbName("ONE")]), None)

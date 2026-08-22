@@ -9,6 +9,7 @@ from tools.pivy_stub_typing_policy import (
     multifield_component_sequence_types,
     multifield_iter_element_types,
     multifield_setvalues_types,
+    MULTIFIELD_TYPE_POLICIES,
     vector_iter_element_types,
 )
 
@@ -1343,7 +1344,10 @@ def _policy_multifield_method_checks():
                     "None",
                 )
             )
-        component_name = component_names[width]
+        component_name = (
+            MULTIFIELD_TYPE_POLICIES[class_name].component_parameter_name
+            or component_names[width]
+        )
         checks.extend(
             (
                 (

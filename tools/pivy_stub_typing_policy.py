@@ -161,6 +161,7 @@ SEQUENCE_POINTER_PARAMETERS = {
     ("SoGLLazyElement", "setColorIndexElt", "indices"): "Sequence[int]",
     ("SoLazyElement", "setColorIndices", "indices"): "Sequence[int]",
     ("SoMFEnum", "setEnums", "values"): "Sequence[int]",
+    ("SoMFEnum", "setEnums", "names"): "SbName | Sequence[SbName | str]",
     ("SoShininessElement", "set", "values"): "Sequence[float]",
     ("SoTransparencyElement", "set", "values"): "Sequence[float]",
     ("SoQt", "init", "argv"): "Sequence[str]",
@@ -1120,6 +1121,11 @@ PYTHON_SHADOW_METHOD_TYPES = {
     for key, policy in CALLBACK_METHOD_POLICIES.items()
     if policy.shadow_signature is not None
 }
+PYTHON_SHADOW_METHOD_TYPES[("SoMFEnum", "setEnums")] = (
+    "self, num: int, vals: Sequence[int], "
+    "names: SbName | Sequence[SbName | str]",
+    "None",
+)
 CALLBACK_PARAMETER_TYPE_OVERRIDES = {
     (class_name, method_name, parameter_name): annotation
     for (class_name, method_name), method_policy in CALLBACK_METHOD_POLICIES.items()
@@ -1220,6 +1226,7 @@ class MultifieldTypePolicy:
     get_values_type: str | None = None
     component_sequence_type: str | None = None
     component_width: int | None = None
+    component_parameter_name: str | None = None
 
 
 FIELD_TYPE_POLICIES = {
@@ -1302,7 +1309,14 @@ MULTIFIELD_TYPE_POLICIES = {
         set_values_types=("SbColor", "SbVec3f", "Sequence[float]"),
         get_values_type="SbColor",
     ),
-    "SoMFColorRGBA": MultifieldTypePolicy(element_type="SbColor4f"),
+    "SoMFColorRGBA": MultifieldTypePolicy(
+        element_type="SbColor4f",
+        set_values_types=("SbColor4f", "Sequence[float]"),
+        get_values_type="SbColor4f",
+        component_sequence_type="Sequence[float]",
+        component_width=4,
+        component_parameter_name="rgba",
+    ),
     "SoMFDouble": MultifieldTypePolicy(element_type="float"),
     "SoMFEngine": MultifieldTypePolicy(
         element_type="SoEngine",

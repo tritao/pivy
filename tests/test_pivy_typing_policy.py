@@ -46,6 +46,23 @@ class FieldTypePolicyTests(unittest.TestCase):
             "str | bytes",
         )
 
+    def test_enum_name_sequence_policy(self):
+        self.assertEqual(
+            policy.SEQUENCE_POINTER_PARAMETERS[
+                ("SoMFEnum", "setEnums", "names")
+            ],
+            "SbName | Sequence[SbName | str]",
+        )
+
+    def test_rgba_multifield_policy(self):
+        rgba = policy.MULTIFIELD_TYPE_POLICIES["SoMFColorRGBA"]
+        self.assertEqual(rgba.element_type, "SbColor4f")
+        self.assertEqual(rgba.set_values_types, ("SbColor4f", "Sequence[float]"))
+        self.assertEqual(rgba.get_values_type, "SbColor4f")
+        self.assertEqual(rgba.component_sequence_type, "Sequence[float]")
+        self.assertEqual(rgba.component_width, 4)
+        self.assertEqual(rgba.component_parameter_name, "rgba")
+
     def test_nullable_node_policy(self):
         policy = FIELD_TYPE_POLICIES["SoSFNode"]
 
