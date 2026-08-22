@@ -62,7 +62,7 @@ class TypingQualityBaseline:
 # should make the relevant bound stricter in the same reviewed change; an
 # accidental generator or dependency drift must not silently lower quality.
 TYPING_QUALITY_BASELINE = TypingQualityBaseline(
-    min_concrete_annotations=21578,
+    min_concrete_annotations=21576,
     max_any_annotations=23,
     max_incomplete_annotations=443,
     max_incomplete_by_category=(

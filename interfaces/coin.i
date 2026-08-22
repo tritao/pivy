@@ -212,59 +212,6 @@ SoByteStream.getData = lambda self: self._pivy_getDataBytes()
 SbByteBuffer.data = lambda self: self._pivy_data_bytes()
 %}
 
-/* Copy SoGlyph's borrowed bitmap into an owned Python value.  The native
-   dimensions and position are returned as owned SbVec2s so callers do not
-   retain output-reference storage after this call returns. */
-%extend SoGlyph {
-  PyObject *getBitmapValue(const SbBool antialiased) const {
-    SbVec2s size(0, 0);
-    SbVec2s pos(0, 0);
-    const unsigned char *bitmap = self->getBitmap(size, pos, antialiased);
-    Py_ssize_t pixel_count = 0;
-    PyObject *pixels = NULL;
-    PyObject *size_object = NULL;
-    PyObject *pos_object = NULL;
-    PyObject *result = NULL;
-
-    if (bitmap == NULL) {
-      Py_INCREF(Py_None);
-      pixels = Py_None;
-    } else {
-      if (size[0] > 0 && size[1] > 0) {
-        pixel_count = (Py_ssize_t)size[0] * (Py_ssize_t)size[1];
-      }
-      pixels = PyBytes_FromStringAndSize(
-        (const char *)bitmap, pixel_count);
-      if (pixels == NULL) {
-        return NULL;
-      }
-    }
-
-    size_object = SWIG_NewPointerObj(
-      (void *)new SbVec2s(size),
-      SWIGTYPE_p_SbVec2s,
-      SWIG_POINTER_OWN);
-    if (size_object == NULL) {
-      Py_DECREF(pixels);
-      return NULL;
-    }
-    pos_object = SWIG_NewPointerObj(
-      (void *)new SbVec2s(pos),
-      SWIGTYPE_p_SbVec2s,
-      SWIG_POINTER_OWN);
-    if (pos_object == NULL) {
-      Py_DECREF(pixels);
-      Py_DECREF(size_object);
-      return NULL;
-    }
-
-    result = Py_BuildValue("(OOO)", pixels, size_object, pos_object);
-    Py_DECREF(pixels);
-    Py_DECREF(size_object);
-    Py_DECREF(pos_object);
-    return result;
-  }
-}
 %include "Inventor/nodes/SoExtSelection.i"
 
 /* Coin's enum reference is represented by its underlying integer in the

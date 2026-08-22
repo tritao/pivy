@@ -264,10 +264,6 @@ PYTHON_HELPER_METHOD_POLICIES = {
         "self, idx: int",
         "tuple[bytes | None, SbVec2s, SbVec2s, int]",
     ),
-    ("SoGlyph", "getBitmapValue"): PythonMethodPolicy(
-        "self, antialiased: bool",
-        "tuple[bytes | None, SbVec2s, SbVec2s]",
-    ),
     ("SoEngine", "__setattr__"): PythonMethodPolicy(
         "self, name: str, value: object", "None"
     ),
