@@ -181,6 +181,34 @@ SoColorPacker.getPackedColors = (
 )
 %}
 
+/* SoMFDouble's native sequence operators are not wrapped by SWIG because
+   its values are exposed only as a const double pointer.  Copy the bounded
+   field contents while the field owns them instead of leaking that pointer
+   into Python. */
+%extend SoMFDouble {
+  PyObject *_pivy_getValuesSnapshot() const {
+    const int count = self->getNum();
+    PyObject *snapshot = PyList_New(count);
+    if (snapshot == NULL) return NULL;
+    if (count == 0) return snapshot;
+
+    const double *values = self->getValues(0);
+    for (int index = 0; index < count; ++index) {
+      PyObject *value = PyFloat_FromDouble(values[index]);
+      if (value == NULL) {
+        Py_DECREF(snapshot);
+        return NULL;
+      }
+      PyList_SET_ITEM(snapshot, index, value);
+    }
+    return snapshot;
+  }
+}
+
+%pythoncode %{
+SoMFDouble.getValuesSnapshot = lambda self: self._pivy_getValuesSnapshot()
+%}
+
 /* Return an owned snapshot for SoByteStream's internal buffer. */
 %extend SoByteStream {
   PyObject *_pivy_getDataBytes() {

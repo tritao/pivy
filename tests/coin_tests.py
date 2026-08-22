@@ -1027,6 +1027,11 @@ class FieldSetValue(unittest.TestCase):
         self.assertEqual(len(name_snapshot), 1)
         self.assertIsInstance(name_snapshot[0], SbName)
 
+        double_field = SoMFDouble()
+        double_field.set1Value(0, 1.25)
+        double_field.set1Value(1, 2.5)
+        self.assertEqual(double_field.getValuesSnapshot(), [1.25, 2.5])
+
 
 class SbStringMethods(unittest.TestCase):
     """tests various string stuff"""

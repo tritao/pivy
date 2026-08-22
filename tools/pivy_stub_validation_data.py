@@ -115,7 +115,7 @@ CALLBACK_METHOD_CHECKS = {
             "addPreCallback",
             {
                 "type": "SoType",
-                "pyfunc": "Callable[[object, SoCallbackAction, SoNode], int]",
+                "pyfunc": "SoCallbackActionNodeCallback",
                 "userdata": "object",
             },
             "None",
@@ -125,7 +125,7 @@ CALLBACK_METHOD_CHECKS = {
             "addPostCallback",
             {
                 "type": "SoType",
-                "pyfunc": "Callable[[object, SoCallbackAction, SoNode], int]",
+                "pyfunc": "SoCallbackActionNodeCallback",
                 "userdata": "object",
             },
             "None",
@@ -134,7 +134,7 @@ CALLBACK_METHOD_CHECKS = {
             "SoCallbackAction",
             "addPreTailCallback",
             {
-                "pyfunc": "Callable[[object, SoCallbackAction, SoNode], int]",
+                "pyfunc": "SoCallbackActionNodeCallback",
                 "userdata": "object",
             },
             "None",
@@ -143,7 +143,7 @@ CALLBACK_METHOD_CHECKS = {
             "SoCallbackAction",
             "addPostTailCallback",
             {
-                "pyfunc": "Callable[[object, SoCallbackAction, SoNode], int]",
+                "pyfunc": "SoCallbackActionNodeCallback",
                 "userdata": "object",
             },
             "None",
@@ -153,10 +153,7 @@ CALLBACK_METHOD_CHECKS = {
             "addTriangleCallback",
             {
                 "type": "SoType",
-                "pyfunc": (
-                    "Callable[[object, SoCallbackAction, SoPrimitiveVertex, "
-                    "SoPrimitiveVertex, SoPrimitiveVertex], None]"
-                ),
+                "pyfunc": "SoTriangleCallback",
                 "userdata": "object",
             },
             "None",
@@ -166,10 +163,7 @@ CALLBACK_METHOD_CHECKS = {
             "addLineSegmentCallback",
             {
                 "type": "SoType",
-                "pyfunc": (
-                    "Callable[[object, SoCallbackAction, SoPrimitiveVertex, "
-                    "SoPrimitiveVertex], None]"
-                ),
+                "pyfunc": "SoLineSegmentCallback",
                 "userdata": "object",
             },
             "None",
@@ -179,7 +173,7 @@ CALLBACK_METHOD_CHECKS = {
             "addPointCallback",
             {
                 "type": "SoType",
-                "pyfunc": "Callable[[object, SoCallbackAction, SoPrimitiveVertex], None]",
+                "pyfunc": "SoPointCallback",
                 "userdata": "object",
             },
             "None",
@@ -187,41 +181,41 @@ CALLBACK_METHOD_CHECKS = {
         (
             "SoCallback",
             "setCallback",
-            {"pyfunc": "Callable[[object, SoAction], None]", "userdata": "object | None"},
+            {"pyfunc": "SoActionCallback", "userdata": "object | None"},
             "None",
         ),
         (
             "SoEventCallback",
             "addEventCallback",
             {
-                "pyfunc": "Callable[[object, SoEventCallback], None]",
+                "pyfunc": "SoEventCallbackHandler",
                 "userdata": "object | None",
             },
-            "tuple[Callable[[object, SoEventCallback], None], object]",
+            "tuple[SoEventCallbackHandler, object]",
         ),
         (
             "SoEventCallback",
             "removeEventCallback",
-            {"tuple": "tuple[Callable[[object, SoEventCallback], None], object]"},
+            {"tuple": "tuple[SoEventCallbackHandler, object]"},
             "None",
         ),
         (
             "SoGLRenderAction",
             "setPassCallback",
-            {"pyfunc": "Callable[[object], None]", "userdata": "object"},
+            {"pyfunc": "SoGLRenderPassCallback", "userdata": "object"},
             "None",
         ),
         (
             "SoGLRenderAction",
             "setAbortCallback",
-            {"pyfunc": "Callable[[object], int]", "userdata": "object"},
+            {"pyfunc": "SoGLRenderAbortCallback", "userdata": "object"},
             "None",
         ),
         (
             "SoGLRenderAction",
             "addPreRenderCallback",
             {
-                "pyfunc": "Callable[[object, SoGLRenderAction], None]",
+                "pyfunc": "SoGLPreRenderCallback",
                 "userdata": "object",
             },
             "None",
@@ -230,7 +224,7 @@ CALLBACK_METHOD_CHECKS = {
             "SoGLRenderAction",
             "removePreRenderCallback",
             {
-                "pyfunc": "Callable[[object, SoGLRenderAction], None]",
+                "pyfunc": "SoGLPreRenderCallback",
                 "userdata": "object",
             },
             "None",
@@ -240,7 +234,7 @@ CALLBACK_METHOD_CHECKS = {
             "addVisitationCallback",
             {
                 "type": "SoType",
-                "pyfunc": "Callable[[object, SoPath], int]",
+                "pyfunc": "SoIntersectionVisitationCallback",
                 "closure": "object",
             },
             "None",
@@ -250,7 +244,7 @@ CALLBACK_METHOD_CHECKS = {
             "removeVisitationCallback",
             {
                 "type": "SoType",
-                "pyfunc": "Callable[[object, SoPath], int]",
+                "pyfunc": "SoIntersectionVisitationCallback",
                 "closure": "object",
             },
             "None",
@@ -259,7 +253,7 @@ CALLBACK_METHOD_CHECKS = {
             "SoIntersectionDetectionAction",
             "setFilterCallback",
             {
-                "pyfunc": "Callable[[object, SoPath, SoPath], bool]",
+                "pyfunc": "SoIntersectionFilterCallback",
                 "closure": "object | None",
             },
             "None",
@@ -268,10 +262,7 @@ CALLBACK_METHOD_CHECKS = {
             "SoIntersectionDetectionAction",
             "addIntersectionCallback",
             {
-                "pyfunc": (
-                    "Callable[[object, SoIntersectingPrimitive, "
-                    "SoIntersectingPrimitive], int]"
-                ),
+                "pyfunc": "SoIntersectionCallback",
                 "closure": "object | None",
             },
             "None",
@@ -280,10 +271,7 @@ CALLBACK_METHOD_CHECKS = {
             "SoIntersectionDetectionAction",
             "removeIntersectionCallback",
             {
-                "pyfunc": (
-                    "Callable[[object, SoIntersectingPrimitive, "
-                    "SoIntersectingPrimitive], int]"
-                ),
+                "pyfunc": "SoIntersectionCallback",
                 "closure": "object | None",
             },
             "None",
@@ -292,7 +280,7 @@ CALLBACK_METHOD_CHECKS = {
             "SoSceneManager",
             "setRenderCallback",
             {
-                "pyfunc": "Callable[[object, SoSceneManager], None]",
+                "pyfunc": "SoSceneManagerCallback",
                 "userData": "object | None",
             },
             "None",
@@ -301,7 +289,7 @@ CALLBACK_METHOD_CHECKS = {
             "SoRenderManager",
             "setRenderCallback",
             {
-                "pyfunc": "Callable[[object, SoRenderManager], None]",
+                "pyfunc": "SoRenderManagerCallback",
                 "userData": "object | None",
             },
             "None",
@@ -309,25 +297,25 @@ CALLBACK_METHOD_CHECKS = {
         (
             "SoRenderManager",
             "addPreRenderCallback",
-            {"pyfunc": "Callable[[object, SoRenderManager], None]", "data": "object"},
+            {"pyfunc": "SoRenderManagerCallback", "data": "object"},
             "None",
         ),
         (
             "SoRenderManager",
             "removePreRenderCallback",
-            {"pyfunc": "Callable[[object, SoRenderManager], None]", "data": "object"},
+            {"pyfunc": "SoRenderManagerCallback", "data": "object"},
             "None",
         ),
         (
             "SoRenderManager",
             "addPostRenderCallback",
-            {"pyfunc": "Callable[[object, SoRenderManager], None]", "data": "object"},
+            {"pyfunc": "SoRenderManagerCallback", "data": "object"},
             "None",
         ),
         (
             "SoRenderManager",
             "removePostRenderCallback",
-            {"pyfunc": "Callable[[object, SoRenderManager], None]", "data": "object"},
+            {"pyfunc": "SoRenderManagerCallback", "data": "object"},
             "None",
         ),
         (
@@ -376,7 +364,7 @@ CALLBACK_METHOD_CHECKS = {
             "SoQtRenderArea",
             "setEventCallback",
             {
-                "pyfunc": "Callable[[object, QEvent], object]",
+                "pyfunc": "SoQtRenderAreaCallback",
                 "user": "object | None",
             },
             "None",
@@ -420,7 +408,7 @@ CALLBACK_METHOD_CHECKS = {
             {
                 "strategy": "int",
                 "value": "float",
-                "cb": "Callable[[object, SbVec2f], SbVec2f] | None",
+                "cb": "SoQtAutoClippingCallback | None",
                 "cbuserdata": "object | None",
             },
             "None",
@@ -429,7 +417,7 @@ CALLBACK_METHOD_CHECKS = {
             "SoQtPopupMenu",
             "addMenuSelectionCallback",
             {
-                "callback": "Callable[[int, object], None]",
+                "callback": "SoQtMenuSelectionCallback",
                 "data": "object",
             },
             "None",
@@ -438,7 +426,7 @@ CALLBACK_METHOD_CHECKS = {
             "SoQtPopupMenu",
             "removeMenuSelectionCallback",
             {
-                "callback": "Callable[[int, object], None]",
+                "callback": "SoQtMenuSelectionCallback",
                 "data": "object",
             },
             "None",
@@ -801,10 +789,10 @@ DEFERRED_RAW_METHOD_CHECKS = {
             "SoQt",
             "setFatalErrorHandler",
             {
-                "cb": "Callable[[SbString, int, object], None]",
+                "cb": "SoQtFatalErrorCallback",
                 "userdata": "object",
             },
-            "Callable[[SbString, int, object], None] | None",
+            "SoQtFatalErrorCallback | None",
         ),
     ),
 }

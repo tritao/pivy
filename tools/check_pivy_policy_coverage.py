@@ -38,7 +38,9 @@ def _methods(tree: ast.Module) -> dict[str, dict[str, list[ast.FunctionDef]]]:
     return result
 
 
-def _has_incomplete(node: ast.AST) -> bool:
+def _has_incomplete(node: ast.AST | None) -> bool:
+    if node is None:
+        return False
     return any(
         isinstance(child, ast.Name) and child.id == "Incomplete"
         for child in ast.walk(node)

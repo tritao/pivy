@@ -1766,14 +1766,10 @@ def normalize_multifield_snapshots(text):
     lines = text.splitlines()
     updated = []
     current_class = None
-    skip_snapshot_docstring = False
+    index = 0
 
-    for line in lines:
-        if skip_snapshot_docstring:
-            if line.strip().startswith('"""'):
-                skip_snapshot_docstring = False
-            continue
-
+    while index < len(lines):
+        line = lines[index]
         class_match = re.match(r"^class\s+([A-Za-z_]\w*)", line)
         if class_match:
             append_multifield_snapshot_method(updated, current_class)
@@ -1782,13 +1778,28 @@ def normalize_multifield_snapshots(text):
             append_multifield_snapshot_method(updated, current_class)
             current_class = None
 
-        if current_class == "SoMField" and re.match(
-            r"\s*def getValuesSnapshot\(self\)", line
+        snapshot_type = (
+            "object"
+            if current_class == "SoMField"
+            else MULTIFIELD_SNAPSHOT_TYPES.get(current_class)
+        )
+        if snapshot_type is not None and re.match(
+            r"\s*def getValuesSnapshot\(self\)(?: -> [^:]+)?:(?: \.{3})?$",
+            line,
         ):
-            updated.append("    def getValuesSnapshot(self) -> list[object]: ...")
-            skip_snapshot_docstring = True
+            updated.append(
+                "    def getValuesSnapshot(self) -> list[%s]: ..." % snapshot_type
+            )
+            index += 1
+            if index < len(lines) and lines[index].strip().startswith('"""'):
+                while index < len(lines):
+                    docstring_line = lines[index].strip()
+                    index += 1
+                    if docstring_line.count('"""') >= 2:
+                        break
             continue
         updated.append(line)
+        index += 1
 
     append_multifield_snapshot_method(updated, current_class)
     return "\n".join(updated) + "\n"
