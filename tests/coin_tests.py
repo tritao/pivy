@@ -538,6 +538,11 @@ class FieldSetValue(unittest.TestCase):
         t.set1Value(0, 'single')
         t[1] = SbString('native')
         self.assertEqual(t.getValues(), ['single', 'native', '3'])
+        unicode_values = SoMFString()
+        unicode_values.setValues(['café', '東京'.encode('utf-8')])
+        self.assertEqual(unicode_values.getValues(), ['café', '東京'])
+        with self.assertRaises(TypeError):
+            unicode_values.setValues('not a sequence')
 
 
     def testMFInt32(self):
@@ -654,6 +659,11 @@ class FieldSetValue(unittest.TestCase):
         t.set1Value(0, 'single')
         t[1] = SbName('native')
         self.assertEqual(t.getValues(), ['single', 'native', '3'])
+        unicode_values = SoMFName()
+        unicode_values.setValues(['café', '東京'.encode('utf-8')])
+        self.assertEqual(unicode_values.getValues(), ['café', '東京'])
+        with self.assertRaises(TypeError):
+            unicode_values.setValues('not a sequence')
 
     def testMFNode(self):
         """check setValue(s) for SoMFNode"""

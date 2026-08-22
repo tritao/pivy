@@ -1,44 +1,108 @@
-%typemap(in) const char * strings[] {
-  int len;  
-  if (PySequence_Check($input)) {
-    len = PySequence_Length($input);
-    if (len > 0) {
-      $1 = (char **)malloc(len * sizeof(char *));
-      for (int i = 0; i < len; i++) {
-#ifdef PY_2
-        PyObject * item = PyObject_Str(PySequence_GetItem($input,i));
-        $1[i] = PyString_AsString(item);
-#else
-        PyObject * item = PySequence_GetItem($input,i);
-        if (PyBytes_Check(item))
-        {
-          $1[i] = PyBytes_AsString(item);
-        }
-        else if  (PyUnicode_Check(item))
-        {
-          $1[i] = PyBytes_AsString(PyUnicode_AsEncodedString(item, "utf-8", "strict"));
-        }
-        else
-        {
-          $1[i] = PyBytes_AsString(PyUnicode_AsEncodedString(PyObject_Str(item), "utf-8", "strict"));
-        }
-#endif
-        Py_DECREF(item);
+%{
+#include <stddef.h>
+
+typedef struct {
+  PyObject **owners;
+  Py_ssize_t count;
+  char *values[1];
+} PivyStringArray;
+
+static void
+pivy_free_string_array(char **values)
+{
+  if (values) {
+    PivyStringArray *array = (PivyStringArray *)(
+        (char *)values - offsetof(PivyStringArray, values));
+    if (array->owners) {
+      for (Py_ssize_t i = 0; i < array->count; i++) {
+        Py_XDECREF(array->owners[i]);
       }
-    } else { $1 = NULL; }
-  } else {
-    PyErr_SetString(PyExc_TypeError, "expected a sequence.");
-    return NULL;
+      free(array->owners);
+    }
+    free(array);
+  }
+}
+%}
+
+%typemap(in) const char * strings[] {
+  Py_ssize_t length;
+
+  $1 = NULL;
+  if (!PySequence_Check($input) || PyUnicode_Check($input) ||
+      PyBytes_Check($input)) {
+    SWIG_exception_fail(SWIG_TypeError, "expected a sequence of strings");
+  }
+
+  length = PySequence_Length($input);
+  if (length < 0) {
+    SWIG_fail;
+  }
+  if (length > 0) {
+    PivyStringArray *array = (PivyStringArray *)calloc(
+        1, sizeof(PivyStringArray) +
+        (size_t)(length - 1) * sizeof(char *));
+    if (array == NULL) {
+      SWIG_exception_fail(
+          SWIG_MemoryError, "unable to allocate string values");
+    }
+    array->count = length;
+    array->owners = (PyObject **)calloc(
+        (size_t)length, sizeof(PyObject *));
+    if (array->owners == NULL) {
+      free(array);
+      SWIG_exception_fail(
+          SWIG_MemoryError, "unable to allocate string owners");
+    }
+    $1 = array->values;
+
+    for (Py_ssize_t i = 0; i < length; i++) {
+      PyObject *item = PySequence_GetItem($input, i);
+      PyObject *text = item;
+      const char *value;
+
+      if (item == NULL) {
+        pivy_free_string_array($1);
+        $1 = NULL;
+        SWIG_fail;
+      }
+
+      if (!PyUnicode_Check(item) && !PyBytes_Check(item)) {
+        text = PyObject_Str(item);
+        Py_DECREF(item);
+        if (text == NULL) {
+          pivy_free_string_array($1);
+          $1 = NULL;
+          SWIG_fail;
+        }
+      }
+
+#ifdef PY_2
+      value = PyString_AsString(text);
+#else
+      value = PyBytes_Check(text) ? PyBytes_AsString(text) :
+        PyUnicode_AsUTF8(text);
+#endif
+      if (value == NULL) {
+        Py_DECREF(text);
+        pivy_free_string_array($1);
+        $1 = NULL;
+        SWIG_fail;
+      }
+
+      $1[i] = (char *)value;
+      array->owners[i] = text;
+    }
   }
 }
 
-/* free the list */
 %typemap(freearg) const char * strings[] {
-  if ($1) { free($1); }
+  pivy_free_string_array($1);
+  $1 = NULL;
 }
 
 %typemap(typecheck,precedence=SWIG_TYPECHECK_POINTER) const char * strings[] {
-  $1 = PySequence_Check($input) ? 1 : 0;
+  $1 = PySequence_Check($input) && !PyUnicode_Check($input) &&
+       !PyBytes_Check($input) ? 1 : 0;
 }
 
 %feature("shadow") SoMFName::setValues %{

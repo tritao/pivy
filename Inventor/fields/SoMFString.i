@@ -36,14 +36,7 @@
 }
 */
 
-/* free the list */
-%typemap(freearg) const char * [] {
-  if ($1) { free($1); }
-}
-
-%typemap(typecheck,precedence=SWIG_TYPECHECK_POINTER) const char * [] {
-  $1 = PySequence_Check($input) ? 1 : 0;
-}
+/* SoMFString uses the ownership-safe string-sequence typemap from SoMFName. */
 
 %feature("shadow") SoMFString::setValues %{
 def setValues(*args):
