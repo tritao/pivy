@@ -33,3 +33,10 @@ jobs:
     - run: pixi run check_typing_policy_coverage
     - run: pixi run typecheck_report
     - run: pixi run typecheck_report_json
+    - name: Write typing quality report
+      run: pixi run python -m tools.report_pivy_typing --json pivy/coin.pyi > "typing-report-${{ matrix.os }}.json"
+    - name: Upload typing quality report
+      uses: actions/upload-artifact@v4
+      with:
+        name: pivy-typing-report-${{ matrix.os }}
+        path: typing-report-${{ matrix.os }}.json
