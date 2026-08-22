@@ -1058,6 +1058,21 @@ Type completeness score: 61%
             curated_runtime_errors(output),
             ("pivy.coin.SoBase.getTypeId is inconsistent",),
         )
+        soqt_output = "\n".join(
+            (
+                "pivy.gui.soqt.SoQt.__swig_destroy__ variable differs from runtime type def (Any) -> Any",
+                "pivy.gui.soqt.SoQt.getVersionString is inconsistent",
+                "pivy.gui.soqt.SoQtComponent.getWidget is inconsistent",
+                "pivy.gui.soqt.QWidget.getSize is inconsistent",
+            )
+        )
+        self.assertEqual(
+            curated_runtime_errors(soqt_output, "pivy.gui.soqt"),
+            (
+                "pivy.gui.soqt.SoQt.getVersionString is inconsistent",
+                "pivy.gui.soqt.SoQtComponent.getWidget is inconsistent",
+            ),
+        )
 
 
 if __name__ == "__main__":

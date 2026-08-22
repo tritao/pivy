@@ -20,10 +20,27 @@ CURATED_CLASSES = (
     "SoMFNode",
     "SoMFString",
 )
+CURATED_CLASSES_BY_MODULE = {
+    "pivy.coin": CURATED_CLASSES,
+    "pivy.gui.soqt": (
+        "SoQt",
+        "SoQtComponent",
+        "SoQtGLWidget",
+        "SoQtRenderArea",
+        "SoQtViewer",
+        "SoQtPopupMenu",
+        "SoQtCursor",
+        "SoQtKeyboard",
+    ),
+}
+
+
+def _curated_classes(module: str) -> tuple[str, ...]:
+    return CURATED_CLASSES_BY_MODULE.get(module, ())
 
 
 def _class_prefixes(module: str) -> tuple[str, ...]:
-    return tuple("%s.%s." % (module, name) for name in CURATED_CLASSES)
+    return tuple("%s.%s." % (module, name) for name in _curated_classes(module))
 
 
 def curated_runtime_errors(output: str, module: str = "pivy.coin") -> tuple[str, ...]:
@@ -76,7 +93,7 @@ def run_stubtest(module: str, root: Path) -> tuple[str, ...]:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--module", default="pivy.coin")
+    parser.add_argument("--module", action="append")
     parser.add_argument(
         "--root", type=Path, default=Path(__file__).resolve().parent.parent
     )
@@ -85,8 +102,13 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> int:
     args = parse_args()
+    modules = tuple(args.module or CURATED_CLASSES_BY_MODULE)
     try:
-        errors = run_stubtest(args.module, args.root)
+        errors = tuple(
+            error
+            for module in modules
+            for error in run_stubtest(module, args.root)
+        )
     except (OSError, RuntimeError) as error:
         print("error: %s" % error, file=sys.stderr)
         return 1
@@ -96,8 +118,11 @@ def main() -> int:
             print(error, file=sys.stderr)
         return 1
     print(
-        "Pivy curated stubtest passed (%s: %s)"
-        % (args.module, ", ".join(CURATED_CLASSES))
+        "Pivy curated stubtest passed (%s)"
+        % ", ".join(
+            "%s: %s" % (module, ", ".join(_curated_classes(module)))
+            for module in modules
+        )
     )
     return 0
 
