@@ -38,6 +38,7 @@ from tools.pivy_stub_typing_policy import (
     multifield_setvalues_types,
     vector_iter_element_types,
     vector_output_parameter_types,
+    vector_multifield_type_policies,
     vector_sequence_array_parameters,
     vector_value_return_types,
 )
@@ -340,6 +341,37 @@ class FieldTypePolicyTests(unittest.TestCase):
 
 
 class MultifieldTypePolicyTests(unittest.TestCase):
+    def test_fixed_width_multifields_are_derived_from_vector_policy(self):
+        derived = vector_multifield_type_policies()
+        self.assertEqual(
+            set(derived),
+            {
+                "SoMFVec2b",
+                "SoMFVec2s",
+                "SoMFVec2i32",
+                "SoMFVec2f",
+                "SoMFVec2d",
+                "SoMFVec3b",
+                "SoMFVec3s",
+                "SoMFVec3i32",
+                "SoMFVec3f",
+                "SoMFVec3d",
+                "SoMFVec4b",
+                "SoMFVec4ub",
+                "SoMFVec4s",
+                "SoMFVec4us",
+                "SoMFVec4i32",
+                "SoMFVec4ui32",
+                "SoMFVec4f",
+                "SoMFVec4d",
+            },
+        )
+        for vector_name, vector_policy in policy.VECTOR_TYPE_POLICIES.items():
+            multifield = derived["SoMF%s" % vector_name[2:]]
+            with self.subTest(vector_name=vector_name):
+                self.assertEqual(multifield.element_type, vector_name)
+                self.assertEqual(multifield.component_width, vector_policy.width)
+
     def test_multifield_element_types_cover_sequence_fields(self):
         element_types = multifield_iter_element_types()
 

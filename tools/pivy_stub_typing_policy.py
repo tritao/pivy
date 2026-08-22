@@ -1511,6 +1511,25 @@ class MultifieldTypePolicy:
     component_parameter_name: str | None = None
 
 
+def vector_multifield_type_policies():
+    """Derive fixed-width numeric multifields from vector value policy."""
+
+    return {
+        "SoMF%s" % vector_name[2:]: MultifieldTypePolicy(
+            element_type=vector_name,
+            set_values_types=(
+                vector_name,
+                "Sequence[%s]" % vector_policy.component_type,
+            ),
+            get_values_type=vector_name,
+            component_sequence_type="Sequence[%s]"
+            % vector_policy.component_type,
+            component_width=vector_policy.width,
+        )
+        for vector_name, vector_policy in VECTOR_TYPE_POLICIES.items()
+    }
+
+
 FIELD_TYPE_POLICIES = {
     "SoSFString": FieldTypePolicy(
         value_type="SbString",
@@ -1561,32 +1580,11 @@ MULTIFIELD_TYPE_POLICIES = {
         set_values_types=("float",),
         get_values_type="float",
     ),
-    "SoMFVec3f": MultifieldTypePolicy(
-        element_type="SbVec3f",
-        set_values_types=("SbVec3f", "Sequence[float]"),
-        get_values_type="SbVec3f",
-        component_sequence_type="Sequence[float]",
-        component_width=3,
-    ),
     "SoMFString": MultifieldTypePolicy(
         element_type="SbString",
         set_values_types=("SbString | str",),
         get_values_type="str",
         single_value_type="SbString | str",
-    ),
-    "SoMFVec2f": MultifieldTypePolicy(
-        element_type="SbVec2f",
-        set_values_types=("SbVec2f", "Sequence[float]"),
-        get_values_type="SbVec2f",
-        component_sequence_type="Sequence[float]",
-        component_width=2,
-    ),
-    "SoMFVec4f": MultifieldTypePolicy(
-        element_type="SbVec4f",
-        set_values_types=("SbVec4f", "Sequence[float]"),
-        get_values_type="SbVec4f",
-        component_sequence_type="Sequence[float]",
-        component_width=4,
     ),
     "SoMFRotation": MultifieldTypePolicy(
         element_type="SbRotation",
@@ -1657,111 +1655,7 @@ MULTIFIELD_TYPE_POLICIES = {
         set_values_types=("int",),
         get_values_type="int",
     ),
-    "SoMFVec2b": MultifieldTypePolicy(
-        element_type="SbVec2b",
-        set_values_types=("SbVec2b", "Sequence[int]"),
-        get_values_type="SbVec2b",
-        component_sequence_type="Sequence[int]",
-        component_width=2,
-    ),
-    "SoMFVec2d": MultifieldTypePolicy(
-        element_type="SbVec2d",
-        set_values_types=("SbVec2d", "Sequence[float]"),
-        get_values_type="SbVec2d",
-        component_sequence_type="Sequence[float]",
-        component_width=2,
-    ),
-    "SoMFVec2i32": MultifieldTypePolicy(
-        element_type="SbVec2i32",
-        set_values_types=("SbVec2i32", "Sequence[int]"),
-        get_values_type="SbVec2i32",
-        component_sequence_type="Sequence[int]",
-        component_width=2,
-    ),
-    "SoMFVec2s": MultifieldTypePolicy(
-        element_type="SbVec2s",
-        set_values_types=("SbVec2s", "Sequence[int]"),
-        get_values_type="SbVec2s",
-        component_sequence_type="Sequence[int]",
-        component_width=2,
-    ),
-    "SoMFVec3b": MultifieldTypePolicy(
-        element_type="SbVec3b",
-        set_values_types=("SbVec3b", "Sequence[int]"),
-        get_values_type="SbVec3b",
-        component_sequence_type="Sequence[int]",
-        component_width=3,
-    ),
-    "SoMFVec3d": MultifieldTypePolicy(
-        element_type="SbVec3d",
-        set_values_types=("SbVec3d", "Sequence[float]"),
-        get_values_type="SbVec3d",
-        component_sequence_type="Sequence[float]",
-        component_width=3,
-    ),
-    "SoMFVec3i32": MultifieldTypePolicy(
-        element_type="SbVec3i32",
-        set_values_types=("SbVec3i32", "Sequence[int]"),
-        get_values_type="SbVec3i32",
-        component_sequence_type="Sequence[int]",
-        component_width=3,
-    ),
-    "SoMFVec3s": MultifieldTypePolicy(
-        element_type="SbVec3s",
-        set_values_types=("SbVec3s", "Sequence[int]"),
-        get_values_type="SbVec3s",
-        component_sequence_type="Sequence[int]",
-        component_width=3,
-    ),
-    "SoMFVec4b": MultifieldTypePolicy(
-        element_type="SbVec4b",
-        set_values_types=("SbVec4b", "Sequence[int]"),
-        get_values_type="SbVec4b",
-        component_sequence_type="Sequence[int]",
-        component_width=4,
-    ),
-    "SoMFVec4d": MultifieldTypePolicy(
-        element_type="SbVec4d",
-        set_values_types=("SbVec4d", "Sequence[float]"),
-        get_values_type="SbVec4d",
-        component_sequence_type="Sequence[float]",
-        component_width=4,
-    ),
-    "SoMFVec4i32": MultifieldTypePolicy(
-        element_type="SbVec4i32",
-        set_values_types=("SbVec4i32", "Sequence[int]"),
-        get_values_type="SbVec4i32",
-        component_sequence_type="Sequence[int]",
-        component_width=4,
-    ),
-    "SoMFVec4s": MultifieldTypePolicy(
-        element_type="SbVec4s",
-        set_values_types=("SbVec4s", "Sequence[int]"),
-        get_values_type="SbVec4s",
-        component_sequence_type="Sequence[int]",
-        component_width=4,
-    ),
-    "SoMFVec4ub": MultifieldTypePolicy(
-        element_type="SbVec4ub",
-        set_values_types=("SbVec4ub", "Sequence[int]"),
-        get_values_type="SbVec4ub",
-        component_sequence_type="Sequence[int]",
-        component_width=4,
-    ),
-    "SoMFVec4ui32": MultifieldTypePolicy(
-        element_type="SbVec4ui32",
-        set_values_types=("SbVec4ui32", "Sequence[int]"),
-        get_values_type="SbVec4ui32",
-        component_sequence_type="Sequence[int]",
-        component_width=4,
-    ),
-    "SoMFVec4us": MultifieldTypePolicy(
-        element_type="SbVec4us",
-        set_values_types=("SbVec4us", "Sequence[int]"),
-        get_values_type="SbVec4us",
-        component_sequence_type="Sequence[int]",
-        component_width=4,
-    ),
+    **vector_multifield_type_policies(),
 }
 
 
