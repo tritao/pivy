@@ -58,6 +58,7 @@ lint = { cmd = ["flake8", ".", "--count", "--select=E901,E999,F821,F822,F823",
 test_stubs = { cmd = ["python", "-m", "tools.validate_pivy_stubs"], depends-on = ["build"]}
 check_stub_drift = { cmd = ["python", "-m", "tools.check_pivy_stub_drift"], depends-on = ["build"]}
 test_typing_policy = { cmd = ["python", "-m", "unittest", "tests/test_pivy_typing_policy.py"]}
+check_typing_policy_coverage = { cmd = ["python", "-m", "tools.check_pivy_policy_coverage", "pivy/coin.pyi"]}
 typecheck_stubs_pyright = { cmd = ["pyright", "--warnings", "tests/typecheck"]}
 typecheck_stubs_pyrefly = { cmd = ["pyrefly", "check", "--summary=none", "--search-path", ".", "tests/typecheck"]}
 typecheck_stubs = { depends-on = ["typecheck_stubs_pyright", "typecheck_stubs_pyrefly"]}

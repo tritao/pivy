@@ -29,4 +29,5 @@ jobs:
     - run: pixi run check_stub_drift
     - run: pixi run typecheck_stubs
     - run: pixi run test_typing_policy
+    - run: pixi run check_typing_policy_coverage
     - run: pixi run typecheck_report

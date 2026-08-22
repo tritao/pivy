@@ -10,6 +10,7 @@ from tools.report_pivy_typing import (
     collect_report,
     quality_regressions,
 )
+from tools.check_pivy_policy_coverage import policy_coverage_errors
 from tools.pivy_stub_typing_policy import (
     FACTORY_CLASSES,
     FIELD_TYPE_POLICIES,
@@ -616,6 +617,9 @@ class PolicyBoundaryTests(unittest.TestCase):
     def test_checked_stub_meets_reviewed_quality_baseline(self):
         report = collect_report(Path("pivy/coin.pyi"))
         self.assertEqual(quality_regressions(report), ())
+
+    def test_policy_managed_fields_are_covered(self):
+        self.assertEqual(policy_coverage_errors(Path("pivy/coin.pyi")), ())
 
     def test_quality_baseline_covers_every_incomplete_category(self):
         budget_categories = {
