@@ -684,6 +684,120 @@ CALLBACK_TYPE_SIGNATURES = {
     "SoErrorCB": "Callable[[object, SoError], None]",
     "SoQtRenderAreaEventCB": "Callable[[object, QEvent], object]",
 }
+
+
+@dataclass(frozen=True)
+class NativeCallbackBoundary:
+    """Document a native callback that has no Python adapter yet."""
+
+    native_signature: str
+    python_surface: str = "native-only; keep Incomplete until adapted"
+
+
+NATIVE_CALLBACK_BOUNDARY_METHODS = {
+    ("SoDB", "getHeaderData"): NativeCallbackBoundary(
+        "SoHeaderCB * precallback, SoHeaderCB * postcallback"
+    ),
+    ("SoCallbackAction", "getTextureImage"): NativeCallbackBoundary(
+        "const unsigned char * return buffer"
+    ),
+    ("SoGLRenderAction", "getAbortCallback"): NativeCallbackBoundary(
+        "SoGLRenderAbortCB ** callback and void ** userdata"
+    ),
+    ("SoGLImage", "setResizeCallback"): NativeCallbackBoundary(
+        "SoGLImageResizeCB * callback, void * closure"
+    ),
+    ("SoWWWAnchor", "setFetchURLCallBack"): NativeCallbackBoundary(
+        "SoWWWAnchorCB * callback, void * userdata"
+    ),
+    ("SoWWWAnchor", "setHighlightURLCallBack"): NativeCallbackBoundary(
+        "SoWWWAnchorCB * callback, void * userdata"
+    ),
+    ("SoWWWInline", "setFetchURLCallBack"): NativeCallbackBoundary(
+        "SoWWWInlineCB * callback, void * userdata"
+    ),
+    ("SbClip", "__init__"): NativeCallbackBoundary(
+        "SbClipCB * callback, void * userdata"
+    ),
+    ("SbHeap", "buildHeap"): NativeCallbackBoundary(
+        "SbBool (*)(float percentage, void * data)"
+    ),
+    ("SbTesselator", "setCallback"): NativeCallbackBoundary(
+        "SbTesselatorCB * callback, void * userdata"
+    ),
+    ("SoVRMLAnchor", "setFetchURLCallBack"): NativeCallbackBoundary(
+        "SoVRMLAnchorCB * callback, void * closure"
+    ),
+    ("SoVRMLAudioClip", "setCallbacks"): NativeCallbackBoundary(
+        "open_func/read_func/seek_func/tell_func/close_func"
+    ),
+    ("SoVRMLImageTexture", "setPrequalifyFileCallBack"): NativeCallbackBoundary(
+        "SoVRMLImageTextureCB * callback, void * closure"
+    ),
+    ("SoVRMLInline", "setFetchURLCallBack"): NativeCallbackBoundary(
+        "SoVRMLInlineCB * callback, void * closure"
+    ),
+    ("SoVRMLScript", "setScriptEvaluateCB"): NativeCallbackBoundary(
+        "SoVRMLScriptEvaluateCB * callback, void * closure"
+    ),
+}
+
+NATIVE_FUNCTION_POINTER_BOUNDARY_METHODS = {
+    ("SbDict", "applyToAll"): "void (*)(void *, void *)",
+    ("SbDict", "setHashingFunction"): "uint32_t (*)(const void *)",
+    ("SbString", "apply"): "void (*)(char *)",
+    ("SoActionMethodList", "addMethod"): "SoActionMethod *",
+    ("SoOutput", "setBuffer"): "void * (*reallocFunc)(void *, size_t)",
+    ("SbStorage", "applyToAll"): "void (*)(void *, void *)",
+}
+NATIVE_FUNCTION_POINTER_BOUNDARY_CLASSES = frozenset(
+    {"SbHeapFuncs", "SbOctTreeFuncs"}
+)
+NATIVE_FUNCTION_POINTER_ACTION_CLASSES = frozenset(
+    {
+        "SoAudioRenderAction",
+        "SoBoxHighlightRenderAction",
+        "SoCallbackAction",
+        "SoGetBoundingBoxAction",
+        "SoGetMatrixAction",
+        "SoGetPrimitiveCountAction",
+        "SoHandleEventAction",
+        "SoIntersectionDetectionAction",
+        "SoLineHighlightRenderAction",
+        "SoPickAction",
+        "SoRayPickAction",
+        "SoReorganizeAction",
+        "SoSearchAction",
+        "SoSimplifyAction",
+        "SoGLRenderAction",
+        "SoToVRML2Action",
+        "SoToVRMLAction",
+        "SoVectorizeAction",
+        "SoVectorizePSAction",
+        "SoWriteAction",
+    }
+)
+
+
+def native_callback_boundary(
+    *, kind: str, class_name: str, method_name: str | None
+) -> NativeCallbackBoundary | None:
+    """Return the reviewed native callback boundary for one stub site."""
+
+    if (class_name, method_name) in NATIVE_CALLBACK_BOUNDARY_METHODS:
+        return NATIVE_CALLBACK_BOUNDARY_METHODS[(class_name, method_name)]
+    if (
+        method_name == "addMethod"
+        and class_name in NATIVE_FUNCTION_POINTER_ACTION_CLASSES
+    ):
+        return NativeCallbackBoundary("SoActionMethod * method")
+    if (class_name, method_name) in NATIVE_FUNCTION_POINTER_BOUNDARY_METHODS:
+        return NativeCallbackBoundary(
+            NATIVE_FUNCTION_POINTER_BOUNDARY_METHODS[(class_name, method_name)]
+        )
+    if class_name in NATIVE_FUNCTION_POINTER_BOUNDARY_CLASSES:
+        return NativeCallbackBoundary("function-pointer member")
+    return None
 @dataclass(frozen=True)
 class CallbackMethodPolicy:
     """Python contract for one callback-bearing Coin method."""

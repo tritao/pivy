@@ -470,6 +470,33 @@ class IncompletePolicyTests(unittest.TestCase):
 
 
 class CallbackTypePolicyTests(unittest.TestCase):
+    def test_native_callback_boundaries_cover_remaining_sites(self):
+        report = collect_report(Path("pivy/coin.pyi"))
+        remaining = {
+            "callbacks",
+            "function pointers",
+        }
+        sites = [
+            site
+            for site, category in report.incomplete_sites
+            if category in remaining
+        ]
+        self.assertEqual(len(sites), 66)
+        for site in sites:
+            with self.subTest(
+                kind=site.kind,
+                class_name=site.class_name,
+                method_name=site.method_name,
+                name=site.name,
+            ):
+                self.assertIsNotNone(
+                    policy.native_callback_boundary(
+                        kind=site.kind,
+                        class_name=site.class_name,
+                        method_name=site.method_name,
+                    )
+                )
+
     def test_callback_policy_generates_generator_views(self):
         for (class_name, method_name), method_policy in (
             policy.CALLBACK_METHOD_POLICIES.items()
