@@ -1205,6 +1205,14 @@ INCOMPLETE_CATEGORIES = (
     "dynamic/runtime API",
     "uncategorized",
 )
+INCOMPLETE_CATEGORY_ACTIONS = {
+    "raw C pointers": "add a Python adapter or keep an explicit raw boundary",
+    "callbacks": "model the callback signature and ownership contract",
+    "unknown output parameters": "add a typed output helper",
+    "function pointers": "expose a Callable or an explicit callback boundary",
+    "dynamic/runtime API": "model the dynamic behavior or document the limit",
+    "uncategorized": "triage and classify before merging",
+}
 
 
 @dataclass(frozen=True)

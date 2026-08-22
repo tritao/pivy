@@ -12,6 +12,7 @@ from typing import Iterable
 
 from tools.pivy_stub_typing_policy import (
     INCOMPLETE_CATEGORIES,
+    INCOMPLETE_CATEGORY_ACTIONS,
     classify_incomplete,
 )
 
@@ -275,12 +276,18 @@ def format_report(report: TypingReport, stub_path: Path) -> str:
         "",
         "Incomplete categories",
         "---------------------",
+        "Category                        Count    Share  Next action",
     ]
     for category in INCOMPLETE_CATEGORIES:
         count = report.incomplete_categories[category]
         lines.append(
-            "%-30s %6d    %s"
-            % (category, count, percentage(count, report.incomplete_annotations))
+            "%-30s %6d    %-6s  %s"
+            % (
+                category,
+                count,
+                percentage(count, report.incomplete_annotations),
+                INCOMPLETE_CATEGORY_ACTIONS[category],
+            )
         )
     return "\n".join(lines)
 
