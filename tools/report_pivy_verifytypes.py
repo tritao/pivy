@@ -11,7 +11,16 @@ import sys
 from typing import Iterable
 
 
-DEFAULT_MODULES = ("pivy.coin", "pivy.gui.soqt")
+DEFAULT_MODULES = (
+    "pivy.coin",
+    "pivy.gui.soqt",
+    "pivy.sogui",
+    "pivy.qt",
+    "pivy.qt.QtCore",
+    "pivy.qt.QtGui",
+    "pivy.qt.QtOpenGL",
+    "pivy.qt.QtWidgets",
+)
 
 
 @dataclass(frozen=True)
@@ -31,15 +40,51 @@ class VerifyTypesBaseline:
 VERIFYTYPES_BASELINES = {
     "pivy.coin": VerifyTypesBaseline(
         min_score=61.0,
-        min_known_symbols=8406,
+        min_known_symbols=8417,
         max_ambiguous_symbols=0,
-        max_unknown_symbols=5382,
+        max_unknown_symbols=5392,
     ),
     "pivy.gui.soqt": VerifyTypesBaseline(
         min_score=75.4,
         min_known_symbols=399,
         max_ambiguous_symbols=0,
         max_unknown_symbols=130,
+    ),
+    "pivy.sogui": VerifyTypesBaseline(
+        min_score=43.6,
+        min_known_symbols=24,
+        max_ambiguous_symbols=4,
+        max_unknown_symbols=27,
+    ),
+    "pivy.qt": VerifyTypesBaseline(
+        min_score=100.0,
+        min_known_symbols=740,
+        max_ambiguous_symbols=0,
+        max_unknown_symbols=0,
+    ),
+    "pivy.qt.QtCore": VerifyTypesBaseline(
+        min_score=100.0,
+        min_known_symbols=235,
+        max_ambiguous_symbols=0,
+        max_unknown_symbols=0,
+    ),
+    "pivy.qt.QtGui": VerifyTypesBaseline(
+        min_score=100.0,
+        min_known_symbols=262,
+        max_ambiguous_symbols=0,
+        max_unknown_symbols=0,
+    ),
+    "pivy.qt.QtOpenGL": VerifyTypesBaseline(
+        min_score=100.0,
+        min_known_symbols=45,
+        max_ambiguous_symbols=0,
+        max_unknown_symbols=0,
+    ),
+    "pivy.qt.QtWidgets": VerifyTypesBaseline(
+        min_score=100.0,
+        min_known_symbols=198,
+        max_ambiguous_symbols=0,
+        max_unknown_symbols=0,
     ),
 }
 
