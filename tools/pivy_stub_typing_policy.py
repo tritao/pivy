@@ -4,6 +4,11 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from tools.pivy_factory_registry import (
+    ENGINE_FACTORY_CLASS_NAMES,
+    ENGINE_FACTORY_CLASSES,
+)
+
 
 @dataclass(frozen=True)
 class VectorTypePolicy:
@@ -398,48 +403,6 @@ ELEMENT_FACTORY_CLASSES = frozenset(
         "SoTextureCombineElement",
         "SoTextureUnitElement",
         "SoCacheHintElement",
-    }
-)
-
-ENGINE_FACTORY_CLASSES = frozenset(
-    {
-        "SoBoolOperation",
-        "SoCalculator",
-        "SoComposeVec2f",
-        "SoComposeVec3f",
-        "SoComposeVec4f",
-        "SoDecomposeVec2f",
-        "SoDecomposeVec3f",
-        "SoDecomposeVec4f",
-        "SoComposeRotation",
-        "SoDecomposeRotation",
-        "SoComposeMatrix",
-        "SoDecomposeMatrix",
-        "SoComposeRotationFromTo",
-        "SoComputeBoundingBox",
-        "SoConcatenate",
-        "SoCounter",
-        "SoElapsedTime",
-        "SoGate",
-        "SoInterpolateFloat",
-        "SoInterpolateVec2f",
-        "SoInterpolateVec3f",
-        "SoInterpolateVec4f",
-        "SoInterpolateRotation",
-        "SoOnOff",
-        "SoOneShot",
-        "SoSelectOne",
-        "SoTimeCounter",
-        "SoTransformVec3f",
-        "SoTriggerAny",
-        "SoHeightMapToNormalMap",
-        "SoVRMLColorInterpolator",
-        "SoVRMLCoordinateInterpolator",
-        "SoVRMLNormalInterpolator",
-        "SoVRMLOrientationInterpolator",
-        "SoVRMLPositionInterpolator",
-        "SoVRMLScalarInterpolator",
-        "SoVRMLTimeSensor",
     }
 )
 

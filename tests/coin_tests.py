@@ -31,45 +31,15 @@ from pivy.coin import *
 import unittest
 import math
 import gc
+import os
+import sys
 
-ENGINE_FACTORY_TYPES = (
-    SoBoolOperation,
-    SoCalculator,
-    SoComposeVec2f,
-    SoComposeVec3f,
-    SoComposeVec4f,
-    SoDecomposeVec2f,
-    SoDecomposeVec3f,
-    SoDecomposeVec4f,
-    SoComposeRotation,
-    SoDecomposeRotation,
-    SoComposeMatrix,
-    SoDecomposeMatrix,
-    SoComposeRotationFromTo,
-    SoComputeBoundingBox,
-    SoConcatenate,
-    SoCounter,
-    SoElapsedTime,
-    SoGate,
-    SoInterpolateFloat,
-    SoInterpolateVec2f,
-    SoInterpolateVec3f,
-    SoInterpolateVec4f,
-    SoInterpolateRotation,
-    SoOnOff,
-    SoOneShot,
-    SoSelectOne,
-    SoTimeCounter,
-    SoTransformVec3f,
-    SoTriggerAny,
-    SoHeightMapToNormalMap,
-    SoVRMLColorInterpolator,
-    SoVRMLCoordinateInterpolator,
-    SoVRMLNormalInterpolator,
-    SoVRMLOrientationInterpolator,
-    SoVRMLPositionInterpolator,
-    SoVRMLScalarInterpolator,
-    SoVRMLTimeSensor,
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from tools.pivy_factory_registry import ENGINE_FACTORY_CLASS_NAMES
+
+ENGINE_FACTORY_TYPES = tuple(
+    globals()[class_name] for class_name in ENGINE_FACTORY_CLASS_NAMES
 )
 
 class Autocasting(unittest.TestCase):

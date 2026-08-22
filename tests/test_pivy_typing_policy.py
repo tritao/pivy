@@ -4,6 +4,7 @@ from dataclasses import replace
 from pathlib import Path
 
 import tools.pivy_stub_generation_data as compatibility_policy
+from tools.pivy_factory_registry import ENGINE_FACTORY_CLASS_NAMES
 import tools.pivy_stub_typing_policy as policy
 from tools.check_pivy_typing_matrix import SUPPORTED_PYTHON_VERSIONS
 from tools.report_pivy_typing import (
@@ -37,6 +38,7 @@ from tools.pivy_stub_typing_policy import (
 class FieldTypePolicyTests(unittest.TestCase):
     def test_engine_factory_policy(self):
         self.assertEqual(len(ENGINE_FACTORY_CLASSES), 37)
+        self.assertEqual(set(ENGINE_FACTORY_CLASS_NAMES), ENGINE_FACTORY_CLASSES)
         self.assertTrue(
             {
                 "SoBoolOperation",
