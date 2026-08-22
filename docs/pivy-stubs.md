@@ -123,9 +123,9 @@ point callbacks. Their closures are retained while installed, and passing
 
 Known pointer-buffer surfaces:
 
-- `SoMFDouble.getValues` and `SoMFDouble.setValues` remain raw native
-  pointer APIs. `SoMFDouble.getValuesSnapshot()` is now a bounded native
-  copy and is the supported Python value API.
+- `SoMFDouble.getValues` remains a raw native pointer API. `getValuesSnapshot()`
+  and sequence-based `setValues(...)` calls are bounded Python adapters;
+  `_pivy_setValuesRaw` preserves the escape hatch for native pointer callers.
 
 Resolved binding-backed surfaces:
 
@@ -215,7 +215,5 @@ Known fixed-width integer array surfaces:
 
 TODO: Add SWIG-side support before tightening these stubs. For callbacks, add
 explicit Python-callable overloads or typemaps that retain the callback and
-userdata safely. For `SoMFDouble.setValues`, add a bounded Python sequence
-wrapper or a `double const *` typemap that accepts Python float sequences
-without exposing pointer-shaped values. For fixed-width integer arrays, add
+userdata safely. For fixed-width integer arrays, add
 typemaps that accept Python integer sequences for the wrapped C array overloads.

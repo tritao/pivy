@@ -595,12 +595,6 @@ RUNTIME_UNSUPPORTED_METHOD_CHECKS = {
             {"start": "int"},
             "Incomplete",
         ),
-        (
-            "SoMFDouble",
-            "setValues",
-            {"start": "int", "num": "int", "newvals": "Incomplete"},
-            "None",
-        ),
     ),
 }
 DEFERRED_RAW_METHOD_CHECKS = {

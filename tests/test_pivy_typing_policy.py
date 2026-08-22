@@ -437,7 +437,7 @@ class MultifieldTypePolicyTests(unittest.TestCase):
             setvalues_types["SoMFColor"],
             ("SbColor", "SbVec3f", "Sequence[float]"),
         )
-        self.assertNotIn("SoMFDouble", setvalues_types)
+        self.assertEqual(setvalues_types["SoMFDouble"], ("float",))
         self.assertFalse(MULTIFIELD_TYPE_POLICIES["SoMFDouble"].indexed_access)
 
     def test_multifield_getvalues_types_are_derived_from_policy(self):
@@ -922,8 +922,8 @@ class PolicyBoundaryTests(unittest.TestCase):
     def test_raw_pointer_audit_is_complete(self):
         report = collect_report(Path("pivy/coin.pyi"))
         self.assertEqual(raw_pointer_audit_issues(report), ())
-        self.assertEqual(len(policy.RAW_POINTER_AUDIT), 99)
-        self.assertEqual(raw_pointer_audit_summary(report)["observed"], 99)
+        self.assertEqual(len(policy.RAW_POINTER_AUDIT), 98)
+        self.assertEqual(raw_pointer_audit_summary(report)["observed"], 98)
 
     def test_policy_managed_fields_are_covered(self):
         self.assertEqual(policy_coverage_errors(Path("pivy/coin.pyi")), ())

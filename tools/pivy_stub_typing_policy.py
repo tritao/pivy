@@ -1783,7 +1783,6 @@ RUNTIME_UNSUPPORTED_NOTE = (
 RUNTIME_UNSUPPORTED_METHOD_NOTES = {
     "pivy.coin": {
         ("SoMFDouble", "getValues"),
-        ("SoMFDouble", "setValues"),
     },
 }
 GENERATED_HEADER = (
@@ -2102,7 +2101,11 @@ MULTIFIELD_TYPE_POLICIES = {
     # Coin exposes SoMFDouble's bulk and indexed storage only through raw
     # pointers on this SWIG build.  Keep the safe scalar setter, iterator,
     # and owned snapshot, but do not claim Python sequence/index operations.
-    "SoMFDouble": MultifieldTypePolicy(element_type="float", indexed_access=False),
+    "SoMFDouble": MultifieldTypePolicy(
+        element_type="float",
+        set_values_types=("float",),
+        indexed_access=False,
+    ),
     "SoMFEngine": MultifieldTypePolicy(
         element_type="SoEngine",
         set_values_types=("SoEngine",),
@@ -3003,7 +3006,6 @@ RAW_POINTER_AUDIT = {
             ("parameter", "SoOutput", "writeBinaryArray", "l"),
             ("parameter", "SoSensorManager", "doSelect", "userTimeOut"),
             ("parameter", "SoDB", "doSelect", "usertimeout"),
-            ("parameter", "SoMFDouble", "setValues", "newvals"),
             ("parameter", "SoOffscreenRenderer", "writeToPostScript", "fp"),
             ("parameter", "SoOffscreenRenderer", "writeToRGB", "fp"),
         ),

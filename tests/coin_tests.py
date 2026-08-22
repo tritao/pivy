@@ -1031,6 +1031,14 @@ class FieldSetValue(unittest.TestCase):
         double_field.set1Value(0, 1.25)
         double_field.set1Value(1, 2.5)
         self.assertEqual(double_field.getValuesSnapshot(), [1.25, 2.5])
+        double_field.setValues([3, 4.5])
+        self.assertEqual(double_field.getValuesSnapshot(), [3.0, 4.5])
+        double_field.setValues(1, [6.25])
+        self.assertEqual(double_field.getValuesSnapshot(), [3.0, 6.25])
+        double_field.setValues(0, 2, [7, 8])
+        self.assertEqual(double_field.getValuesSnapshot(), [7.0, 8.0])
+        with self.assertRaises(ValueError):
+            double_field.setValues(0, 1, [1, 2])
 
 
 class SbStringMethods(unittest.TestCase):

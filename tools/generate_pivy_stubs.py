@@ -1670,6 +1670,10 @@ def normalize_multifield_helpers(text):
         )
         multifield_policy = MULTIFIELD_TYPE_POLICIES.get(current_class)
         if match and multifield_policy and multifield_policy.set_values_types:
+            while updated and updated[-1].strip().startswith(
+                "# NOTE: SWIG exposes raw C pointers"
+            ):
+                updated.pop()
             if rendered_setvalues_class != current_class:
                 if updated and updated[-1].strip() == "@overload":
                     updated.pop()

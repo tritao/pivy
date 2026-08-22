@@ -43,6 +43,7 @@ applications."
 #undef ANY
 
 #include "coin_header_includes.h"
+#include <limits.h>
 
 /* make GLState in SoGLLazyElement known to SWIG */
 typedef SoGLLazyElement::GLState GLState;
@@ -186,6 +187,95 @@ SoColorPacker.getPackedColors = (
    field contents while the field owns them instead of leaking that pointer
    into Python. */
 %extend SoMFDouble {
+  PyObject *_pivy_setValuesArguments(PyObject *arguments) {
+    if (!PyTuple_Check(arguments)) {
+      PyErr_SetString(
+          PyExc_TypeError,
+          "SoMFDouble.setValues expects a positional argument tuple");
+      return NULL;
+    }
+
+    const Py_ssize_t argument_count = PyTuple_GET_SIZE(arguments);
+    int start = 0;
+    int num = -1;
+    PyObject *values_object = NULL;
+
+    if (argument_count == 1) {
+      values_object = PyTuple_GET_ITEM(arguments, 0);
+    } else if (argument_count == 2 || argument_count == 3) {
+      long parsed_start = PyLong_AsLong(PyTuple_GET_ITEM(arguments, 0));
+      if (PyErr_Occurred()) return NULL;
+      if (parsed_start < INT_MIN || parsed_start > INT_MAX) {
+        PyErr_SetString(PyExc_OverflowError, "SoMFDouble.setValues start is out of range");
+        return NULL;
+      }
+      start = (int)parsed_start;
+      if (argument_count == 2) {
+        values_object = PyTuple_GET_ITEM(arguments, 1);
+      } else {
+        long parsed_num = PyLong_AsLong(PyTuple_GET_ITEM(arguments, 1));
+        if (PyErr_Occurred()) return NULL;
+        if (parsed_num < 0 || parsed_num > INT_MAX) {
+          PyErr_SetString(PyExc_OverflowError, "SoMFDouble.setValues count is out of range");
+          return NULL;
+        }
+        num = (int)parsed_num;
+        values_object = PyTuple_GET_ITEM(arguments, 2);
+      }
+    } else {
+      PyErr_SetString(
+          PyExc_TypeError,
+          "SoMFDouble.setValues expects values, start/values, or start/count/values");
+      return NULL;
+    }
+
+    PyObject *values = PySequence_Fast(
+        values_object, "SoMFDouble.setValues expects a numeric sequence");
+    if (values == NULL) return NULL;
+
+    Py_ssize_t length = PySequence_Fast_GET_SIZE(values);
+    if (num < 0) num = (int)length;
+    if (length != num) {
+      PyErr_Format(
+          PyExc_ValueError,
+          "SoMFDouble.setValues expected %d values, got %zd",
+          num, length);
+      Py_DECREF(values);
+      return NULL;
+    }
+
+    double *storage = NULL;
+    if (num > 0) {
+      storage = (double *)PyMem_Malloc((size_t)num * sizeof(double));
+      if (storage == NULL) {
+        Py_DECREF(values);
+        return PyErr_NoMemory();
+      }
+    }
+
+    for (int index = 0; index < num; ++index) {
+      PyObject *number = PyNumber_Float(
+          PySequence_Fast_GET_ITEM(values, index));
+      if (number == NULL) {
+        PyMem_Free(storage);
+        Py_DECREF(values);
+        return NULL;
+      }
+      storage[index] = PyFloat_AsDouble(number);
+      Py_DECREF(number);
+      if (PyErr_Occurred()) {
+        PyMem_Free(storage);
+        Py_DECREF(values);
+        return NULL;
+      }
+    }
+
+    self->setValues(start, num, storage);
+    PyMem_Free(storage);
+    Py_DECREF(values);
+    Py_RETURN_NONE;
+  }
+
   PyObject *_pivy_getValuesSnapshot() const {
     const int count = self->getNum();
     PyObject *snapshot = PyList_New(count);
@@ -207,6 +297,9 @@ SoColorPacker.getPackedColors = (
 
 %pythoncode %{
 SoMFDouble.getValuesSnapshot = lambda self: self._pivy_getValuesSnapshot()
+
+SoMFDouble._pivy_setValuesRaw = SoMFDouble.setValues
+SoMFDouble.setValues = lambda self, *args: self._pivy_setValuesArguments(args)
 %}
 
 /* Return an owned snapshot for SoByteStream's internal buffer. */
