@@ -186,6 +186,39 @@ def check_field_attribute_inventory() -> None:
     assert_type(coin.SoVertexProperty().texCoord3, coin.SoMFVec3f)
 
 
+def check_extended_node_field_inventory() -> None:
+    switch = coin.SoSwitch()
+    assert_type(switch.whichChild, coin.SoSFInt32)
+
+    lod = coin.SoLOD()
+    assert_type(lod.center, coin.SoSFVec3f)
+    assert_type(lod.range, coin.SoMFFloat)
+
+    assert_type(coin.SoFaceSet().numVertices, coin.SoMFInt32)
+    assert_type(coin.SoLineSet().numVertices, coin.SoMFInt32)
+    assert_type(coin.SoPointSet().numPoints, coin.SoSFInt32)
+
+    text2 = coin.SoText2()
+    assert_type(text2.justification, coin.SoSFEnum)
+    assert_type(text2.spacing, coin.SoSFFloat)
+    assert_type(text2.string, coin.SoMFString)
+
+    text3 = coin.SoText3()
+    assert_type(text3.justification, coin.SoSFEnum)
+    assert_type(text3.parts, coin.SoSFBitMask)
+    assert_type(text3.spacing, coin.SoSFFloat)
+    assert_type(text3.string, coin.SoMFString)
+
+    shape = coin.SoVRMLShape()
+    assert_type(shape.appearance, coin.SoSFNode)
+    assert_type(shape.boundingBoxCaching, coin.SoSFEnum)
+    assert_type(shape.geometry, coin.SoSFNode)
+    assert_type(shape.renderCaching, coin.SoSFEnum)
+
+    assert_type(coin.SoMaterialBinding().value, coin.SoSFEnum)
+    assert_type(coin.SoNormalBinding().value, coin.SoSFEnum)
+
+
 def check_nullable_fields() -> None:
     node = coin.SoSFNode()
     assert_type(node.getValue(), coin.SoNode | None)
