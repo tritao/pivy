@@ -63,6 +63,33 @@ def check_bitmask_multifield() -> None:
     values[0] = 3
 
 
+def check_boolean_enum_and_time_multifields() -> None:
+    booleans = coin.SoMFBool()
+    booleans.setValues(0, 2, [True, False])
+    booleans.set1Value(0, True)
+    booleans[1] = False
+    assert_type(booleans[0], bool)
+    assert_type(booleans.getValues(), list[bool])
+    assert_type(iter(booleans), Iterator[bool])
+
+    enums = coin.SoMFEnum()
+    enums.setValues(0, 2, [1, 2])
+    enums.set1Value(0, 3)
+    enums[1] = 4
+    assert_type(enums[0], int)
+    assert_type(enums.getValues(), list[int])
+    assert_type(iter(enums), Iterator[int])
+
+    times = coin.SoMFTime()
+    time_values: Sequence[coin.SbTime] = [coin.SbTime(0.5)]
+    times.setValues(0, 1, time_values)
+    times.set1Value(0, coin.SbTime(1.0))
+    times[0] = coin.SbTime(2.0)
+    assert_type(times[0], coin.SbTime)
+    assert_type(times.getValues(), list[coin.SbTime])
+    assert_type(iter(times), Iterator[coin.SbTime])
+
+
 def check_vector_multifield() -> None:
     values = coin.SoMFVec3f()
     vectors: Sequence[coin.SbVec3f] = [coin.SbVec3f()]

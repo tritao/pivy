@@ -65,6 +65,23 @@ class FieldTypePolicyTests(unittest.TestCase):
         self.assertEqual(rgba.component_width, 4)
         self.assertEqual(rgba.component_parameter_name, "rgba")
 
+    def test_scalar_multifield_family_policy(self):
+        expected = {
+            "SoMFBool": ("bool", "bool", "bool"),
+            "SoMFEnum": ("int", "int", "int"),
+            "SoMFTime": ("SbTime", "SbTime", "SbTime"),
+        }
+        for class_name, policy_values in expected.items():
+            multifield = policy.MULTIFIELD_TYPE_POLICIES[class_name]
+            self.assertEqual(
+                (
+                    multifield.element_type,
+                    multifield.set_values_types[0],
+                    multifield.get_values_type,
+                ),
+                policy_values,
+            )
+
     def test_string_multifield_single_value_policy(self):
         single_value_types = multifield_single_value_types()
 
