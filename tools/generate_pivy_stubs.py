@@ -63,6 +63,7 @@ try:
         INPLACE_DIVISION_METHODS,
         INT_TYPES,
         KNOWN_ITER_ELEMENT_TYPES,
+        MULTIFIELD_TYPE_POLICIES,
         METHOD_RETURN_TYPE_OVERRIDES,
         MATRIX_CPP_TYPES,
         MATRIX_ROW_RETURN_TYPES,
@@ -86,12 +87,6 @@ try:
         STRING_POINTER_PARAMETERS,
         vector_output_parameter_types,
         field_method_type_overrides,
-        multifield_component_sequence_types,
-        multifield_getvalues_types,
-        multifield_iter_element_types,
-        multifield_snapshot_types,
-        multifield_single_value_types,
-        multifield_setvalues_types,
     )
 except ImportError:
     from pivy_stub_typing_policy import (
@@ -114,6 +109,7 @@ except ImportError:
         INPLACE_DIVISION_METHODS,
         INT_TYPES,
         KNOWN_ITER_ELEMENT_TYPES,
+        MULTIFIELD_TYPE_POLICIES,
         METHOD_RETURN_TYPE_OVERRIDES,
         MATRIX_CPP_TYPES,
         MATRIX_ROW_RETURN_TYPES,
@@ -137,22 +133,10 @@ except ImportError:
         STRING_POINTER_PARAMETERS,
         vector_output_parameter_types,
         field_method_type_overrides,
-        multifield_component_sequence_types,
-        multifield_getvalues_types,
-        multifield_iter_element_types,
-        multifield_snapshot_types,
-        multifield_single_value_types,
-        multifield_setvalues_types,
     )
 
 
 FIELD_METHOD_TYPE_OVERRIDES = field_method_type_overrides()
-MULTIFIELD_COMPONENT_SEQUENCE_TYPES = multifield_component_sequence_types()
-MULTIFIELD_GETVALUES_TYPES = multifield_getvalues_types()
-MULTIFIELD_ITER_ELEMENT_TYPES = multifield_iter_element_types()
-MULTIFIELD_SNAPSHOT_TYPES = multifield_snapshot_types()
-MULTIFIELD_SINGLE_VALUE_TYPES = multifield_single_value_types()
-MULTIFIELD_SETVALUES_TYPES = multifield_setvalues_types()
 VECTOR_OUTPUT_PARAMETER_TYPES = vector_output_parameter_types()
 
 
@@ -310,7 +294,13 @@ def callback_cpp_type_to_python(cpp_type):
 
 
 def sequence_parameter_type(class_name, method_name, cpp_arg):
-    component_sequence = MULTIFIELD_COMPONENT_SEQUENCE_TYPES.get(class_name)
+    multifield_policy = MULTIFIELD_TYPE_POLICIES.get(class_name)
+    component_sequence = None
+    if multifield_policy and multifield_policy.component_sequence_type:
+        component_sequence = (
+            multifield_policy.component_sequence_type,
+            multifield_policy.component_width,
+        )
     if component_sequence and method_name in {"set1Value", "setValue"}:
         sequence_type, width = component_sequence
         normalized = normalize_cpp_type(cpp_arg.type)
@@ -1342,10 +1332,9 @@ def collect_container_element_types(lines):
             current_class = class_match.group(1)
             if current_class in KNOWN_ITER_ELEMENT_TYPES:
                 element_types[current_class] = KNOWN_ITER_ELEMENT_TYPES[current_class]
-            if current_class in MULTIFIELD_ITER_ELEMENT_TYPES:
-                element_types[current_class] = MULTIFIELD_ITER_ELEMENT_TYPES[
-                    current_class
-                ]
+            multifield_policy = MULTIFIELD_TYPE_POLICIES.get(current_class)
+            if multifield_policy:
+                element_types[current_class] = multifield_policy.element_type
             continue
 
         if not current_class:
@@ -1679,14 +1668,15 @@ def normalize_multifield_helpers(text):
             r"\)(?: -> None)?: \.\.\.$",
             line,
         )
-        if match and current_class in MULTIFIELD_SETVALUES_TYPES:
+        multifield_policy = MULTIFIELD_TYPE_POLICIES.get(current_class)
+        if match and multifield_policy and multifield_policy.set_values_types:
             if rendered_setvalues_class != current_class:
                 if updated and updated[-1].strip() == "@overload":
                     updated.pop()
                 updated.extend(
                     render_multifield_setvalues(
                         match.group("indent"),
-                        MULTIFIELD_SETVALUES_TYPES[current_class],
+                        multifield_policy.set_values_types,
                     )
                 )
                 rendered_setvalues_class = current_class
@@ -1730,7 +1720,10 @@ def normalize_multifield_getvalues(text):
             r"(?: -> [^:]+)?: \.\.\.$",
             line,
         )
-        value_type = MULTIFIELD_GETVALUES_TYPES.get(current_class)
+        multifield_policy = MULTIFIELD_TYPE_POLICIES.get(current_class)
+        value_type = (
+            multifield_policy.get_values_type if multifield_policy else None
+        )
         if match and value_type is not None:
             updated.append(
                 "%sdef getValues(%s) -> list[%s]: ..."
@@ -1744,7 +1737,8 @@ def normalize_multifield_getvalues(text):
 
 
 def append_multifield_snapshot_method(lines, class_name):
-    if class_name not in MULTIFIELD_SNAPSHOT_TYPES:
+    multifield_policy = MULTIFIELD_TYPE_POLICIES.get(class_name)
+    if multifield_policy is None:
         return
     if any(
         re.match(r"\s*def getValuesSnapshot\(", line)
@@ -1755,7 +1749,7 @@ def append_multifield_snapshot_method(lines, class_name):
         lines.pop()
     lines.append(
         "    def getValuesSnapshot(self) -> list[%s]: ..."
-        % MULTIFIELD_SNAPSHOT_TYPES[class_name]
+        % multifield_policy.element_type
     )
     lines.append("")
 
@@ -1778,10 +1772,11 @@ def normalize_multifield_snapshots(text):
             append_multifield_snapshot_method(updated, current_class)
             current_class = None
 
+        multifield_policy = MULTIFIELD_TYPE_POLICIES.get(current_class)
         snapshot_type = (
             "object"
             if current_class == "SoMField"
-            else MULTIFIELD_SNAPSHOT_TYPES.get(current_class)
+            else multifield_policy.element_type if multifield_policy else None
         )
         if snapshot_type is not None and re.match(
             r"\s*def getValuesSnapshot\(self\)(?: -> [^:]+)?:(?: \.{3})?$",
@@ -1819,7 +1814,10 @@ def normalize_multifield_single_values(text):
         elif current_class and is_top_level_statement(line):
             current_class = None
 
-        value_type = MULTIFIELD_SINGLE_VALUE_TYPES.get(current_class)
+        multifield_policy = MULTIFIELD_TYPE_POLICIES.get(current_class)
+        value_type = (
+            multifield_policy.single_value_type if multifield_policy else None
+        )
         match = re.match(
             r"(?P<indent>\s*)def (?P<method>find|set1Value|__setitem__)"
             r"\((?P<args>[^)]*)\)(?P<suffix>.*)$",
