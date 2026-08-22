@@ -62,11 +62,11 @@ class FieldTypePolicyTests(unittest.TestCase):
     def test_image_field_python_surfaces(self):
         self.assertEqual(
             policy.METHOD_RETURN_TYPE_OVERRIDES[("SoSFImage", "getValue")],
-            "tuple[str, SbVec2s, int]",
+            "tuple[bytes, SbVec2s, int]",
         )
         self.assertEqual(
             policy.METHOD_RETURN_TYPE_OVERRIDES[("SoSFImage3", "startEditing")],
-            "tuple[str, SbVec3s, int]",
+            "tuple[bytes, SbVec3s, int]",
         )
         self.assertEqual(
             policy.PYTHON_PARAMETER_TYPE_OVERRIDES[

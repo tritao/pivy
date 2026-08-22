@@ -232,6 +232,10 @@ PYTHON_HELPER_METHOD_TYPES = {
         "self, name: str",
         "SoField | SoEngineOutput",
     ),
+    ("SoEngine", "getOutput"): (
+        "self, outputname: SbName | str",
+        "SoEngineOutput | None",
+    ),
     ("SoEngine", "__setattr__"): ("self, name: str, value: Any", "None"),
     ("SoFieldContainer", "__dir__"): ("self", "list[str]"),
     ("SoFieldContainer", "__getattr__"): ("self, name: str", "SoField"),
@@ -263,10 +267,10 @@ METHOD_RETURN_TYPE_OVERRIDES = {
     ("SoByteStream", "getData"): "bytes",
     # SWIG's image typemaps expose the native pixel pointer together with the
     # dimensions and component count as a Python tuple.
-    ("SoSFImage", "getValue"): "tuple[str, SbVec2s, int]",
-    ("SoSFImage", "startEditing"): "tuple[str, SbVec2s, int]",
-    ("SoSFImage3", "getValue"): "tuple[str, SbVec3s, int]",
-    ("SoSFImage3", "startEditing"): "tuple[str, SbVec3s, int]",
+    ("SoSFImage", "getValue"): "tuple[bytes, SbVec2s, int]",
+    ("SoSFImage", "startEditing"): "tuple[bytes, SbVec2s, int]",
+    ("SoSFImage3", "getValue"): "tuple[bytes, SbVec3s, int]",
+    ("SoSFImage3", "startEditing"): "tuple[bytes, SbVec3s, int]",
     ("SoAction", "getNodeAppliedTo"): "SoNode | None",
     ("SoAction", "getPathAppliedTo"): "SoPath | None",
     ("SoAction", "getPathListAppliedTo"): "SoPathList | None",

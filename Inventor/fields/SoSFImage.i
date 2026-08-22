@@ -5,11 +5,21 @@
 
 %typemap(argout) (SbVec2s & size, int & nc) {
   Py_XDECREF($result); /* free up any previous result */
+#ifdef PY_2
   $result = Py_BuildValue("(s#Oi)",
                           (const char *)result,
                           (*$1)[0] * (*$1)[1] * (*$2),
                           SWIG_NewPointerObj((void *)$1, SWIGTYPE_p_SbVec2s, 1),
                           *$2);
+#else
+  PyObject *pixels = PyBytes_FromStringAndSize(
+      (const char *)result, (*$1)[0] * (*$1)[1] * (*$2));
+  PyObject *size = SWIG_NewPointerObj(
+      (void *)$1, SWIGTYPE_p_SbVec2s, 1);
+  $result = Py_BuildValue("(OOi)", pixels, size, *$2);
+  Py_DECREF(pixels);
+  Py_DECREF(size);
+#endif
 }
 
 %extend SoSFImage {

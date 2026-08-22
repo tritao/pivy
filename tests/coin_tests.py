@@ -374,9 +374,18 @@ class FieldSetValue(unittest.TestCase):
         s = SoSFImage()        
         t.setValue(SbVec2s(2,2), 1, "abcd")
         s.setValue(t)
-        self.assertTrue(("abcd", SbVec2s(2,2), 1) == t.getValue() == s.getValue(), 
+        self.assertTrue((b"abcd", SbVec2s(2,2), 1) == t.getValue() == s.getValue(),
                         'setValue on SoSFImage failed')
-        self.assertEqual(t.startEditing(), ("abcd", SbVec2s(2,2), 1))
+        pixels, size, components = t.getValue()
+        self.assertIsInstance(pixels, bytes)
+        self.assertEqual(tuple(size), (2, 2))
+        self.assertEqual(components, 1)
+        edited_pixels, edited_size, edited_components = t.startEditing()
+        self.assertIsInstance(edited_pixels, bytes)
+        self.assertEqual(tuple(edited_size), (2, 2))
+        self.assertEqual(edited_components, 1)
+        t.finishEditing()
+        self.assertEqual(t.startEditing(), (b"abcd", SbVec2s(2,2), 1))
         t.finishEditing()
 
     def testSFImage3(self):
@@ -385,9 +394,18 @@ class FieldSetValue(unittest.TestCase):
         s = SoSFImage3()        
         t.setValue(SbVec3s(2,2,2), 1, "abcdefgh")
         s.setValue(t)
-        self.assertTrue(("abcdefgh", SbVec3s(2,2,2), 1) == t.getValue() == s.getValue(), 
+        self.assertTrue((b"abcdefgh", SbVec3s(2,2,2), 1) == t.getValue() == s.getValue(),
                         'setValue on SoSFImage3 failed')
-        self.assertEqual(t.startEditing(), ("abcdefgh", SbVec3s(2,2,2), 1))
+        pixels, size, components = t.getValue()
+        self.assertIsInstance(pixels, bytes)
+        self.assertEqual(tuple(size), (2, 2, 2))
+        self.assertEqual(components, 1)
+        edited_pixels, edited_size, edited_components = t.startEditing()
+        self.assertIsInstance(edited_pixels, bytes)
+        self.assertEqual(tuple(edited_size), (2, 2, 2))
+        self.assertEqual(edited_components, 1)
+        t.finishEditing()
+        self.assertEqual(t.startEditing(), (b"abcdefgh", SbVec3s(2,2,2), 1))
         t.finishEditing()
 
     def testSFPath(self):
