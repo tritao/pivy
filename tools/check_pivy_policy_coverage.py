@@ -81,9 +81,20 @@ def policy_coverage_errors(stub_path: Path) -> tuple[str, ...]:
         if any(_has_incomplete(method.returns) for method in get_items):
             errors.append("%s.__getitem__ still contains Incomplete" % class_name)
 
+        if field_policy.indexed_access:
+            set_items = _check_method(errors, methods, class_name, "__setitem__")
+            if any(_has_incomplete(method) for method in set_items):
+                errors.append("%s.__setitem__ still contains Incomplete" % class_name)
+
         iterators = _check_method(errors, methods, class_name, "__iter__")
         if any(_has_incomplete(method.returns) for method in iterators):
             errors.append("%s.__iter__ still contains Incomplete" % class_name)
+
+        snapshots = _check_method(errors, methods, class_name, "getValuesSnapshot")
+        if any(_has_incomplete(method.returns) for method in snapshots):
+            errors.append(
+                "%s.getValuesSnapshot still contains Incomplete" % class_name
+            )
 
         if field_policy.set_values_types:
             setters = _check_method(errors, methods, class_name, "setValues")

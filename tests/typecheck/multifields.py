@@ -226,6 +226,29 @@ def check_object_multifields() -> None:
     assert_type(strings[0], coin.SbString)
     assert_type(strings.getValues(), list[str])
 
+    engines = coin.SoMFEngine()
+    engines.set1Value(0, coin.SoTimeCounter())
+    assert_type(engines[0], coin.SoEngine)
+    assert_type(engines.getValuesSnapshot(), list[coin.SoEngine])
+    assert_type(iter(engines), Iterator[coin.SoEngine])
+
+    paths = coin.SoMFPath()
+    paths.set1Value(0, coin.SoPath())
+    assert_type(paths[0], coin.SoPath)
+    assert_type(paths.getValuesSnapshot(), list[coin.SoPath])
+    assert_type(iter(paths), Iterator[coin.SoPath])
+
+    planes = coin.SoMFPlane()
+    planes.set1Value(0, coin.SbPlane())
+    assert_type(planes[0], coin.SbPlane)
+    assert_type(planes.getValuesSnapshot(), list[coin.SbPlane])
+    assert_type(iter(planes), Iterator[coin.SbPlane])
+
+    doubles = coin.SoMFDouble()
+    doubles.set1Value(0, 1.0)
+    assert_type(doubles.getValuesSnapshot(), list[float])
+    assert_type(iter(doubles), Iterator[float])
+
 
 def check_string_multifields() -> None:
     names = coin.SoMFName()

@@ -437,6 +437,7 @@ class MultifieldTypePolicyTests(unittest.TestCase):
             ("SbColor", "SbVec3f", "Sequence[float]"),
         )
         self.assertNotIn("SoMFDouble", setvalues_types)
+        self.assertFalse(MULTIFIELD_TYPE_POLICIES["SoMFDouble"].indexed_access)
 
     def test_multifield_getvalues_types_are_derived_from_policy(self):
         getvalues_types = multifield_getvalues_types()

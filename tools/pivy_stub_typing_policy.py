@@ -1995,6 +1995,7 @@ class MultifieldTypePolicy:
     set_values_types: tuple[str, ...] = ()
     get_values_type: str | None = None
     single_value_type: str | None = None
+    indexed_access: bool = True
     component_sequence_type: str | None = None
     component_width: int | None = None
     component_parameter_name: str | None = None
@@ -2098,7 +2099,10 @@ MULTIFIELD_TYPE_POLICIES = {
         component_width=4,
         component_parameter_name="rgba",
     ),
-    "SoMFDouble": MultifieldTypePolicy(element_type="float"),
+    # Coin exposes SoMFDouble's bulk and indexed storage only through raw
+    # pointers on this SWIG build.  Keep the safe scalar setter, iterator,
+    # and owned snapshot, but do not claim Python sequence/index operations.
+    "SoMFDouble": MultifieldTypePolicy(element_type="float", indexed_access=False),
     "SoMFEngine": MultifieldTypePolicy(
         element_type="SoEngine",
         set_values_types=("SoEngine",),
