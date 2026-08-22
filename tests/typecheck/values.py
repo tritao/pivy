@@ -38,6 +38,14 @@ def check_sb_image_snapshot() -> None:
     assert_type(components, int)
 
 
+def check_glyph_bitmap_snapshot() -> None:
+    glyph = coin.SoGlyph.getGlyph("A", coin.SbName("Helvetica"))
+    assert_type(
+        glyph.getBitmapValue(True),
+        tuple[bytes | None, coin.SbVec2s, coin.SbVec2s],
+    )
+
+
 def check_fixed_width_integer_vectors() -> None:
     vector = coin.SbVec4ui32([1, 2, 3, 4])
 

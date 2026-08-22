@@ -1700,6 +1700,16 @@ class ZZCallbackActionTextureTests(unittest.TestCase):
         self.assertEqual(seen, ["SoTexture2"])
 
 
+class ZZGlyphSnapshotTests(unittest.TestCase):
+    def testBitmapSnapshot(self):
+        glyph = SoGlyph.getGlyph("A", SbName("Helvetica"))
+        pixels, size, pos = glyph.getBitmapValue(True)
+        self.assertIsInstance(pixels, (bytes, type(None)))
+        self.assertGreaterEqual(size[0], 0)
+        self.assertGreaterEqual(size[1], 0)
+        self.assertIsInstance(pos, SbVec2s)
+
+
 class ZZSoDBCallbackTests(unittest.TestCase):
     def testPythonDatabaseCallbacks(self):
         progress_events = []

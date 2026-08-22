@@ -1679,6 +1679,11 @@ METHOD_RETURN_TYPE_CHECKS = {
             "getSubTextureValue",
             "tuple[bytes | None, SbVec2s, SbVec2s, int]",
         ),
+        (
+            "SoGlyph",
+            "getBitmapValue",
+            "tuple[bytes | None, SbVec2s, SbVec2s]",
+        ),
         ("SoEngineOutput", "getContainer", "SoEngine | None"),
         ("SoEngineOutput", "getFieldContainer", "SoFieldContainer | None"),
         ("SoEngineOutput", "getNodeContainer", "SoNodeEngine | None"),
