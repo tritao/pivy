@@ -42,6 +42,12 @@ ENGINE_FACTORY_TYPES = tuple(
     globals()[class_name] for class_name in ENGINE_FACTORY_CLASS_NAMES
 )
 
+SCXML_FACTORY_TEST_TYPES = (
+    ScXMLDocument,
+    ScXMLStringDataObj,
+    SoScXMLEvent,
+)
+
 class Autocasting(unittest.TestCase):
     def testFieldAutocast(self):
         """check autocasting for SoSFBool created through createInstance()"""
@@ -118,6 +124,16 @@ class EngineFactoryTests(unittest.TestCase):
                 engine = factory_type.createInstance()
                 self.assertIsInstance(engine, factory_type)
                 self.assertTrue(engine.thisown)
+
+
+class ScXMLFactoryTests(unittest.TestCase):
+    def testScXMLFactoryAutocastAndOwnership(self):
+        for factory_type in SCXML_FACTORY_TEST_TYPES:
+            with self.subTest(factory_type=factory_type.__name__):
+                object_ = factory_type.createInstance()
+                self.assertIsInstance(object_, factory_type)
+                self.assertIsInstance(object_, ScXMLObject)
+                self.assertTrue(object_.thisown)
 
 
 class EngineOutputTests(unittest.TestCase):

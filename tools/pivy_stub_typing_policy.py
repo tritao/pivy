@@ -4,10 +4,20 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from tools.pivy_factory_registry import (
-    ENGINE_FACTORY_CLASS_NAMES,
-    ENGINE_FACTORY_CLASSES,
-)
+try:
+    from tools.pivy_factory_registry import (
+        ENGINE_FACTORY_CLASS_NAMES,
+        ENGINE_FACTORY_CLASSES,
+        SCXML_FACTORY_CLASSES,
+        SCXML_FACTORY_CLASS_NAMES,
+    )
+except ImportError:
+    from pivy_factory_registry import (
+        ENGINE_FACTORY_CLASS_NAMES,
+        ENGINE_FACTORY_CLASSES,
+        SCXML_FACTORY_CLASSES,
+        SCXML_FACTORY_CLASS_NAMES,
+    )
 
 
 @dataclass(frozen=True)
@@ -499,7 +509,10 @@ FIELD_FACTORY_CLASSES = frozenset(
 )
 
 FACTORY_CLASSES = (
-    ELEMENT_FACTORY_CLASSES | ENGINE_FACTORY_CLASSES | FIELD_FACTORY_CLASSES
+    ELEMENT_FACTORY_CLASSES
+    | ENGINE_FACTORY_CLASSES
+    | FIELD_FACTORY_CLASSES
+    | SCXML_FACTORY_CLASSES
 )
 
 

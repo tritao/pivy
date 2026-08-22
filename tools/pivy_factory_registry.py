@@ -46,3 +46,82 @@ ENGINE_FACTORY_CLASS_NAMES = (
 )
 
 ENGINE_FACTORY_CLASSES = frozenset(ENGINE_FACTORY_CLASS_NAMES)
+
+
+SCXML_FACTORY_CLASS_NAMES = (
+    "SoScXMLDollyTarget",
+    "SoScXMLFlightControlTarget",
+    "SoScXMLMiscTarget",
+    "SoScXMLMotionTarget",
+    "SoScXMLPanTarget",
+    "SoScXMLRotateTarget",
+    "SoScXMLSeekTarget",
+    "SoScXMLSpinTarget",
+    "SoScXMLZoomTarget",
+    "ScXMLAnchorElt",
+    "ScXMLAssignElt",
+    "ScXMLStringDataObj",
+    "ScXMLRealDataObj",
+    "ScXMLBoolDataObj",
+    "ScXMLSbDataObj",
+    "ScXMLXMLDataObj",
+    "ScXMLReferenceDataObj",
+    "ScXMLAndOpExprDataObj",
+    "ScXMLOrOpExprDataObj",
+    "ScXMLNotOpExprDataObj",
+    "ScXMLEqualsOpExprDataObj",
+    "ScXMLAddOpExprDataObj",
+    "ScXMLSubtractOpExprDataObj",
+    "ScXMLMultiplyOpExprDataObj",
+    "ScXMLDivideOpExprDataObj",
+    "ScXMLNegateOpExprDataObj",
+    "ScXMLCoinEvaluator",
+    "ScXMLCoinEqualsOpExprDataObj",
+    "ScXMLCoinAddOpExprDataObj",
+    "ScXMLCoinSubtractOpExprDataObj",
+    "ScXMLCoinMultiplyOpExprDataObj",
+    "ScXMLCoinDivideOpExprDataObj",
+    "ScXMLCoinLengthFuncExprDataObj",
+    "ScXMLContentElt",
+    "ScXMLDataElt",
+    "ScXMLDataModelElt",
+    "ScXMLDocument",
+    "ScXMLECMAScriptEvaluator",
+    "ScXMLElseElt",
+    "ScXMLElseIfElt",
+    "ScXMLEvent",
+    "ScXMLEventElt",
+    "ScXMLFinalElt",
+    "ScXMLFinalizeElt",
+    "ScXMLHistoryElt",
+    "ScXMLIfElt",
+    "ScXMLInitialElt",
+    "ScXMLInvokeElt",
+    "ScXMLLogElt",
+    "ScXMLMinimumEvaluator",
+    "ScXMLOnEntryElt",
+    "ScXMLOnExitElt",
+    "ScXMLParallelElt",
+    "ScXMLParamElt",
+    "ScXMLScxmlElt",
+    "ScXMLSendElt",
+    "ScXMLStateElt",
+    "ScXMLStateMachine",
+    "ScXMLTransitionElt",
+    "ScXMLValidateElt",
+    "ScXMLXPathEvaluator",
+    "SoScXMLEvent",
+    "SoScXMLStateMachine",
+)
+
+SCXML_FACTORY_CLASSES = frozenset(SCXML_FACTORY_CLASS_NAMES)
+
+# Coin 4.0.7 exposes these factories, but their runtime type IDs are not
+# initialized consistently, so autocasting them would return ScXMLObject (or
+# emit registration errors). Keep them explicitly outside the adapted set
+# until the upstream runtime contract is fixed.
+SCXML_UNSUPPORTED_FACTORY_CLASS_NAMES = (
+    "ScXMLInExprDataObj",
+    "ScXMLAppendOpExprDataObj",
+    "ScXMLScriptElt",
+)

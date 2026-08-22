@@ -4,7 +4,12 @@ from dataclasses import replace
 from pathlib import Path
 
 import tools.pivy_stub_generation_data as compatibility_policy
-from tools.pivy_factory_registry import ENGINE_FACTORY_CLASS_NAMES
+from tools.pivy_factory_registry import (
+    ENGINE_FACTORY_CLASS_NAMES,
+    SCXML_FACTORY_CLASSES,
+    SCXML_FACTORY_CLASS_NAMES,
+    SCXML_UNSUPPORTED_FACTORY_CLASS_NAMES,
+)
 import tools.pivy_stub_typing_policy as policy
 from tools.check_pivy_typing_matrix import SUPPORTED_PYTHON_VERSIONS
 from tools.report_pivy_typing import (
@@ -601,6 +606,7 @@ class PolicyBoundaryTests(unittest.TestCase):
             ("Inventor/elements/SoElement.i", "PIVY_ELEMENT_FACTORY_OUT"),
             ("Inventor/engines/SoEngine.i", "PIVY_ENGINE_FACTORY_OUT"),
             ("Inventor/fields/SoField.i", "PIVY_FIELD_FACTORY_OUT"),
+            ("Inventor/scxml/ScXMLObject.i", "PIVY_SCXML_FACTORY_OUT"),
         ):
             text = Path(path).read_text()
             interface_classes.update(
@@ -610,6 +616,10 @@ class PolicyBoundaryTests(unittest.TestCase):
             )
 
         self.assertEqual(interface_classes, FACTORY_CLASSES)
+        self.assertEqual(set(SCXML_FACTORY_CLASS_NAMES), SCXML_FACTORY_CLASSES)
+        self.assertTrue(
+            set(SCXML_UNSUPPORTED_FACTORY_CLASS_NAMES).isdisjoint(interface_classes)
+        )
         for class_name in interface_classes:
             self.assertEqual(
                 factory_method_return_type(class_name, "createInstance"),
@@ -659,7 +669,7 @@ class PolicyBoundaryTests(unittest.TestCase):
         baseline = replace(
             TYPING_QUALITY_BASELINE,
             max_incomplete_by_category=(
-                ("dynamic/runtime API", 355),
+                ("dynamic/runtime API", 292),
             ),
         )
         violations = quality_regressions(report, baseline)
@@ -678,7 +688,7 @@ class PolicyBoundaryTests(unittest.TestCase):
         self.assertEqual(
             dict(report.dynamic_runtime_subcategories),
             {
-                "runtime factory returns": 67,
+                "runtime factory returns": 4,
                 "opaque pointer/object returns": 41,
                 "opaque parameter boundaries": 247,
                 "opaque field storage": 1,

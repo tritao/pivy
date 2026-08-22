@@ -228,6 +228,42 @@ autocast_event(SoEvent * event)
   return result;
 }
 
+/* autocasting helper for Coin's non-SoBase ScXML object hierarchy */
+SWIGEXPORT PyObject *
+autocast_scxml_object(ScXMLObject * object, int own = 0)
+{
+  PyObject * result = NULL;
+  swig_type_info * base_swig_type = SWIG_TypeQuery("ScXMLObject *");
+
+  if (object && base_swig_type) {
+    PyObject * obj = NULL;
+    SoType type = object->getTypeId();
+
+    while (!(type.isBad() || result)) {
+      obj = SWIG_NewPointerObj((void *)object, base_swig_type, 0);
+
+      result = cast_internal(NULL, obj, type.getName().getString(),
+                             type.getName().getLength(), own);
+
+      Py_DECREF(obj);
+
+      if (!result) { type = type.getParent(); }
+    }
+  }
+
+  if (!result) {
+    if (object && own && base_swig_type) {
+      result = SWIG_NewPointerObj((void *)object, base_swig_type,
+                                  SWIG_POINTER_OWN);
+    } else {
+      Py_INCREF(Py_None);
+      result = Py_None;
+    }
+  }
+
+  return result;
+}
+
 %}
 
 /* typemaps for autocasting types through the Inventor type system */
