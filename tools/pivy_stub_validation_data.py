@@ -1663,6 +1663,7 @@ METHOD_RETURN_TYPE_CHECKS = {
         ("SoInput", "findReference", "SoBase | None"),
         ("SoOutput", "getCurrentProto", "SoProto | None"),
         ("SoEngine", "getOutput", "SoEngineOutput | None"),
+        ("SoEngine", "getOutputNameValue", "tuple[bool, str]"),
         ("SoEngineOutput", "getContainer", "SoEngine | None"),
         ("SoEngineOutput", "getFieldContainer", "SoFieldContainer | None"),
         ("SoEngineOutput", "getNodeContainer", "SoNodeEngine | None"),

@@ -144,6 +144,7 @@ class EngineOutputTests(unittest.TestCase):
         self.assertTrue(isinstance(engine.__getattr__("output"), SoEngineOutput))
         self.assertTrue(isinstance(engine.__getattr__("a"), SoMFBool))
         self.assertTrue(isinstance(engine.getOutput("output"), SoEngineOutput))
+        self.assertEqual(engine.getOutputNameValue(output), (True, "output"))
         self.assertIsNone(engine.getOutput(SbName("missing")))
         self.assertIsNone(SoEngine.getByName(SbName("missing")))
         self.assertTrue(isinstance(output.getContainer(), SoBoolOperation))

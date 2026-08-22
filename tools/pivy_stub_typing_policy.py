@@ -236,6 +236,10 @@ PYTHON_HELPER_METHOD_TYPES = {
         "self, outputname: SbName | str",
         "SoEngineOutput | None",
     ),
+    ("SoEngine", "getOutputNameValue"): (
+        "self, output: SoEngineOutput",
+        "tuple[bool, str]",
+    ),
     ("SoEngine", "__setattr__"): ("self, name: str, value: Any", "None"),
     ("SoFieldContainer", "__dir__"): ("self", "list[str]"),
     ("SoFieldContainer", "__getattr__"): ("self, name: str", "SoField"),

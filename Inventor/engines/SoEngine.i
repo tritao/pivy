@@ -1,5 +1,14 @@
 /* add generic interface to access outputs as attributes */
 %extend SoEngine {
+/* SbName & outputname is an output parameter in C++.  SWIG cannot mutate a
+   useful Python value in place, so expose an explicit snapshot helper while
+   preserving the historical getOutputName() binding. */
+  PyObject *_pivy_getOutputNameValue(SoEngineOutput * output) const {
+    SbName outputname;
+    SbBool found = self->getOutputName(output, outputname);
+    return Py_BuildValue("(is)", found, outputname.getString());
+  }
+
 %pythoncode %{
     def __getattr__(self, name):
         try:
@@ -21,6 +30,9 @@
         if out is None:
             return SoFieldContainer.__setattr__(self, name, value)
         raise AttributeError('Cannot set output %s on engine %s' %(name,self.__class__.__name__))
+
+    def getOutputNameValue(self, output):
+        return self._pivy_getOutputNameValue(output)
         
 %}
 }

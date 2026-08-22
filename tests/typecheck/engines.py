@@ -15,6 +15,7 @@ def check_engine_outputs() -> None:
     assert_type(boolean.__getattr__("a"), coin.SoField | coin.SoEngineOutput)
     assert_type(boolean.__getattr__("output"), coin.SoField | coin.SoEngineOutput)
     assert_type(boolean.getOutput("missing"), coin.SoEngineOutput | None)
+    assert_type(boolean.getOutputNameValue(boolean.output), tuple[bool, str])
     assert_type(boolean.getOutputName(boolean.output, coin.SbName()), bool)
     assert_type(boolean.getOutputData(), coin.SoEngineOutputData)
     assert_type(boolean.copy(), coin.SoEngine)
