@@ -34,7 +34,7 @@ from tools.pivy_stub_validation_data import (
     RUNTIME_UNSUPPORTED_NOTE,
     SENSOR_CALLBACK_CLASSES,
     SENSOR_CALLBACK_CONSTRUCTOR_TYPES,
-    SOQT_COIN_DUPLICATE_CLASSES,
+    SOQT_COIN_SHARED_TYPES,
     STUB_SPECS,
     StubKind,
     TYPEDEF_AND_STRING_METHOD_CHECKS,
@@ -506,22 +506,33 @@ def assert_multifield_getvalues(path, tree):
             )
 
 
-def assert_soqt_coin_duplicate_classes(path, tree):
+def assert_soqt_coin_shared_types(path, tree):
     classes = class_map(tree)
-    missing_classes = sorted(SOQT_COIN_DUPLICATE_CLASSES - set(classes))
-    if missing_classes:
+    duplicate_classes = sorted(SOQT_COIN_SHARED_TYPES & set(classes))
+    if duplicate_classes:
         raise AssertionError(
-            "%s is missing expected SoQt Coin duplicate classes: %s"
-            % (path, ", ".join(missing_classes))
+            "%s redeclares shared Coin types: %s"
+            % (path, ", ".join(duplicate_classes))
+        )
+
+    imported_coin_names = {
+        alias.name
+        for node in tree.body
+        if isinstance(node, ast.ImportFrom) and node.module == "pivy.coin"
+        for alias in node.names
+    }
+    required_coin_names = {"SbVec2s", "SoEvent", "SoType"}
+    missing_imports = sorted(required_coin_names - imported_coin_names)
+    if missing_imports:
+        raise AssertionError(
+            "%s is missing shared Coin imports: %s"
+            % (path, ", ".join(missing_imports))
         )
 
     checks = (
-        ("SoType", "fromName", {"name": "SbName | str"}, "SoType"),
-        ("SbString", "getString", {}, "str"),
-        ("SbName", "getString", {}, "str"),
-        ("SoEvent", "getPosition", {}, "SbVec2s"),
-        ("SoField", "getTypeId", {}, "SoType"),
-        ("SoMField", "getNum", {}, "int"),
+        ("SoQt", "getWidgetSize", {"widget": "QWidget"}, "SbVec2s"),
+        ("SoQtDevice", "translateEvent", {"event": "QEvent"}, "SoEvent"),
+        ("SoQtRenderArea", "sendSoEvent", {"event": "SoEvent"}, "bool"),
     )
     for class_name, method_name, argument_types, return_type in checks:
         assert_method_signature(
@@ -665,7 +676,7 @@ def validate_stub_files(package_dir):
                 )
                 assert_no_bare_multifield_setvalues(path, tree)
                 if relative == os.path.join("gui", "soqt.pyi"):
-                    assert_soqt_coin_duplicate_classes(path, tree)
+                    assert_soqt_coin_shared_types(path, tree)
                 assert_callback_helpers(
                     path, tree, CALLBACK_METHOD_CHECKS.get(relative, ())
                 )

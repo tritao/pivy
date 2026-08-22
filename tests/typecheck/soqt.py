@@ -17,7 +17,7 @@ def check_soqt_lifecycle_contract() -> None:
     assert_type(widget, soqt.QWidget)
     assert_type(soqt.SoQt.getTopLevelWidget(), soqt.QWidget)
     assert_type(soqt.SoQt.getShellWidget(widget), soqt.QWidget)
-    assert_type(soqt.SoQt.getWidgetSize(widget), soqt.SbVec2s)
+    assert_type(soqt.SoQt.getWidgetSize(widget), coin.SbVec2s)
 
 
 def check_soqt_render_area_contract() -> None:
@@ -45,7 +45,7 @@ def check_soqt_render_area_contract() -> None:
     assert_type(area.isClearZBufferBeforeRender(), bool)
     assert_type(area.getWidget(), soqt.QWidget)
     assert_type(area.getParentWidget(), soqt.QWidget)
-    assert_type(area.sendSoEvent(soqt.SoEvent()), bool)
+    assert_type(area.sendSoEvent(coin.SoEvent()), bool)
 
 
 def check_soqt_component_and_gl_widget_contract() -> None:
@@ -54,7 +54,7 @@ def check_soqt_component_and_gl_widget_contract() -> None:
     assert_type(component.getBaseWidget(), soqt.QWidget)
     assert_type(component.getShellWidget(), soqt.QWidget)
     assert_type(component.getParentWidget(), soqt.QWidget)
-    assert_type(component.getSize(), soqt.SbVec2s)
+    assert_type(component.getSize(), coin.SbVec2s)
     assert_type(component.getTitle(), str)
     assert_type(component.getIconTitle(), str)
     assert_type(component.getWidgetName(), str)
@@ -97,7 +97,7 @@ def check_soqt_viewer_family_contract() -> None:
 
 def check_soqt_devices_and_utility_contract() -> None:
     device = soqt.SoQtKeyboard()
-    assert_type(device.translateEvent(soqt.QEvent()), soqt.SoEvent)
+    assert_type(device.translateEvent(soqt.QEvent()), coin.SoEvent)
 
     popup = soqt.SoQtPopupMenu()
     assert_type(popup.newMenu("File"), int)

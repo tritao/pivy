@@ -702,8 +702,11 @@ class CallbackTypePolicyTests(unittest.TestCase):
                 self.assertIn("class %s(Protocol" % name, coin_stub)
 
         soqt_stub = Path("pivy/gui/soqt.pyi").read_text()
-        self.assertIn("class SoErrorCallback(Protocol):", soqt_stub)
-        self.assertNotIn("SoErrorCallback", soqt_stub.splitlines()[7])
+        self.assertNotIn("class SoErrorCallback(Protocol):", soqt_stub)
+        self.assertNotIn("class SoEvent:", soqt_stub)
+        self.assertNotIn("class SbVec2s:", soqt_stub)
+        self.assertIn("SoEvent", soqt_stub.splitlines()[7])
+        self.assertIn("SbVec2s", soqt_stub.splitlines()[7])
 
 
 class PolicyBoundaryTests(unittest.TestCase):

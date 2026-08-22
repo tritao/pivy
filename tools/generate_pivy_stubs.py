@@ -175,7 +175,7 @@ def base_cpp_type(cpp_type):
 
 
 EXTERNAL_STUB_MODULES = ("pivy.coin",)
-REPLACE_EXTERNAL_CLASS_MODULES = {
+IMPORT_EXTERNAL_CLASS_MODULES = {
     "pivy.gui.soqt": EXTERNAL_STUB_MODULES,
 }
 
@@ -802,7 +802,7 @@ def collect_external_class_modules(output_dir, module, local_class_names):
 
 def external_duplicate_class_modules(output_dir, module, local_class_names):
     duplicate_class_modules = {}
-    for external_module in REPLACE_EXTERNAL_CLASS_MODULES.get(module, ()):
+    for external_module in IMPORT_EXTERNAL_CLASS_MODULES.get(module, ()):
         if external_module == module:
             continue
 
@@ -814,71 +814,25 @@ def external_duplicate_class_modules(output_dir, module, local_class_names):
     return duplicate_class_modules
 
 
-def collect_class_blocks(text):
-    lines = text.splitlines()
-    blocks = {}
-    index = 0
-
-    while index < len(lines):
-        line = lines[index]
-        class_match = re.match(r"^class\s+([A-Za-z_]\w*)", line)
-        if not class_match:
-            index += 1
-            continue
-
-        start = index
-        index += 1
-        while index < len(lines) and not is_top_level_statement(lines[index]):
-            index += 1
-
-        blocks[class_match.group(1)] = "\n".join(lines[start:index]).rstrip()
-
-    return blocks
-
-
-def collect_module_class_blocks(output_dir, module):
-    path = stub_path(output_dir, module)
-    if not os.path.exists(path):
-        return {}
-
-    with open(path) as stub_file:
-        return collect_class_blocks(stub_file.read())
-
-
-def external_duplicate_class_blocks(output_dir, module, local_class_names):
-    duplicate_class_modules = external_duplicate_class_modules(
-        output_dir, module, local_class_names
-    )
-    duplicate_class_blocks = {}
-    for external_module in sorted(set(duplicate_class_modules.values())):
-        module_blocks = collect_module_class_blocks(output_dir, external_module)
-        for class_name, duplicate_module in duplicate_class_modules.items():
-            if duplicate_module == external_module and class_name in module_blocks:
-                duplicate_class_blocks[class_name] = module_blocks[class_name]
-
-    return duplicate_class_blocks
-
-
-def replace_class_blocks(text, replacement_blocks):
-    if not replacement_blocks:
+def remove_class_blocks(text, class_names):
+    if not class_names:
         return text, set()
 
     lines = text.splitlines()
     updated = []
-    replaced = set()
+    removed = set()
     index = 0
 
     while index < len(lines):
         line = lines[index]
         class_match = re.match(r"^class\s+([A-Za-z_]\w*)", line)
         class_name = class_match.group(1) if class_match else None
-        if class_name not in replacement_blocks:
+        if class_name not in class_names:
             updated.append(line)
             index += 1
             continue
 
-        updated.extend(replacement_blocks[class_name].splitlines())
-        replaced.add(class_name)
+        removed.add(class_name)
 
         index += 1
         while index < len(lines) and not is_top_level_statement(lines[index]):
@@ -887,12 +841,17 @@ def replace_class_blocks(text, replacement_blocks):
         if index < len(lines) and updated and updated[-1] != "":
             updated.append("")
 
-    return "\n".join(updated) + "\n", replaced
+    return "\n".join(updated) + "\n", removed
 
 
-def replace_external_duplicate_classes(text, module, output_dir, local_class_names):
-    return replace_class_blocks(
-        text, external_duplicate_class_blocks(output_dir, module, local_class_names)
+def remove_external_duplicate_classes(text, module, output_dir, local_class_names):
+    return remove_class_blocks(
+        text,
+        set(
+            external_duplicate_class_modules(
+                output_dir, module, local_class_names
+            )
+        ),
     )
 
 
@@ -1934,6 +1893,9 @@ def postprocess_stub(path, module, output_dir):
     external_class_modules = collect_external_class_modules(
         output_dir, module, class_names
     )
+    external_class_modules.update(
+        external_duplicate_class_modules(output_dir, module, class_names)
+    )
     used_external_types = set()
     lines = original.splitlines()
     updated = []
@@ -1997,13 +1959,15 @@ def postprocess_stub(path, module, output_dir):
         index = end
 
     processed = "\n".join(updated) + "\n"
-    processed, replaced_classes = replace_external_duplicate_classes(
+    processed, removed_classes = remove_external_duplicate_classes(
         processed, module, output_dir, class_names
     )
-    if replaced_classes:
+    if removed_classes:
         used_external_types.update(
             collect_referenced_external_types(
-                processed, class_names, external_class_modules
+                processed,
+                class_names - removed_classes,
+                external_class_modules,
             )
         )
     processed = normalize_operator_helpers(processed)
@@ -2034,7 +1998,7 @@ def postprocess_stub(path, module, output_dir):
     processed = normalize_method_return_overrides(processed)
     processed = remove_swig_meta_classmethod(processed)
     processed = add_runtime_unsupported_notes(processed, module)
-    processed = add_callback_protocols(processed, class_names)
+    processed = add_callback_protocols(processed, class_names - removed_classes)
     processed = add_typing_import(processed, "Any")
     processed = add_typing_import(processed, "Callable")
     processed = add_typing_import(processed, "Iterator")

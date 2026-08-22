@@ -44,7 +44,7 @@ STUB_SPECS = (
     StubSpec(os.path.join("gui", "_soqt.pyi"), StubKind.PRIVATE),
 )
 REQUIRED_STUBS = tuple(spec.relative_path for spec in STUB_SPECS)
-SOQT_COIN_DUPLICATE_CLASSES = {
+SOQT_COIN_SHARED_TYPES = {
     "SbDict",
     "SbIntList",
     "SbName",
@@ -55,6 +55,7 @@ SOQT_COIN_DUPLICATE_CLASSES = {
     "SbVec2s",
     "SoDebugError",
     "SoError",
+    "SoErrorCallback",
     "SoEvent",
     "SoField",
     "SoMField",
@@ -794,9 +795,6 @@ DEFERRED_RAW_ATTRIBUTE_CHECKS = {
         ("SbOctTreeFuncs", "insidespherefunc", "Incomplete"),
         ("SbOctTreeFuncs", "insideplanesfunc", "Incomplete"),
     ),
-    os.path.join("gui", "soqt.pyi"): (
-        ("SoMField", "values", "Incomplete"),
-    ),
 }
 TYPEDEF_AND_STRING_METHOD_CHECKS = {
     "coin.pyi": (
@@ -884,12 +882,6 @@ DOC_TYPED_METHOD_CHECKS = {
         ),
     ),
     os.path.join("gui", "soqt.pyi"): (
-        (
-            "SoType",
-            "getInstantiationMethod",
-            {},
-            "int",
-        ),
         (
             "SoQt",
             "init",
@@ -1331,20 +1323,6 @@ OPERATOR_METHOD_CHECKS = {
             "SbRotation",
         ),
     ),
-    os.path.join("gui", "soqt.pyi"): (
-        (
-            "SbVec2f",
-            "__itruediv__",
-            {"d": "float"},
-            "SbVec2f",
-        ),
-        (
-            "SbTime",
-            "__truediv__",
-            {"d": "float"},
-            "float",
-        ),
-    ),
 }
 def _policy_multifield_method_checks():
     checks = []
@@ -1686,14 +1664,6 @@ EXTEND_HELPER_METHOD_CHECKS = {
             "SbVec3f",
         ),
     ),
-    os.path.join("gui", "soqt.pyi"): (
-        (
-            "SoType",
-            "createInstance",
-            {},
-            "SoBase | SoField | SoPath | None",
-        ),
-    ),
 }
 METHOD_RETURN_TYPE_CHECKS = {
     "coin.pyi": (
@@ -1854,6 +1824,7 @@ from pivy.coin import (
     SoDragger,
     SoEngine,
     SoEngineOutput,
+    SoEvent,
     SoEventCallback,
     SoField,
     SoFieldData,
@@ -1897,12 +1868,8 @@ from pivy.coin import (
 from pivy.gui.soqt import (
     QEvent,
     QWidget,
-    SbTime as SoQtSbTime,
-    SbVec2f as SoQtSbVec2f,
-    SoEvent as SoQtSoEvent,
     SoQt,
     SoQtRenderArea,
-    SoType as SoQtSoType,
     SoQtViewer,
     floatp as SoQtFloatp,
     intp as SoQtIntp,
@@ -2025,18 +1992,18 @@ string_not_equal: int = SbString("value").__nq__("other")
 name_equal: bool = SbName("value") == "value"
 name_not_equal: int = SbName("value").__nq__("other")
 soqt_area = SoQtRenderArea()
-soqt_type: SoQtSoType = soqt_area.getTypeId()
-soqt_instantiation_method: int = SoQtSoType.badType().getInstantiationMethod()
-soqt_area.sendSoEvent(SoQtSoEvent())
-soqt_vec_divided: SoQtSbVec2f = SoQtSbVec2f(1.0, 2.0).__itruediv__(2.0)
-soqt_time_ratio: float = SoQtSbTime(10.0) / SoQtSbTime(2.0)
+soqt_type: SoType = soqt_area.getTypeId()
+soqt_instantiation_method: int = SoType.badType().getInstantiationMethod()
+soqt_area.sendSoEvent(SoEvent())
+soqt_vec_divided: SbVec2f = SbVec2f(1.0, 2.0).__itruediv__(2.0)
+soqt_time_ratio: float = SbTime(10.0) / SbTime(2.0)
 soqt_argc = SoQtIntp()
 soqt_widget: QWidget = SoQt.init(soqt_argc, ["pivy"], "Pivy")
 soqt_version_major = SoQtIntp()
 SoQt.getVersionInfo(soqt_version_major, None, None)
 soqt_granularity = SoQtFloatp()
-soqt_area.getPointSizeLimits(SoQtSbVec2f(), soqt_granularity)
-soqt_area.getLineWidthLimits(SoQtSbVec2f(), soqt_granularity)
+soqt_area.getPointSizeLimits(SbVec2f(), soqt_granularity)
+soqt_area.getLineWidthLimits(SbVec2f(), soqt_granularity)
 soqt_smoothing = SoQtIntp()
 soqt_num_passes = SoQtIntp()
 soqt_area.getAntialiasing(soqt_smoothing, soqt_num_passes)
