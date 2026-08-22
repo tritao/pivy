@@ -6,7 +6,11 @@ import argparse
 import ast
 from pathlib import Path
 
-from tools.pivy_stub_typing_policy import FIELD_TYPE_POLICIES, MULTIFIELD_TYPE_POLICIES
+from tools.pivy_stub_typing_policy import (
+    FACTORY_CLASSES,
+    FIELD_TYPE_POLICIES,
+    MULTIFIELD_TYPE_POLICIES,
+)
 
 
 def _methods(tree: ast.Module) -> dict[str, dict[str, list[ast.FunctionDef]]]:
@@ -56,6 +60,11 @@ def policy_coverage_errors(stub_path: Path) -> tuple[str, ...]:
     tree = ast.parse(stub_path.read_text(encoding="utf-8"), filename=str(stub_path))
     methods = _methods(tree)
     errors: list[str] = []
+
+    for class_name in sorted(FACTORY_CLASSES):
+        factories = _check_method(errors, methods, class_name, "createInstance")
+        if any(_has_incomplete(method.returns) for method in factories):
+            errors.append("%s.createInstance still contains Incomplete" % class_name)
 
     for class_name, field_policy in FIELD_TYPE_POLICIES.items():
         get_values = _check_method(errors, methods, class_name, "getValue")

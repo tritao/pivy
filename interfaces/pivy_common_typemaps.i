@@ -94,7 +94,7 @@ fail:
 
 /* autocasting helper function for SoBase */
 SWIGEXPORT PyObject *
-autocast_base(SoBase * base)
+autocast_base(SoBase * base, int own = 0)
 {
   PyObject * result = NULL;
 
@@ -107,7 +107,8 @@ autocast_base(SoBase * base)
     while (!(type.isBad() || result)) {
       obj = SWIG_NewPointerObj((void*)base, SWIGTYPE_p_SoBase, 0);
       
-      result = cast_internal(NULL, obj, type.getName().getString(), type.getName().getLength());
+      result = cast_internal(NULL, obj, type.getName().getString(),
+                             type.getName().getLength(), own);
 
       Py_DECREF(obj);
 
@@ -116,8 +117,13 @@ autocast_base(SoBase * base)
   }      
 
   if (!result) {
-    Py_INCREF(Py_None);
-    result = Py_None;
+    if (base && own) {
+      result = SWIG_NewPointerObj((void*)base, SWIGTYPE_p_SoBase,
+                                  SWIG_POINTER_OWN);
+    } else {
+      Py_INCREF(Py_None);
+      result = Py_None;
+    }
   }
 
   return result;

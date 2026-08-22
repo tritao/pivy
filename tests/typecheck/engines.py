@@ -43,6 +43,17 @@ def check_engine_outputs() -> None:
     assert_type(output_data.getIndex(boolean, output), int)
 
 
+def check_engine_factory_contract() -> None:
+    boolean = coin.SoBoolOperation.createInstance()
+    assert_type(boolean, coin.SoBoolOperation)
+
+    composer = coin.SoComposeVec3f.createInstance()
+    assert_type(composer, coin.SoComposeVec3f)
+
+    node_engine = coin.SoVRMLTimeSensor.createInstance()
+    assert_type(node_engine, coin.SoVRMLTimeSensor)
+
+
 def check_engine_lookup() -> None:
     assert_type(coin.SoEngine.getByName(coin.SbName("missing")), coin.SoEngine | None)
 

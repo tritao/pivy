@@ -100,6 +100,22 @@ class FieldFactoryTests(unittest.TestCase):
         self.assertTrue(all(field.thisown for field in fields))
 
 
+class EngineFactoryTests(unittest.TestCase):
+    def testEngineFactoryAutocastAndOwnership(self):
+        engines = (
+            SoBoolOperation.createInstance(),
+            SoComposeVec3f.createInstance(),
+            SoVRMLTimeSensor.createInstance(),
+        )
+        self.assertIsInstance(engines[0], SoBoolOperation)
+        self.assertIsInstance(engines[1], SoComposeVec3f)
+        self.assertIsInstance(engines[2], SoVRMLTimeSensor)
+        self.assertTrue(isinstance(engines[0], SoEngine))
+        self.assertTrue(isinstance(engines[1], SoEngine))
+        self.assertTrue(isinstance(engines[2], SoNodeEngine))
+        self.assertTrue(all(engine.thisown for engine in engines))
+
+
 class EngineOutputTests(unittest.TestCase):
     def testEngineOutputContract(self):
         engine = SoBoolOperation()

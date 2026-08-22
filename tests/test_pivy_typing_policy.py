@@ -14,6 +14,7 @@ from tools.report_pivy_typing import (
 from tools.check_pivy_policy_coverage import policy_coverage_errors
 from tools.pivy_stub_typing_policy import (
     FACTORY_CLASSES,
+    ENGINE_FACTORY_CLASSES,
     FIELD_TYPE_POLICIES,
     INCOMPLETE_CATEGORIES,
     INCOMPLETE_CATEGORY_ACTIONS,
@@ -34,6 +35,17 @@ from tools.pivy_stub_typing_policy import (
 
 
 class FieldTypePolicyTests(unittest.TestCase):
+    def test_engine_factory_policy(self):
+        self.assertEqual(len(ENGINE_FACTORY_CLASSES), 37)
+        self.assertTrue(
+            {
+                "SoBoolOperation",
+                "SoComposeVec3f",
+                "SoVRMLTimeSensor",
+            }.issubset(ENGINE_FACTORY_CLASSES)
+        )
+        self.assertTrue(ENGINE_FACTORY_CLASSES.issubset(FACTORY_CLASSES))
+
     def test_image_field_python_surfaces(self):
         self.assertEqual(
             policy.METHOD_RETURN_TYPE_OVERRIDES[("SoSFImage", "getValue")],
@@ -585,6 +597,7 @@ class PolicyBoundaryTests(unittest.TestCase):
         interface_classes = set()
         for path, macro in (
             ("Inventor/elements/SoElement.i", "PIVY_ELEMENT_FACTORY_OUT"),
+            ("Inventor/engines/SoEngine.i", "PIVY_ENGINE_FACTORY_OUT"),
             ("Inventor/fields/SoField.i", "PIVY_FIELD_FACTORY_OUT"),
         ):
             text = Path(path).read_text()
@@ -644,7 +657,7 @@ class PolicyBoundaryTests(unittest.TestCase):
         baseline = replace(
             TYPING_QUALITY_BASELINE,
             max_incomplete_by_category=(
-                ("dynamic/runtime API", 392),
+                ("dynamic/runtime API", 355),
             ),
         )
         violations = quality_regressions(report, baseline)
@@ -663,7 +676,7 @@ class PolicyBoundaryTests(unittest.TestCase):
         self.assertEqual(
             dict(report.dynamic_runtime_subcategories),
             {
-                "runtime factory returns": 104,
+                "runtime factory returns": 67,
                 "opaque pointer/object returns": 41,
                 "opaque parameter boundaries": 247,
                 "opaque field storage": 1,

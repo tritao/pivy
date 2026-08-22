@@ -292,9 +292,10 @@ PYTHON_PARAMETER_TYPE_OVERRIDES = {
     ("SoQtRenderArea", "setEventCallback", "user"): "object",
 }
 
-# Coin's element and field header macros expose these class-specific factories
-# as ``void *``. The binding typemaps autocast and own the concrete object, so
-# the generated Python contract can name the class returned by each factory.
+# Coin's element, engine, and field header macros expose these class-specific
+# factories as ``void *``. The binding typemaps autocast and own the concrete
+# object, so the generated Python contract can name the class returned by each
+# factory.
 ELEMENT_FACTORY_CLASSES = frozenset(
     {
         "SoDecimationTypeElement",
@@ -400,6 +401,48 @@ ELEMENT_FACTORY_CLASSES = frozenset(
     }
 )
 
+ENGINE_FACTORY_CLASSES = frozenset(
+    {
+        "SoBoolOperation",
+        "SoCalculator",
+        "SoComposeVec2f",
+        "SoComposeVec3f",
+        "SoComposeVec4f",
+        "SoDecomposeVec2f",
+        "SoDecomposeVec3f",
+        "SoDecomposeVec4f",
+        "SoComposeRotation",
+        "SoDecomposeRotation",
+        "SoComposeMatrix",
+        "SoDecomposeMatrix",
+        "SoComposeRotationFromTo",
+        "SoComputeBoundingBox",
+        "SoConcatenate",
+        "SoCounter",
+        "SoElapsedTime",
+        "SoGate",
+        "SoInterpolateFloat",
+        "SoInterpolateVec2f",
+        "SoInterpolateVec3f",
+        "SoInterpolateVec4f",
+        "SoInterpolateRotation",
+        "SoOnOff",
+        "SoOneShot",
+        "SoSelectOne",
+        "SoTimeCounter",
+        "SoTransformVec3f",
+        "SoTriggerAny",
+        "SoHeightMapToNormalMap",
+        "SoVRMLColorInterpolator",
+        "SoVRMLCoordinateInterpolator",
+        "SoVRMLNormalInterpolator",
+        "SoVRMLOrientationInterpolator",
+        "SoVRMLPositionInterpolator",
+        "SoVRMLScalarInterpolator",
+        "SoVRMLTimeSensor",
+    }
+)
+
 FIELD_FACTORY_CLASSES = frozenset(
     {
         "SoSFEnum",
@@ -492,7 +535,9 @@ FIELD_FACTORY_CLASSES = frozenset(
     }
 )
 
-FACTORY_CLASSES = ELEMENT_FACTORY_CLASSES | FIELD_FACTORY_CLASSES
+FACTORY_CLASSES = (
+    ELEMENT_FACTORY_CLASSES | ENGINE_FACTORY_CLASSES | FIELD_FACTORY_CLASSES
+)
 
 
 def factory_method_return_type(class_name, method_name):
