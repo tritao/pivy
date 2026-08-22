@@ -527,27 +527,27 @@ def factory_method_return_type(class_name, method_name):
 EXTEND_HELPER_METHOD_TYPES = {
     ("SoSensor", "getFunction", "self"): (
         "self",
-        "Callable[[object, SoSensor], None] | None",
+        "SoSensorCallback[SoSensor] | None",
     ),
     ("SoSensor", "getData", "self"): ("self", "object | None"),
     ("SoError", "getHandlerCallback", ""): (
         "",
-        "Callable[[object, SoError], None] | None",
+        "SoErrorCallback | None",
     ),
     ("SoError", "getHandlerData", ""): ("", "object | None"),
     ("SoDebugError", "getHandlerCallback", ""): (
         "",
-        "Callable[[object, SoError], None] | None",
+        "SoErrorCallback | None",
     ),
     ("SoDebugError", "getHandlerData", ""): ("", "object | None"),
     ("SoMemoryError", "getHandlerCallback", ""): (
         "",
-        "Callable[[object, SoError], None] | None",
+        "SoErrorCallback | None",
     ),
     ("SoMemoryError", "getHandlerData", ""): ("", "object | None"),
     ("SoReadError", "getHandlerCallback", ""): (
         "",
-        "Callable[[object, SoError], None] | None",
+        "SoErrorCallback | None",
     ),
     ("SoReadError", "getHandlerData", ""): ("", "object | None"),
     ("SoEngine", "getByName", "name: SbName"): (
@@ -668,11 +668,51 @@ CALLBACK_DATA_PARAMETER_NAMES = {
     "userData",
 }
 CALLBACK_HANDLE_PARAMETER_NAMES = {"tuple"}
-CALLBACK_TYPE_SIGNATURES = {
-    "ScXMLStateChangeCB": (
-        "Callable[[Any, ScXMLStateMachine, str, bool, bool], None]"
+CALLBACK_PROTOCOL_DEFINITIONS = (
+    (
+        "SoSensorCallback",
+        ("SoSensor",),
+        "_SensorT = TypeVar(\"_SensorT\", bound=SoSensor, contravariant=True)\n"
+        "\n"
+        "class SoSensorCallback(Protocol[_SensorT]):\n"
+        "    def __call__(\n"
+        "        self, data: object, sensor: _SensorT, /\n"
+        "    ) -> None: ...",
     ),
-    "ScXMLStateMachineDeleteCB": "Callable[[Any, ScXMLStateMachine], None]",
+    (
+        "SoErrorCallback",
+        ("SoError",),
+        "class SoErrorCallback(Protocol):\n"
+        "    def __call__(\n"
+        "        self, data: object, error: SoError, /\n"
+        "    ) -> None: ...",
+    ),
+    (
+        "ScXMLStateMachineDeleteCallback",
+        ("ScXMLStateMachine",),
+        "class ScXMLStateMachineDeleteCallback(Protocol):\n"
+        "    def __call__(\n"
+        "        self, data: Any, machine: ScXMLStateMachine, /\n"
+        "    ) -> None: ...",
+    ),
+    (
+        "ScXMLStateChangeCallback",
+        ("ScXMLStateMachine",),
+        "class ScXMLStateChangeCallback(Protocol):\n"
+        "    def __call__(\n"
+        "        self,\n"
+        "        data: Any,\n"
+        "        machine: ScXMLStateMachine,\n"
+        "        stateidentifier: str,\n"
+        "        enterstate: bool,\n"
+        "        success: bool,\n"
+        "        /,\n"
+        "    ) -> None: ...",
+    ),
+)
+CALLBACK_TYPE_SIGNATURES = {
+    "ScXMLStateChangeCB": "ScXMLStateChangeCallback",
+    "ScXMLStateMachineDeleteCB": "ScXMLStateMachineDeleteCallback",
     "SoCallbackAction::SoCallbackActionCB": (
         "Callable[[Any, SoCallbackAction, SoNode], int]"
     ),
@@ -705,8 +745,8 @@ CALLBACK_TYPE_SIGNATURES = {
         "Callable[[Any, SoCallbackAction, SoPrimitiveVertex, "
         "SoPrimitiveVertex, SoPrimitiveVertex], None]"
     ),
-    "SoSensorCB": "Callable[[object, SoSensor], None]",
-    "SoErrorCB": "Callable[[object, SoError], None]",
+    "SoSensorCB": "SoSensorCallback[SoSensor]",
+    "SoErrorCB": "SoErrorCallback",
     "SoQtRenderAreaEventCB": "Callable[[object, QEvent], object]",
 }
 
@@ -842,41 +882,41 @@ class CallbackMethodPolicy:
 CALLBACK_METHOD_POLICIES = {
     ("SoError", "setHandlerCallback"): CallbackMethodPolicy(
         (
-            ("pyfunc", "Callable[[object, SoError], None]"),
+            ("pyfunc", "SoErrorCallback"),
             ("data", "object"),
         ),
         (
-            "pyfunc: Callable[[object, SoError], None], data: object",
+            "pyfunc: SoErrorCallback, data: object",
             "None",
         ),
     ),
     ("SoDebugError", "setHandlerCallback"): CallbackMethodPolicy(
         (
-            ("pyfunc", "Callable[[object, SoError], None]"),
+            ("pyfunc", "SoErrorCallback"),
             ("data", "object"),
         ),
         (
-            "pyfunc: Callable[[object, SoError], None], data: object",
+            "pyfunc: SoErrorCallback, data: object",
             "None",
         ),
     ),
     ("SoMemoryError", "setHandlerCallback"): CallbackMethodPolicy(
         (
-            ("pyfunc", "Callable[[object, SoError], None]"),
+            ("pyfunc", "SoErrorCallback"),
             ("data", "object"),
         ),
         (
-            "pyfunc: Callable[[object, SoError], None], data: object",
+            "pyfunc: SoErrorCallback, data: object",
             "None",
         ),
     ),
     ("SoReadError", "setHandlerCallback"): CallbackMethodPolicy(
         (
-            ("pyfunc", "Callable[[object, SoError], None]"),
+            ("pyfunc", "SoErrorCallback"),
             ("data", "object"),
         ),
         (
-            "pyfunc: Callable[[object, SoError], None], data: object",
+            "pyfunc: SoErrorCallback, data: object",
             "None",
         ),
     ),
@@ -1074,19 +1114,19 @@ CALLBACK_METHOD_POLICIES = {
         ),
     ),
     ("SoSensor", "setFunction"): CallbackMethodPolicy(
-        (("callbackfunction", "Callable[[object, SoSensor], None]"),),
+        (("callbackfunction", "SoSensorCallback[SoSensor]"),),
         (
-            "self, callbackfunction: Callable[[object, SoSensor], None]",
+            "self, callbackfunction: SoSensorCallback[SoSensor]",
             "None",
         ),
     ),
     ("SoDataSensor", "setDeleteCallback"): CallbackMethodPolicy(
         (
-            ("function", "Callable[[object, SoSensor], None]"),
+            ("function", "SoSensorCallback[SoSensor]"),
             ("data", "object | None"),
         ),
         (
-            "self, function: Callable[[object, SoSensor], None], "
+            "self, function: SoSensorCallback[SoSensor], "
             "data: object | None = ...",
             "None",
         ),
@@ -1308,7 +1348,7 @@ SENSOR_CALLBACK_CLASSES = {
 }
 SENSOR_CALLBACK_CONSTRUCTOR_TYPES = {
     class_name: (
-        "Callable[[object, %s], None]" % class_name,
+        "SoSensorCallback[%s]" % class_name,
         "object | None",
     )
     for class_name in SENSOR_CALLBACK_CLASSES

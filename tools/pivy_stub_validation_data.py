@@ -325,13 +325,19 @@ CALLBACK_METHOD_CHECKS = {
         (
             "ScXMLStateMachine",
             "addDeleteCallback",
-            {"pyfunc": "Callable[[Any, ScXMLStateMachine], None]", "userdata": "Any"},
+            {
+                "pyfunc": "ScXMLStateMachineDeleteCallback",
+                "userdata": "Any",
+            },
             "None",
         ),
         (
             "ScXMLStateMachine",
             "removeDeleteCallback",
-            {"pyfunc": "Callable[[Any, ScXMLStateMachine], None]", "userdata": "Any"},
+            {
+                "pyfunc": "ScXMLStateMachineDeleteCallback",
+                "userdata": "Any",
+            },
             "None",
         ),
         (
@@ -339,7 +345,7 @@ CALLBACK_METHOD_CHECKS = {
             "addStateChangeCallback",
             {
                 "pyfunc": (
-                    "Callable[[Any, ScXMLStateMachine, str, bool, bool], None]"
+                    "ScXMLStateChangeCallback"
                 ),
                 "userdata": "Any",
             },
@@ -350,7 +356,7 @@ CALLBACK_METHOD_CHECKS = {
             "removeStateChangeCallback",
             {
                 "pyfunc": (
-                    "Callable[[Any, ScXMLStateMachine, str, bool, bool], None]"
+                    "ScXMLStateChangeCallback"
                 ),
                 "userdata": "Any",
             },

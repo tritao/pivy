@@ -50,6 +50,7 @@ try:
         CALLBACK_HANDLE_PARAMETER_NAMES,
         CALLBACK_PARAMETER_NAMES,
         CALLBACK_PARAMETER_TYPE_OVERRIDES,
+        CALLBACK_PROTOCOL_DEFINITIONS,
         CALLBACK_TYPE_SIGNATURES,
         COMPARISON_METHODS,
         factory_method_return_type,
@@ -97,6 +98,7 @@ except ImportError:
         CALLBACK_HANDLE_PARAMETER_NAMES,
         CALLBACK_PARAMETER_NAMES,
         CALLBACK_PARAMETER_TYPE_OVERRIDES,
+        CALLBACK_PROTOCOL_DEFINITIONS,
         CALLBACK_TYPE_SIGNATURES,
         COMPARISON_METHODS,
         factory_method_return_type,
@@ -896,8 +898,13 @@ def replace_external_duplicate_classes(text, module, output_dir, local_class_nam
 
 def collect_referenced_external_types(text, class_names, external_class_modules):
     used_external_types = set()
+    local_callback_protocols = {
+        name
+        for name, required_classes, _ in CALLBACK_PROTOCOL_DEFINITIONS
+        if set(required_classes).issubset(class_names)
+    }
     for name in re.findall(r"\b[A-Z][A-Za-z_]\w*\b", text):
-        if name in class_names:
+        if name in class_names or name in local_callback_protocols:
             continue
         if name in external_class_modules:
             used_external_types.add(name)
@@ -1189,6 +1196,31 @@ def add_generated_header(text):
         lines.pop(0)
 
     return GENERATED_HEADER + "\n".join(lines) + "\n"
+
+
+def add_callback_protocols(text, class_names):
+    """Add named Protocols for Python-facing callback adapters."""
+
+    definitions = []
+    for name, required_classes, definition in CALLBACK_PROTOCOL_DEFINITIONS:
+        if not set(required_classes).issubset(class_names):
+            continue
+        if re.search(r"^class\s+%s\b" % re.escape(name), text, flags=re.MULTILINE):
+            continue
+        definitions.append(definition)
+
+    if not definitions:
+        return text
+
+    lines = text.splitlines()
+    insert_at = next(
+        (index for index, line in enumerate(lines) if line.startswith("class ")),
+        len(lines),
+    )
+    block_lines = "\n\n".join(definitions).splitlines()
+    prefix = [""] if insert_at and lines[insert_at - 1] else []
+    lines[insert_at:insert_at] = prefix + block_lines + [""]
+    return "\n".join(lines) + "\n"
 
 
 def remove_swig_meta_classmethod(text):
@@ -1940,10 +1972,13 @@ def postprocess_stub(path, module, output_dir):
     processed = normalize_shadow_methods(processed)
     processed = remove_swig_meta_classmethod(processed)
     processed = add_runtime_unsupported_notes(processed, module)
+    processed = add_callback_protocols(processed, class_names)
     processed = add_typing_import(processed, "Any")
     processed = add_typing_import(processed, "Callable")
     processed = add_typing_import(processed, "Iterator")
+    processed = add_typing_import(processed, "Protocol")
     processed = add_typing_import(processed, "Sequence")
+    processed = add_typing_import(processed, "TypeVar")
     processed = add_generated_header(processed)
     if processed != original:
         with open(path, "w") as stub_file:

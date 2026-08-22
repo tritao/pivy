@@ -6,6 +6,48 @@ from typing_extensions import assert_type
 from pivy import coin
 
 
+def check_named_callback_protocols() -> None:
+    class SensorCallbackObject:
+        def __call__(self, data: object, sensor: coin.SoSensor) -> None:
+            pass
+
+    sensor = coin.SoSensor()
+    sensor.setFunction(SensorCallbackObject())
+    assert_type(
+        sensor.getFunction(),
+        coin.SoSensorCallback[coin.SoSensor] | None,
+    )
+
+    class ErrorCallbackObject:
+        def __call__(self, data: object, error: coin.SoError) -> None:
+            pass
+
+    coin.SoError.setHandlerCallback(ErrorCallbackObject(), None)
+
+    class StateMachineDeleteCallback:
+        def __call__(
+            self,
+            data: object,
+            machine: coin.ScXMLStateMachine,
+        ) -> None:
+            pass
+
+    class StateChangeCallback:
+        def __call__(
+            self,
+            data: object,
+            machine: coin.ScXMLStateMachine,
+            stateidentifier: str,
+            enterstate: bool,
+            success: bool,
+        ) -> None:
+            pass
+
+    state_machine = coin.ScXMLStateMachine()
+    state_machine.addDeleteCallback(StateMachineDeleteCallback(), None)
+    state_machine.addStateChangeCallback(StateChangeCallback(), None)
+
+
 def check_sensor_callbacks() -> None:
     def timer_callback(data: Any, sensor: coin.SoTimerSensor) -> None:
         pass
@@ -29,10 +71,11 @@ def check_sensor_callbacks() -> None:
 
     plain_timer = coin.SoTimerSensor()
     plain_timer.setFunction(base_sensor_callback)
-    assert_type(
-        plain_timer.getFunction(),
-        Callable[[object, coin.SoSensor], None] | None,
+    sensor_callback: coin.SoSensorCallback[coin.SoSensor] | None = (
+        plain_timer.getFunction()
     )
+    if sensor_callback is not None:
+        sensor_callback({}, plain_timer)
     assert_type(plain_timer.getData(), object | None)
 
     data_sensor = coin.SoFieldSensor()
@@ -377,22 +420,14 @@ def check_error_callbacks() -> None:
     coin.SoMemoryError.setHandlerCallback(error_callback, None)
     coin.SoReadError.setHandlerCallback(error_callback, None)
 
-    assert_type(
-        coin.SoError.getHandlerCallback(),
-        Callable[[object, coin.SoError], None] | None,
+    error_handler: coin.SoErrorCallback | None = coin.SoError.getHandlerCallback()
+    debug_handler: coin.SoErrorCallback | None = (
+        coin.SoDebugError.getHandlerCallback()
     )
-    assert_type(
-        coin.SoDebugError.getHandlerCallback(),
-        Callable[[object, coin.SoError], None] | None,
+    memory_handler: coin.SoErrorCallback | None = (
+        coin.SoMemoryError.getHandlerCallback()
     )
-    assert_type(
-        coin.SoMemoryError.getHandlerCallback(),
-        Callable[[object, coin.SoError], None] | None,
-    )
-    assert_type(
-        coin.SoReadError.getHandlerCallback(),
-        Callable[[object, coin.SoError], None] | None,
-    )
+    read_handler: coin.SoErrorCallback | None = coin.SoReadError.getHandlerCallback()
     assert_type(coin.SoError.getHandlerData(), object | None)
     assert_type(coin.SoDebugError.getHandlerData(), object | None)
     assert_type(coin.SoMemoryError.getHandlerData(), object | None)

@@ -167,14 +167,14 @@ class FieldTypePolicyTests(unittest.TestCase):
         self.assertEqual(
             policy.PYTHON_SHADOW_METHOD_TYPES[("SoSensor", "setFunction")],
             (
-                "self, callbackfunction: Callable[[object, SoSensor], None]",
+                "self, callbackfunction: SoSensorCallback[SoSensor]",
                 "None",
             ),
         )
         self.assertEqual(
             policy.PYTHON_SHADOW_METHOD_TYPES[("SoDataSensor", "setDeleteCallback")],
             (
-                "self, function: Callable[[object, SoSensor], None], "
+                "self, function: SoSensorCallback[SoSensor], "
                 "data: object | None = ...",
                 "None",
             ),
@@ -184,7 +184,7 @@ class FieldTypePolicyTests(unittest.TestCase):
         self.assertEqual(
             policy.SENSOR_CALLBACK_CONSTRUCTOR_TYPES["SoTimerSensor"],
             (
-                "Callable[[object, SoTimerSensor], None]",
+                "SoSensorCallback[SoTimerSensor]",
                 "object | None",
             ),
         )
@@ -563,7 +563,7 @@ class CallbackTypePolicyTests(unittest.TestCase):
                     )
 
     def test_error_callbacks_use_python_callable_overrides(self):
-        expected = "Callable[[object, SoError], None]"
+        expected = "SoErrorCallback"
 
         for class_name in (
             "SoError",
@@ -589,13 +589,13 @@ class CallbackTypePolicyTests(unittest.TestCase):
             policy.CALLBACK_PARAMETER_TYPE_OVERRIDES[
                 ("SoSensor", "setFunction", "callbackfunction")
             ],
-            "Callable[[object, SoSensor], None]",
+            "SoSensorCallback[SoSensor]",
         )
         self.assertEqual(
             policy.CALLBACK_PARAMETER_TYPE_OVERRIDES[
                 ("SoDataSensor", "setDeleteCallback", "function")
             ],
-            "Callable[[object, SoSensor], None]",
+            "SoSensorCallback[SoSensor]",
         )
         self.assertEqual(
             policy.CALLBACK_PARAMETER_TYPE_OVERRIDES[
@@ -603,6 +603,38 @@ class CallbackTypePolicyTests(unittest.TestCase):
             ],
             "object | None",
         )
+
+    def test_adapted_callback_protocols_have_required_bindings(self):
+        definitions = {
+            name: required_classes
+            for name, required_classes, _ in policy.CALLBACK_PROTOCOL_DEFINITIONS
+        }
+        self.assertEqual(
+            definitions["SoSensorCallback"],
+            ("SoSensor",),
+        )
+        self.assertEqual(
+            definitions["SoErrorCallback"],
+            ("SoError",),
+        )
+        self.assertEqual(
+            policy.CALLBACK_TYPE_SIGNATURES["ScXMLStateMachineDeleteCB"],
+            "ScXMLStateMachineDeleteCallback",
+        )
+        self.assertEqual(
+            policy.CALLBACK_TYPE_SIGNATURES["ScXMLStateChangeCB"],
+            "ScXMLStateChangeCallback",
+        )
+
+    def test_adapted_callback_protocols_are_emitted_in_public_stubs(self):
+        coin_stub = Path("pivy/coin.pyi").read_text()
+        for name, _, _ in policy.CALLBACK_PROTOCOL_DEFINITIONS:
+            with self.subTest(name=name):
+                self.assertIn("class %s(Protocol" % name, coin_stub)
+
+        soqt_stub = Path("pivy/gui/soqt.pyi").read_text()
+        self.assertIn("class SoErrorCallback(Protocol):", soqt_stub)
+        self.assertNotIn("SoErrorCallback", soqt_stub.splitlines()[7])
 
 
 class PolicyBoundaryTests(unittest.TestCase):
