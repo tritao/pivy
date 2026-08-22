@@ -1,6 +1,6 @@
 # pyright: reportMissingModuleSource=false
 
-from typing import assert_type
+from typing import Iterator, assert_type
 
 from pivy import coin
 
@@ -116,6 +116,44 @@ def check_nullable_fields() -> None:
     path = coin.SoSFPath()
     assert_type(path.getValue(), coin.SoPath | None)
     path.setValue(None)
+
+
+def check_string_name_and_multifield_contracts() -> None:
+    string_field = coin.SoSFString()
+    assert_type(string_field.getValue(), coin.SbString)
+    string_field.setValue(coin.SbString("hello"))
+    string_field.setValue("hello")
+
+    name_field = coin.SoSFName()
+    assert_type(name_field.getValue(), coin.SbName)
+    name_field.setValue(coin.SbName("world"))
+    name_field.setValue("world")
+
+    names = coin.SoMFName()
+    names.setValues(0, 2, [coin.SbName("one"), "two"])
+    assert_type(names[0], coin.SbName)
+    assert_type(names.getValues(), list[str])
+    assert_type(iter(names), Iterator[coin.SbName])
+    names[0] = "updated"
+
+    strings = coin.SoMFString()
+    strings.setValues(0, 2, [coin.SbString("one"), "two"])
+    assert_type(strings[0], coin.SbString)
+    assert_type(strings.getValues(), list[str])
+    assert_type(iter(strings), Iterator[coin.SbString])
+    strings[0] = coin.SbString("updated")
+
+    nodes = coin.SoMFNode()
+    nodes.setValues(0, 1, [coin.SoCone()])
+    assert_type(nodes[0], coin.SoNode)
+    assert_type(nodes.getValues(), list[coin.SoNode])
+    assert_type(iter(nodes), Iterator[coin.SoNode])
+
+    paths = coin.SoMFPath()
+    paths.setValues(0, 1, [coin.SoPath()])
+    assert_type(paths[0], coin.SoPath)
+    assert_type(paths.getValues(), list[coin.SoPath])
+    assert_type(iter(paths), Iterator[coin.SoPath])
 
 
 def check_image_fields() -> None:

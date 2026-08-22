@@ -94,6 +94,24 @@ class FieldTypePolicyTests(unittest.TestCase):
         self.assertEqual(policy.value_type, "SoNode | None")
         self.assertEqual(policy.setter_value_type, "SoNode | None")
 
+    def test_string_and_name_field_policies(self):
+        self.assertEqual(
+            policy.FIELD_TYPE_POLICIES["SoSFString"].value_type,
+            "SbString",
+        )
+        self.assertEqual(
+            policy.FIELD_TYPE_POLICIES["SoSFString"].setter_value_type,
+            "SbString | str",
+        )
+        self.assertEqual(
+            policy.FIELD_TYPE_POLICIES["SoSFName"].value_type,
+            "SbName",
+        )
+        self.assertEqual(
+            policy.FIELD_TYPE_POLICIES["SoSFName"].setter_value_type,
+            "SbName | str",
+        )
+
     def test_field_methods_are_derived_from_policy(self):
         overrides = field_method_type_overrides()
 

@@ -1388,6 +1388,16 @@ class MultifieldTypePolicy:
 
 
 FIELD_TYPE_POLICIES = {
+    "SoSFString": FieldTypePolicy(
+        value_type="SbString",
+        setter_argument_type="SbString",
+        setter_value_type="SbString | str",
+    ),
+    "SoSFName": FieldTypePolicy(
+        value_type="SbName",
+        setter_argument_type="SbName",
+        setter_value_type="SbName | str",
+    ),
     "SoSFNode": FieldTypePolicy(
         value_type="SoNode | None",
         setter_argument_type="SoNode",
