@@ -1,6 +1,7 @@
 # pyright: reportMissingModuleSource=false
 
-from typing import Any, Iterator, Sequence, assert_type
+from typing import Any, Iterator, Sequence
+from typing_extensions import assert_type
 
 from pivy import coin
 

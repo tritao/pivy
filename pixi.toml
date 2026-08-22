@@ -20,6 +20,7 @@ flake8 = "*"
 mypy = "*"
 pyright = ">=1.1.408,<2"
 pyrefly = ">=0.61.1,<0.62"
+typing-extensions = "*"
 
 
 [target.linux-64.dependencies]
@@ -62,4 +63,5 @@ check_typing_policy_coverage = { cmd = ["python", "-m", "tools.check_pivy_policy
 typecheck_stubs_pyright = { cmd = ["pyright", "--warnings", "tests/typecheck"]}
 typecheck_stubs_pyrefly = { cmd = ["pyrefly", "check", "--summary=none", "--search-path", ".", "tests/typecheck"]}
 typecheck_stubs = { depends-on = ["typecheck_stubs_pyright", "typecheck_stubs_pyrefly"]}
+typecheck_stubs_matrix = { cmd = ["python", "-m", "tools.check_pivy_typing_matrix"]}
 typecheck_report = { cmd = ["python", "-m", "tools.report_pivy_typing", "--check-baseline", "pivy/coin.pyi"]}

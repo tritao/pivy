@@ -1,6 +1,7 @@
 # pyright: reportMissingModuleSource=false
 
-from typing import Any, Callable, assert_type
+from typing import Any, Callable
+from typing_extensions import assert_type
 
 from pivy import coin
 

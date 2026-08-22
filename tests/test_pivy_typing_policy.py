@@ -5,6 +5,7 @@ from pathlib import Path
 
 import tools.pivy_stub_generation_data as compatibility_policy
 import tools.pivy_stub_typing_policy as policy
+from tools.check_pivy_typing_matrix import SUPPORTED_PYTHON_VERSIONS
 from tools.report_pivy_typing import (
     TYPING_QUALITY_BASELINE,
     collect_report,
@@ -620,6 +621,12 @@ class PolicyBoundaryTests(unittest.TestCase):
 
     def test_policy_managed_fields_are_covered(self):
         self.assertEqual(policy_coverage_errors(Path("pivy/coin.pyi")), ())
+
+    def test_typing_matrix_covers_supported_python_targets(self):
+        self.assertEqual(
+            SUPPORTED_PYTHON_VERSIONS,
+            ("3.10", "3.11", "3.12", "3.13", "3.14"),
+        )
 
     def test_quality_baseline_covers_every_incomplete_category(self):
         budget_categories = {

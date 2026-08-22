@@ -1,6 +1,6 @@
 # pyright: reportMissingModuleSource=false
 
-from typing import assert_type
+from typing_extensions import assert_type
 
 from pivy import coin
 from pivy.gui import soqt
