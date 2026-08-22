@@ -43,6 +43,30 @@ def check_engine_outputs() -> None:
     assert_type(output_data.getIndex(boolean, output), int)
 
 
+def check_engine_output_connection_contract() -> None:
+    engine = coin.SoBoolOperation()
+    output = engine.output
+
+    assert_type(output.isNodeEngineOutput(), bool)
+    output.enable(False)
+    output.addConnection(engine.a)
+    output.removeConnection(engine.a)
+    assert_type(output.prepareToWrite(), None)
+    assert_type(output.doneWriting(), None)
+
+    output_data = coin.SoEngineOutputData(1)
+    assert_type(
+        output_data.addOutput(
+            engine,
+            "result",
+            output,
+            coin.SoType.badType(),
+        ),
+        None,
+    )
+    assert_type(engine.copyThroughConnection(), coin.SoFieldContainer)
+
+
 def check_engine_factory_contract() -> None:
     boolean = coin.SoBoolOperation.createInstance()
     assert_type(boolean, coin.SoBoolOperation)
