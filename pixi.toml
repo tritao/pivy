@@ -50,7 +50,7 @@ configure = { cmd = ["cmake", "-G", "Ninja", "-B", "build", "-S", ".",
                      "-D", "QT_HOST_PATH=$CONDA_PREFIX" 
                      ], depends-on = []}
 
-build = { cmd = ["ninja", "-C", "build", "install"], depends-on = ["configure"]}
+build = { cmd = ["ninja", "-C", "build", "-j10", "install"], depends-on = ["configure"]}
 test = { cmd = ["python", "tests/coin_tests.py"], depends-on = ["build"]}
 test_soqt = { cmd = ["python", "tests/soqt_tests.py"], depends-on = ["build"]}
 test_quarter = { cmd = ["python", "tests/quarter_tests.py"], depends-on = ["build"]}
@@ -58,6 +58,7 @@ lint = { cmd = ["flake8", ".", "--count", "--select=E901,E999,F821,F822,F823",
                 "--show-source", "--statistics", "--exclude=build,.pixi,.svn,CVS,.bzr,.hg,.git,__pycache__,.tox,.eggs,.egg,SoPyScript"]}
 test_stubs = { cmd = ["python", "-m", "tools.validate_pivy_stubs"], depends-on = ["build"]}
 check_stub_drift = { cmd = ["python", "-m", "tools.check_pivy_stub_drift"], depends-on = ["build"]}
+check_stub_determinism = { cmd = ["python", "-m", "tools.check_pivy_stub_determinism"], depends-on = ["build"]}
 test_typing_policy = { cmd = ["python", "-m", "unittest", "tests/test_pivy_typing_policy.py"]}
 check_typing_policy_coverage = { cmd = ["python", "-m", "tools.check_pivy_policy_coverage", "pivy/coin.pyi"]}
 check_field_attribute_coverage = { cmd = ["python", "-m", "tools.check_pivy_field_coverage", "pivy/coin.pyi"], depends-on = ["build"]}
@@ -76,4 +77,4 @@ typecheck_verifytypes_json = { cmd = ["python", "-m", "tools.report_pivy_verifyt
 typecheck_stubtest_coin = { cmd = ["python", "-m", "tools.check_pivy_stubtest", "--module", "pivy.coin"], depends-on = ["build"]}
 typecheck_stubtest_soqt = { cmd = ["python", "-m", "tools.check_pivy_stubtest", "--module", "pivy.gui.soqt"], depends-on = ["build"]}
 typecheck_stubtest = { depends-on = ["typecheck_stubtest_coin", "typecheck_stubtest_soqt"]}
-typecheck_quality = { depends-on = ["typecheck_stubs", "typecheck_negative", "typecheck_stubs_strict", "typecheck_stubs_matrix", "test_typing_policy", "check_typing_policy_coverage", "check_field_attribute_coverage", "typecheck_report", "typecheck_verifytypes", "typecheck_stubtest"]}
+typecheck_quality = { depends-on = ["typecheck_stubs", "typecheck_negative", "typecheck_stubs_strict", "typecheck_stubs_matrix", "test_typing_policy", "check_typing_policy_coverage", "check_field_attribute_coverage", "typecheck_report", "typecheck_verifytypes", "test_stubs", "check_stub_drift", "check_stub_determinism", "typecheck_stubtest"]}

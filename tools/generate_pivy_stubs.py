@@ -1662,24 +1662,27 @@ def normalize_multifield_helpers(text):
         elif current_class and is_top_level_statement(line):
             current_class = None
 
-        match = re.match(
-            r"(?P<indent>\s*)def setValues\(self, "
-            r"(?:\*args|start: int, num: int, values: Sequence\[[^]]+\])"
-            r"\)(?: -> None)?: \.\.\.$",
-            line,
-        )
         multifield_policy = MULTIFIELD_TYPE_POLICIES.get(current_class)
-        if match and multifield_policy and multifield_policy.set_values_types:
+        is_setvalues_method = bool(
+            re.match(r"(?P<indent>\s*)def setValues\(self,", line)
+        )
+        if (
+            is_setvalues_method
+            and multifield_policy
+            and multifield_policy.set_values_types
+        ):
+            while updated and updated[-1].strip() in (
+                "@overload",
+            ):
+                updated.pop()
             while updated and updated[-1].strip().startswith(
                 "# NOTE: SWIG exposes raw C pointers"
             ):
                 updated.pop()
             if rendered_setvalues_class != current_class:
-                if updated and updated[-1].strip() == "@overload":
-                    updated.pop()
                 updated.extend(
                     render_multifield_setvalues(
-                        match.group("indent"),
+                        re.match(r"(?P<indent>\s*)", line).group("indent"),
                         multifield_policy.set_values_types,
                     )
                 )
@@ -1691,12 +1694,7 @@ def normalize_multifield_helpers(text):
             rendered_setvalues_class == current_class
             and line.strip() == "@overload"
             and index + 1 < len(lines)
-            and re.match(
-                r"\s*def setValues\(self, "
-                r"(?:\*args|start: int, num: int, values: Sequence\[[^]]+\])"
-                r"\)(?: -> None)?: \.\.\.$",
-                lines[index + 1],
-            )
+            and re.match(r"\s*def setValues\(self,", lines[index + 1])
         ):
             index += 1
             continue
