@@ -1229,6 +1229,25 @@ INCOMPLETE_CATEGORY_ACTIONS = {
     "uncategorized": "triage and classify before merging",
 }
 
+DYNAMIC_RUNTIME_SUBCATEGORIES = (
+    "runtime factory returns",
+    "opaque pointer/object returns",
+    "opaque parameter boundaries",
+    "opaque field storage",
+)
+
+
+def classify_dynamic_runtime_site(*, kind: str, method_name: str | None) -> str:
+    """Give reviewed dynamic/runtime sites a more useful next-action bucket."""
+
+    if kind == "return" and method_name == "createInstance":
+        return "runtime factory returns"
+    if kind == "return":
+        return "opaque pointer/object returns"
+    if kind == "attribute":
+        return "opaque field storage"
+    return "opaque parameter boundaries"
+
 
 @dataclass(frozen=True)
 class FieldTypePolicy:

@@ -594,6 +594,26 @@ class PolicyBoundaryTests(unittest.TestCase):
         violations = quality_regressions(report, baseline)
         self.assertTrue(any("dynamic/runtime API" in violation for violation in violations))
 
+    def test_dynamic_runtime_inventory_is_complete(self):
+        report = collect_report(Path("pivy/coin.pyi"))
+        self.assertEqual(
+            set(report.dynamic_runtime_subcategories),
+            set(policy.DYNAMIC_RUNTIME_SUBCATEGORIES),
+        )
+        self.assertEqual(
+            sum(report.dynamic_runtime_subcategories.values()),
+            report.incomplete_categories["dynamic/runtime API"],
+        )
+        self.assertEqual(
+            dict(report.dynamic_runtime_subcategories),
+            {
+                "runtime factory returns": 104,
+                "opaque pointer/object returns": 42,
+                "opaque parameter boundaries": 247,
+                "opaque field storage": 1,
+            },
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

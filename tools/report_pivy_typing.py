@@ -11,9 +11,11 @@ from pathlib import Path
 from typing import Iterable
 
 from tools.pivy_stub_typing_policy import (
+    DYNAMIC_RUNTIME_SUBCATEGORIES,
     INCOMPLETE_CATEGORIES,
     INCOMPLETE_CATEGORY_ACTIONS,
     classify_incomplete,
+    classify_dynamic_runtime_site,
 )
 
 
@@ -39,6 +41,7 @@ class TypingReport:
     any_annotations: int
     incomplete_annotations: int
     incomplete_categories: Counter[str]
+    dynamic_runtime_subcategories: Counter[str]
     incomplete_sites: tuple[tuple[AnnotationSite, str], ...]
 
 
@@ -213,6 +216,7 @@ def collect_report(stub_path: Path) -> TypingReport:
     incomplete_sites: list[tuple[AnnotationSite, str]] = []
     status_counts = Counter()
     category_counts = Counter()
+    dynamic_subcategory_counts = Counter()
     for site in annotation_sites:
         if has_annotation_name(site.annotation, "Incomplete"):
             category = classify_incomplete(
@@ -224,6 +228,13 @@ def collect_report(stub_path: Path) -> TypingReport:
             )
             incomplete_sites.append((site, category))
             category_counts[category] += 1
+            if category == "dynamic/runtime API":
+                dynamic_subcategory_counts[
+                    classify_dynamic_runtime_site(
+                        kind=site.kind,
+                        method_name=site.method_name,
+                    )
+                ] += 1
             status_counts["incomplete"] += 1
         elif has_annotation_name(site.annotation, "Any"):
             status_counts["any"] += 1
@@ -239,6 +250,7 @@ def collect_report(stub_path: Path) -> TypingReport:
         any_annotations=status_counts["any"],
         incomplete_annotations=status_counts["incomplete"],
         incomplete_categories=category_counts,
+        dynamic_runtime_subcategories=dynamic_subcategory_counts,
         incomplete_sites=tuple(incomplete_sites),
     )
 
@@ -289,6 +301,28 @@ def format_report(report: TypingReport, stub_path: Path) -> str:
                 INCOMPLETE_CATEGORY_ACTIONS[category],
             )
         )
+    lines.extend(
+        [
+            "",
+            "Dynamic/runtime inventory",
+            "-------------------------",
+            "Subcategory                     Count    Next action",
+        ]
+    )
+    for subcategory in DYNAMIC_RUNTIME_SUBCATEGORIES:
+        lines.append(
+            "%-30s %6d    %s"
+            % (
+                subcategory,
+                report.dynamic_runtime_subcategories[subcategory],
+                {
+                    "runtime factory returns": "verify factory downcast behavior",
+                    "opaque pointer/object returns": "add a Python adapter where stable",
+                    "opaque parameter boundaries": "model or document the ABI boundary",
+                    "opaque field storage": "replace raw storage with a field protocol",
+                }[subcategory],
+            )
+        )
     return "\n".join(lines)
 
 
@@ -322,6 +356,11 @@ def parse_args() -> argparse.Namespace:
         help="list the individual Incomplete sites left uncategorized",
     )
     parser.add_argument(
+        "--show-category",
+        choices=INCOMPLETE_CATEGORIES,
+        help="list individual Incomplete sites in one category",
+    )
+    parser.add_argument(
         "--check-baseline",
         action="store_true",
         help="fail if the reviewed typing-quality baseline regresses",
@@ -335,6 +374,19 @@ def main() -> int:
     output = format_report(report, args.stub)
     if args.show_uncategorized:
         output += format_uncategorized(report)
+    if args.show_category:
+        sites = [
+            site
+            for site, category in report.incomplete_sites
+            if category == args.show_category
+        ]
+        output += "\n\n%s Incomplete sites\n%s" % (
+            args.show_category,
+            "-" * (len(args.show_category) + len(" Incomplete sites")),
+        )
+        output += "\n" + "\n".join(
+            "%s (line %d)" % (format_site(site), site.line) for site in sites
+        )
     print(output)
     uncategorized = report.incomplete_categories["uncategorized"]
     if uncategorized:
