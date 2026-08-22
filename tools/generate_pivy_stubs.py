@@ -87,6 +87,7 @@ try:
         multifield_component_sequence_types,
         multifield_getvalues_types,
         multifield_iter_element_types,
+        multifield_snapshot_types,
         multifield_single_value_types,
         multifield_setvalues_types,
     )
@@ -135,6 +136,7 @@ except ImportError:
         multifield_component_sequence_types,
         multifield_getvalues_types,
         multifield_iter_element_types,
+        multifield_snapshot_types,
         multifield_single_value_types,
         multifield_setvalues_types,
     )
@@ -144,6 +146,7 @@ FIELD_METHOD_TYPE_OVERRIDES = field_method_type_overrides()
 MULTIFIELD_COMPONENT_SEQUENCE_TYPES = multifield_component_sequence_types()
 MULTIFIELD_GETVALUES_TYPES = multifield_getvalues_types()
 MULTIFIELD_ITER_ELEMENT_TYPES = multifield_iter_element_types()
+MULTIFIELD_SNAPSHOT_TYPES = multifield_snapshot_types()
 MULTIFIELD_SINGLE_VALUE_TYPES = multifield_single_value_types()
 MULTIFIELD_SETVALUES_TYPES = multifield_setvalues_types()
 VECTOR_OUTPUT_PARAMETER_TYPES = vector_output_parameter_types()
@@ -438,7 +441,7 @@ def infer_python_callback_types(signatures):
         if position in pyobject_positions or position in pyobject_handle_positions
     }
     handle_types = {
-        position: "tuple[%s, Any]" % callback_types[position]
+        position: "tuple[%s, object]" % callback_types[position]
         for position in pyobject_handle_positions
         if position in callback_types
     }
@@ -653,7 +656,7 @@ def render_python_signature(
             and pyobject_argument_role(cpp_arg.name) == PyObjectArgumentRole.USERDATA
             and cpp_base in {"PyObject", "void"}
         ):
-            parameter_type = "Any"
+            parameter_type = "object"
         if parameter_type is None:
             parameter_type = cpp_type_to_python(
                 cpp_arg.type,
@@ -698,7 +701,7 @@ def render_python_signature(
         elif (class_name, name) in METHOD_RETURN_TYPE_OVERRIDES:
             return_type = METHOD_RETURN_TYPE_OVERRIDES[(class_name, name)]
         elif cpp_return and name == "addEventCallback" and callback_types:
-            return_type = "tuple[%s, Any]" % next(iter(callback_types.values()))
+            return_type = "tuple[%s, object]" % next(iter(callback_types.values()))
         elif cpp_return:
             return_type = cpp_type_to_python(
                 cpp_return,
@@ -1670,6 +1673,57 @@ def normalize_multifield_getvalues(text):
     return "\n".join(updated) + "\n"
 
 
+def append_multifield_snapshot_method(lines, class_name):
+    if class_name not in MULTIFIELD_SNAPSHOT_TYPES:
+        return
+    if any(
+        re.match(r"\s*def getValuesSnapshot\(", line)
+        for line in lines[-12:]
+    ):
+        return
+    while lines and lines[-1] == "":
+        lines.pop()
+    lines.append(
+        "    def getValuesSnapshot(self) -> list[%s]: ..."
+        % MULTIFIELD_SNAPSHOT_TYPES[class_name]
+    )
+    lines.append("")
+
+
+def normalize_multifield_snapshots(text):
+    """Expose the Python-owned multifield snapshot on every concrete MF."""
+
+    lines = text.splitlines()
+    updated = []
+    current_class = None
+    skip_snapshot_docstring = False
+
+    for line in lines:
+        if skip_snapshot_docstring:
+            if line.strip().startswith('"""'):
+                skip_snapshot_docstring = False
+            continue
+
+        class_match = re.match(r"^class\s+([A-Za-z_]\w*)", line)
+        if class_match:
+            append_multifield_snapshot_method(updated, current_class)
+            current_class = class_match.group(1)
+        elif current_class and is_top_level_statement(line):
+            append_multifield_snapshot_method(updated, current_class)
+            current_class = None
+
+        if current_class == "SoMField" and re.match(
+            r"\s*def getValuesSnapshot\(self\)", line
+        ):
+            updated.append("    def getValuesSnapshot(self) -> list[Any]: ...")
+            skip_snapshot_docstring = True
+            continue
+        updated.append(line)
+
+    append_multifield_snapshot_method(updated, current_class)
+    return "\n".join(updated) + "\n"
+
+
 def normalize_multifield_single_values(text):
     """Apply Python string coercion to supported single-value MF operations."""
 
@@ -1984,6 +2038,7 @@ def postprocess_stub(path, module, output_dir):
     processed = normalize_operator_helpers(processed)
     processed = normalize_multifield_helpers(processed)
     processed = normalize_multifield_getvalues(processed)
+    processed = normalize_multifield_snapshots(processed)
     processed = normalize_multifield_single_values(processed)
     processed = normalize_vector_getvalue_helpers(processed)
     processed = normalize_python_helpers(processed)

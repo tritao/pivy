@@ -36,6 +36,7 @@ from tools.pivy_stub_typing_policy import (
     multifield_component_sequence_types,
     multifield_getvalues_types,
     multifield_iter_element_types,
+    multifield_snapshot_types,
     multifield_single_value_types,
     multifield_setvalues_types,
     vector_iter_element_types,
@@ -237,7 +238,7 @@ class FieldTypePolicyTests(unittest.TestCase):
         self.assertEqual(
             policy.PYTHON_SHADOW_METHOD_TYPES[("SoDB", "addProgressCallback")],
             (
-                "func: Callable[[object, SbName, float, bool], bool], "
+                "func: SoDBProgressCallback, "
                 "userdata: object | None",
                 "None",
             ),
@@ -247,7 +248,7 @@ class FieldTypePolicyTests(unittest.TestCase):
         self.assertEqual(
             policy.PYTHON_SHADOW_METHOD_TYPES[("SoCallbackList", "addCallback")],
             (
-                "self, f: Callable[[object, object], None], "
+                "self, f: SoCallbackListCallback, "
                 "userData: object | None = ...",
                 "None",
             ),
@@ -263,7 +264,7 @@ class FieldTypePolicyTests(unittest.TestCase):
                 ("SoContextHandler", "addContextDestructionCallback")
             ],
             (
-                "func: Callable[[object, int], None], "
+                "func: SoContextDestructionCallback, "
                 "userdata: object | None = ...",
                 "None",
             ),
@@ -406,6 +407,20 @@ class MultifieldTypePolicyTests(unittest.TestCase):
         self.assertEqual(getvalues_types["SoMFVec3f"], "SbVec3f")
         self.assertEqual(getvalues_types["SoMFName"], "str")
         self.assertNotIn("SoMFDouble", getvalues_types)
+
+    def test_multifield_snapshot_types_cover_every_family(self):
+        snapshot_types = multifield_snapshot_types()
+
+        self.assertEqual(snapshot_types["SoMFFloat"], "float")
+        self.assertEqual(snapshot_types["SoMFVec3f"], "SbVec3f")
+        self.assertEqual(snapshot_types["SoMFDouble"], "float")
+        self.assertEqual(
+            snapshot_types,
+            {
+                name: policy.element_type
+                for name, policy in MULTIFIELD_TYPE_POLICIES.items()
+            },
+        )
 
     def test_vector_component_sequence_types_are_derived_from_policy(self):
         component_types = multifield_component_sequence_types()
@@ -683,6 +698,18 @@ class CallbackTypePolicyTests(unittest.TestCase):
             for name, required_classes, _ in policy.PYTHON_PROTOCOL_DEFINITIONS
         }
         self.assertEqual(
+            definitions["SoCallbackListCallback"],
+            ("SoCallbackList",),
+        )
+        self.assertEqual(
+            definitions["SoContextDestructionCallback"],
+            ("SoContextHandler",),
+        )
+        self.assertEqual(
+            definitions["SoDBProgressCallback"],
+            ("SbName", "SoDB"),
+        )
+        self.assertEqual(
             definitions["SoSensorCallback"],
             ("SoSensor",),
         )
@@ -714,6 +741,9 @@ class CallbackTypePolicyTests(unittest.TestCase):
     def test_adapted_callback_protocols_are_emitted_in_public_stubs(self):
         coin_stub = Path("pivy/coin.pyi").read_text()
         coin_protocols = {
+            "SoCallbackListCallback",
+            "SoContextDestructionCallback",
+            "SoDBProgressCallback",
             "SoSensorCallback",
             "SoErrorCallback",
             "ScXMLStateMachineDeleteCallback",

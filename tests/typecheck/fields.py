@@ -41,6 +41,20 @@ def check_value_fields() -> None:
     rotation.setValue([0.0, 0.0, 1.0, 1.5708])
 
 
+def check_multifield_snapshots() -> None:
+    vectors = coin.SoMFVec3f()
+    vectors.setValues([[1.0, 2.0, 3.0]])
+    assert_type(vectors.getValuesSnapshot(), list[coin.SbVec3f])
+
+    scalars = coin.SoMFFloat()
+    scalars.setValues([1.0, 2.0])
+    assert_type(scalars.getValuesSnapshot(), list[float])
+
+    names = coin.SoMFName()
+    names.setValues(["snapshot"])
+    assert_type(names.getValuesSnapshot(), list[coin.SbName])
+
+
 def check_extended_single_value_fields() -> None:
     trigger = coin.SoSFTrigger()
     assert_type(trigger.getValue(), None)

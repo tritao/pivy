@@ -120,8 +120,10 @@ def check_callback_list() -> None:
     def callback(data: object, callbackdata: object) -> None:
         pass
 
-    callback_list.addCallback(callback, None)
-    callback_list.removeCallback(callback, None)
+    callback_contract: coin.SoCallbackListCallback = callback
+
+    callback_list.addCallback(callback_contract, None)
+    callback_list.removeCallback(callback_contract, None)
     callback_list.invokeCallbacks({"source": "typing"})
 
 
@@ -129,10 +131,26 @@ def check_context_handler_callbacks() -> None:
     def callback(data: object, contextid: int) -> None:
         pass
 
-    coin.SoContextHandler.addContextDestructionCallback(callback, None)
-    coin.SoContextHandler.removeContextDestructionCallback(callback, None)
+    callback_contract: coin.SoContextDestructionCallback = callback
 
-    coin.SoGLCacheContextElement.scheduleDeleteCallback(41, callback, None)
+    coin.SoContextHandler.addContextDestructionCallback(callback_contract, None)
+    coin.SoContextHandler.removeContextDestructionCallback(callback_contract, None)
+
+    coin.SoGLCacheContextElement.scheduleDeleteCallback(41, callback_contract, None)
+
+
+def check_database_progress_callback_protocol() -> None:
+    def callback(
+        data: object,
+        itemid: coin.SbName,
+        fraction: float,
+        interruptible: bool,
+    ) -> bool:
+        return interruptible and fraction >= 0.0 and bool(itemid)
+
+    callback_contract: coin.SoDBProgressCallback = callback
+    coin.SoDB.addProgressCallback(callback_contract, None)
+    coin.SoDB.removeProgressCallback(callback_contract, None)
 
 
 def check_graphics_callback_setters() -> None:
@@ -239,7 +257,7 @@ def check_event_and_selection_callbacks() -> None:
     )
     assert_type(
         event_handle,
-        tuple[Callable[[Any, coin.SoEventCallback], None], Any],
+        tuple[Callable[[object, coin.SoEventCallback], None], object],
     )
     event_node.removeEventCallback(coin.SoType.badType(), event_handle)
 

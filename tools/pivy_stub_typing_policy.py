@@ -230,7 +230,7 @@ STRING_POINTER_PARAMETERS = {
 INPLACE_DIVISION_METHODS = {"__idiv__", "__itruediv__"}
 PYTHON_HELPER_METHOD_POLICIES = {
     ("_SwigNonDynamicMeta", "__setattr__"): PythonMethodPolicy(
-        "cls, name: str, value: Any",
+        "cls, name: str, value: object",
         "None",
     ),
     ("SoBase", "__nonzero__"): PythonMethodPolicy("self", "bool"),
@@ -238,7 +238,7 @@ PYTHON_HELPER_METHOD_POLICIES = {
         "self, name: str", "SoNode | SoField"
     ),
     ("SoBaseKit", "__setattr__"): PythonMethodPolicy(
-        "self, name: str, value: Any", "None"
+        "self, name: str, value: object", "None"
     ),
     ("SoEngine", "__getattr__"): PythonMethodPolicy(
         "self, name: str",
@@ -269,14 +269,14 @@ PYTHON_HELPER_METHOD_POLICIES = {
         "tuple[bytes | None, SbVec2s, SbVec2s]",
     ),
     ("SoEngine", "__setattr__"): PythonMethodPolicy(
-        "self, name: str, value: Any", "None"
+        "self, name: str, value: object", "None"
     ),
     ("SoFieldContainer", "__dir__"): PythonMethodPolicy("self", "list[str]"),
     ("SoFieldContainer", "__getattr__"): PythonMethodPolicy(
         "self, name: str", "SoField"
     ),
     ("SoFieldContainer", "__setattr__"): PythonMethodPolicy(
-        "self, name: str, value: Any",
+        "self, name: str, value: object",
         "None",
     ),
     ("SoGroup", "__iadd__"): PythonMethodPolicy(
@@ -731,6 +731,31 @@ CALLBACK_DATA_PARAMETER_NAMES = {
 CALLBACK_HANDLE_PARAMETER_NAMES = {"tuple"}
 PYTHON_PROTOCOL_DEFINITIONS = (
     (
+        "SoCallbackListCallback",
+        ("SoCallbackList",),
+        "class SoCallbackListCallback(Protocol):\n"
+        "    def __call__(\n"
+        "        self, data: object, callbackdata: object, /\n"
+        "    ) -> None: ...",
+    ),
+    (
+        "SoContextDestructionCallback",
+        ("SoContextHandler",),
+        "class SoContextDestructionCallback(Protocol):\n"
+        "    def __call__(\n"
+        "        self, data: object, contextid: int, /\n"
+        "    ) -> None: ...",
+    ),
+    (
+        "SoDBProgressCallback",
+        ("SbName", "SoDB"),
+        "class SoDBProgressCallback(Protocol):\n"
+        "    def __call__(\n"
+        "        self, data: object, itemid: SbName, fraction: float,\n"
+        "        interruptible: bool, /\n"
+        "    ) -> bool: ...",
+    ),
+    (
         "SoSensorCallback",
         ("SoSensor",),
         "_SensorT = TypeVar(\"_SensorT\", bound=SoSensor, contravariant=True)\n"
@@ -753,7 +778,7 @@ PYTHON_PROTOCOL_DEFINITIONS = (
         ("ScXMLStateMachine",),
         "class ScXMLStateMachineDeleteCallback(Protocol):\n"
         "    def __call__(\n"
-        "        self, data: Any, machine: ScXMLStateMachine, /\n"
+        "        self, data: object, machine: ScXMLStateMachine, /\n"
         "    ) -> None: ...",
     ),
     (
@@ -762,7 +787,7 @@ PYTHON_PROTOCOL_DEFINITIONS = (
         "class ScXMLStateChangeCallback(Protocol):\n"
         "    def __call__(\n"
         "        self,\n"
-        "        data: Any,\n"
+        "        data: object,\n"
         "        machine: ScXMLStateMachine,\n"
         "        stateidentifier: str,\n"
         "        enterstate: bool,\n"
@@ -815,35 +840,35 @@ CALLBACK_TYPE_SIGNATURES = {
     "ScXMLStateChangeCB": "ScXMLStateChangeCallback",
     "ScXMLStateMachineDeleteCB": "ScXMLStateMachineDeleteCallback",
     "SoCallbackAction::SoCallbackActionCB": (
-        "Callable[[Any, SoCallbackAction, SoNode], int]"
+        "Callable[[object, SoCallbackAction, SoNode], int]"
     ),
-    "SoCallbackCB": "Callable[[Any, SoAction], None]",
-    "SoDraggerCB": "Callable[[Any, SoDragger], None]",
-    "SoEventCallbackCB": "Callable[[Any, SoEventCallback], None]",
-    "SoGLPreRenderCB": "Callable[[Any, SoGLRenderAction], None]",
-    "SoGLRenderAction::SoGLRenderAbortCB": "Callable[[Any], int]",
-    "SoGLRenderPassCB": "Callable[[Any], None]",
+    "SoCallbackCB": "Callable[[object, SoAction], None]",
+    "SoDraggerCB": "Callable[[object, SoDragger], None]",
+    "SoEventCallbackCB": "Callable[[object, SoEventCallback], None]",
+    "SoGLPreRenderCB": "Callable[[object, SoGLRenderAction], None]",
+    "SoGLRenderAction::SoGLRenderAbortCB": "Callable[[object], int]",
+    "SoGLRenderPassCB": "Callable[[object], None]",
     "SoIntersectionDetectionAction::SoIntersectionCB": (
-        "Callable[[Any, SoIntersectingPrimitive, SoIntersectingPrimitive], int]"
+        "Callable[[object, SoIntersectingPrimitive, SoIntersectingPrimitive], int]"
     ),
     "SoIntersectionDetectionAction::SoIntersectionFilterCB": (
-        "Callable[[Any, SoPath, SoPath], bool]"
+        "Callable[[object, SoPath, SoPath], bool]"
     ),
     "SoIntersectionDetectionAction::SoIntersectionVisitationCB": (
-        "Callable[[Any, SoPath], int]"
+        "Callable[[object, SoPath], int]"
     ),
     "SoLineSegmentCB": (
-        "Callable[[Any, SoCallbackAction, SoPrimitiveVertex, "
+        "Callable[[object, SoCallbackAction, SoPrimitiveVertex, "
         "SoPrimitiveVertex], None]"
     ),
-    "SoPointCB": "Callable[[Any, SoCallbackAction, SoPrimitiveVertex], None]",
-    "SoRenderManagerRenderCB": "Callable[[Any, SoRenderManager], None]",
-    "SoSceneManagerRenderCB": "Callable[[Any, SoSceneManager], None]",
-    "SoSelectionClassCB": "Callable[[Any, SoSelection], None]",
-    "SoSelectionPathCB": "Callable[[Any, SoPath], None]",
-    "SoSelectionPickCB": "Callable[[Any, SoPickedPoint], SoPath]",
+    "SoPointCB": "Callable[[object, SoCallbackAction, SoPrimitiveVertex], None]",
+    "SoRenderManagerRenderCB": "Callable[[object, SoRenderManager], None]",
+    "SoSceneManagerRenderCB": "Callable[[object, SoSceneManager], None]",
+    "SoSelectionClassCB": "Callable[[object, SoSelection], None]",
+    "SoSelectionPathCB": "Callable[[object, SoPath], None]",
+    "SoSelectionPickCB": "Callable[[object, SoPickedPoint], SoPath]",
     "SoTriangleCB": (
-        "Callable[[Any, SoCallbackAction, SoPrimitiveVertex, "
+        "Callable[[object, SoCallbackAction, SoPrimitiveVertex, "
         "SoPrimitiveVertex, SoPrimitiveVertex], None]"
     ),
     "SoSensorCB": "SoSensorCallback[SoSensor]",
@@ -1081,22 +1106,22 @@ CALLBACK_METHOD_POLICIES = {
     ),
     ("SoCallbackList", "addCallback"): CallbackMethodPolicy(
         (
-            ("f", "Callable[[object, object], None]"),
+            ("f", "SoCallbackListCallback"),
             ("userData", "object | None"),
         ),
         (
-            "self, f: Callable[[object, object], None], "
+            "self, f: SoCallbackListCallback, "
             "userData: object | None = ...",
             "None",
         ),
     ),
     ("SoCallbackList", "removeCallback"): CallbackMethodPolicy(
         (
-            ("f", "Callable[[object, object], None]"),
+            ("f", "SoCallbackListCallback"),
             ("userdata", "object | None"),
         ),
         (
-            "self, f: Callable[[object, object], None], "
+            "self, f: SoCallbackListCallback, "
             "userdata: object | None = ...",
             "None",
         ),
@@ -1110,21 +1135,21 @@ CALLBACK_METHOD_POLICIES = {
     ),
     ("SoContextHandler", "addContextDestructionCallback"): CallbackMethodPolicy(
         (
-            ("func", "Callable[[object, int], None]"),
+            ("func", "SoContextDestructionCallback"),
             ("userdata", "object | None"),
         ),
         (
-            "func: Callable[[object, int], None], userdata: object | None = ...",
+            "func: SoContextDestructionCallback, userdata: object | None = ...",
             "None",
         ),
     ),
     ("SoContextHandler", "removeContextDestructionCallback"): CallbackMethodPolicy(
         (
-            ("func", "Callable[[object, int], None]"),
+            ("func", "SoContextDestructionCallback"),
             ("userdata", "object | None"),
         ),
         (
-            "func: Callable[[object, int], None], userdata: object | None = ...",
+            "func: SoContextDestructionCallback, userdata: object | None = ...",
             "None",
         ),
     ),
@@ -1147,12 +1172,12 @@ CALLBACK_METHOD_POLICIES = {
     ),
     ("SoGLCacheContextElement", "scheduleDeleteCallback"): CallbackMethodPolicy(
         (
-            ("cb", "Callable[[object, int], None]"),
+            ("cb", "SoContextDestructionCallback"),
             ("closure", "object | None"),
         ),
         (
             "contextid: int, "
-            "cb: Callable[[object, int], None], "
+            "cb: SoContextDestructionCallback, "
             "closure: object | None = ...",
             "None",
         ),
@@ -1252,22 +1277,22 @@ CALLBACK_METHOD_POLICIES = {
     ),
     ("SoDB", "addProgressCallback"): CallbackMethodPolicy(
         (
-            ("func", "Callable[[object, SbName, float, bool], bool]"),
+            ("func", "SoDBProgressCallback"),
             ("userdata", "object | None"),
         ),
         (
-            "func: Callable[[object, SbName, float, bool], bool], "
+            "func: SoDBProgressCallback, "
             "userdata: object | None",
             "None",
         ),
     ),
     ("SoDB", "removeProgressCallback"): CallbackMethodPolicy(
         (
-            ("func", "Callable[[object, SbName, float, bool], bool]"),
+            ("func", "SoDBProgressCallback"),
             ("userdata", "object | None"),
         ),
         (
-            "func: Callable[[object, SbName, float, bool], bool], "
+            "func: SoDBProgressCallback, "
             "userdata: object | None",
             "None",
         ),
@@ -1529,7 +1554,7 @@ def callback_method_checks(*, excluded_classes=()):
         if method_policy.shadow_signature is not None
         and class_name not in set(excluded_classes)
     )
-FUNCTION_POINTER_TYPE_SIGNATURES = {"void(*)(void*)": "Callable[[Any], None]"}
+FUNCTION_POINTER_TYPE_SIGNATURES = {"void(*)(void*)": "Callable[[object], None]"}
 SENSOR_CALLBACK_CLASSES = {
     "SoAlarmSensor",
     "SoDelayQueueSensor",
@@ -1881,6 +1906,15 @@ def multifield_getvalues_types():
         field_class: policy.get_values_type
         for field_class, policy in MULTIFIELD_TYPE_POLICIES.items()
         if policy.get_values_type
+    }
+
+
+def multifield_snapshot_types():
+    """Return element types for owned Python multifield snapshots."""
+
+    return {
+        field_class: policy.element_type
+        for field_class, policy in MULTIFIELD_TYPE_POLICIES.items()
     }
 
 

@@ -1010,6 +1010,23 @@ class FieldSetValue(unittest.TestCase):
                 field.setValues([components, (3,)])
             assert_values([value])
 
+    def testMultifieldSnapshots(self):
+        vector_field = SoMFVec3f()
+        vector_field.setValues([[1.0, 2.0, 3.0]])
+        vector_snapshot = vector_field.getValuesSnapshot()
+        self.assertEqual(len(vector_snapshot), 1)
+        self.assertIsInstance(vector_snapshot[0], SbVec3f)
+
+        scalar_field = SoMFFloat()
+        scalar_field.setValues([1.0, 2.0])
+        self.assertEqual(scalar_field.getValuesSnapshot(), [1.0, 2.0])
+
+        name_field = SoMFName()
+        name_field.setValues(["snapshot"])
+        name_snapshot = name_field.getValuesSnapshot()
+        self.assertEqual(len(name_snapshot), 1)
+        self.assertIsInstance(name_snapshot[0], SbName)
+
 
 class SbStringMethods(unittest.TestCase):
     """tests various string stuff"""

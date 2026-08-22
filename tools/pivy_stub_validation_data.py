@@ -107,7 +107,7 @@ CALLBACK_METHOD_CHECKS = {
         (
             "SoSensorManager",
             "setChangedCallback",
-            {"pyfunc": "Callable[[Any], None]", "data": "Any"},
+            {"pyfunc": "Callable[[object], None]", "data": "object"},
             "None",
         ),
         (
@@ -115,8 +115,8 @@ CALLBACK_METHOD_CHECKS = {
             "addPreCallback",
             {
                 "type": "SoType",
-                "pyfunc": "Callable[[Any, SoCallbackAction, SoNode], int]",
-                "userdata": "Any",
+                "pyfunc": "Callable[[object, SoCallbackAction, SoNode], int]",
+                "userdata": "object",
             },
             "None",
         ),
@@ -125,8 +125,8 @@ CALLBACK_METHOD_CHECKS = {
             "addPostCallback",
             {
                 "type": "SoType",
-                "pyfunc": "Callable[[Any, SoCallbackAction, SoNode], int]",
-                "userdata": "Any",
+                "pyfunc": "Callable[[object, SoCallbackAction, SoNode], int]",
+                "userdata": "object",
             },
             "None",
         ),
@@ -134,8 +134,8 @@ CALLBACK_METHOD_CHECKS = {
             "SoCallbackAction",
             "addPreTailCallback",
             {
-                "pyfunc": "Callable[[Any, SoCallbackAction, SoNode], int]",
-                "userdata": "Any",
+                "pyfunc": "Callable[[object, SoCallbackAction, SoNode], int]",
+                "userdata": "object",
             },
             "None",
         ),
@@ -143,8 +143,8 @@ CALLBACK_METHOD_CHECKS = {
             "SoCallbackAction",
             "addPostTailCallback",
             {
-                "pyfunc": "Callable[[Any, SoCallbackAction, SoNode], int]",
-                "userdata": "Any",
+                "pyfunc": "Callable[[object, SoCallbackAction, SoNode], int]",
+                "userdata": "object",
             },
             "None",
         ),
@@ -154,10 +154,10 @@ CALLBACK_METHOD_CHECKS = {
             {
                 "type": "SoType",
                 "pyfunc": (
-                    "Callable[[Any, SoCallbackAction, SoPrimitiveVertex, "
+                    "Callable[[object, SoCallbackAction, SoPrimitiveVertex, "
                     "SoPrimitiveVertex, SoPrimitiveVertex], None]"
                 ),
-                "userdata": "Any",
+                "userdata": "object",
             },
             "None",
         ),
@@ -167,10 +167,10 @@ CALLBACK_METHOD_CHECKS = {
             {
                 "type": "SoType",
                 "pyfunc": (
-                    "Callable[[Any, SoCallbackAction, SoPrimitiveVertex, "
+                    "Callable[[object, SoCallbackAction, SoPrimitiveVertex, "
                     "SoPrimitiveVertex], None]"
                 ),
-                "userdata": "Any",
+                "userdata": "object",
             },
             "None",
         ),
@@ -179,50 +179,50 @@ CALLBACK_METHOD_CHECKS = {
             "addPointCallback",
             {
                 "type": "SoType",
-                "pyfunc": "Callable[[Any, SoCallbackAction, SoPrimitiveVertex], None]",
-                "userdata": "Any",
+                "pyfunc": "Callable[[object, SoCallbackAction, SoPrimitiveVertex], None]",
+                "userdata": "object",
             },
             "None",
         ),
         (
             "SoCallback",
             "setCallback",
-            {"pyfunc": "Callable[[Any, SoAction], None]", "userdata": "Any | None"},
+            {"pyfunc": "Callable[[object, SoAction], None]", "userdata": "object | None"},
             "None",
         ),
         (
             "SoEventCallback",
             "addEventCallback",
             {
-                "pyfunc": "Callable[[Any, SoEventCallback], None]",
-                "userdata": "Any | None",
+                "pyfunc": "Callable[[object, SoEventCallback], None]",
+                "userdata": "object | None",
             },
-            "tuple[Callable[[Any, SoEventCallback], None], Any]",
+            "tuple[Callable[[object, SoEventCallback], None], object]",
         ),
         (
             "SoEventCallback",
             "removeEventCallback",
-            {"tuple": "tuple[Callable[[Any, SoEventCallback], None], Any]"},
+            {"tuple": "tuple[Callable[[object, SoEventCallback], None], object]"},
             "None",
         ),
         (
             "SoGLRenderAction",
             "setPassCallback",
-            {"pyfunc": "Callable[[Any], None]", "userdata": "Any"},
+            {"pyfunc": "Callable[[object], None]", "userdata": "object"},
             "None",
         ),
         (
             "SoGLRenderAction",
             "setAbortCallback",
-            {"pyfunc": "Callable[[Any], int]", "userdata": "Any"},
+            {"pyfunc": "Callable[[object], int]", "userdata": "object"},
             "None",
         ),
         (
             "SoGLRenderAction",
             "addPreRenderCallback",
             {
-                "pyfunc": "Callable[[Any, SoGLRenderAction], None]",
-                "userdata": "Any",
+                "pyfunc": "Callable[[object, SoGLRenderAction], None]",
+                "userdata": "object",
             },
             "None",
         ),
@@ -230,8 +230,8 @@ CALLBACK_METHOD_CHECKS = {
             "SoGLRenderAction",
             "removePreRenderCallback",
             {
-                "pyfunc": "Callable[[Any, SoGLRenderAction], None]",
-                "userdata": "Any",
+                "pyfunc": "Callable[[object, SoGLRenderAction], None]",
+                "userdata": "object",
             },
             "None",
         ),
@@ -240,8 +240,8 @@ CALLBACK_METHOD_CHECKS = {
             "addVisitationCallback",
             {
                 "type": "SoType",
-                "pyfunc": "Callable[[Any, SoPath], int]",
-                "closure": "Any",
+                "pyfunc": "Callable[[object, SoPath], int]",
+                "closure": "object",
             },
             "None",
         ),
@@ -250,8 +250,8 @@ CALLBACK_METHOD_CHECKS = {
             "removeVisitationCallback",
             {
                 "type": "SoType",
-                "pyfunc": "Callable[[Any, SoPath], int]",
-                "closure": "Any",
+                "pyfunc": "Callable[[object, SoPath], int]",
+                "closure": "object",
             },
             "None",
         ),
@@ -259,8 +259,8 @@ CALLBACK_METHOD_CHECKS = {
             "SoIntersectionDetectionAction",
             "setFilterCallback",
             {
-                "pyfunc": "Callable[[Any, SoPath, SoPath], bool]",
-                "closure": "Any | None",
+                "pyfunc": "Callable[[object, SoPath, SoPath], bool]",
+                "closure": "object | None",
             },
             "None",
         ),
@@ -269,10 +269,10 @@ CALLBACK_METHOD_CHECKS = {
             "addIntersectionCallback",
             {
                 "pyfunc": (
-                    "Callable[[Any, SoIntersectingPrimitive, "
+                    "Callable[[object, SoIntersectingPrimitive, "
                     "SoIntersectingPrimitive], int]"
                 ),
-                "closure": "Any | None",
+                "closure": "object | None",
             },
             "None",
         ),
@@ -281,10 +281,10 @@ CALLBACK_METHOD_CHECKS = {
             "removeIntersectionCallback",
             {
                 "pyfunc": (
-                    "Callable[[Any, SoIntersectingPrimitive, "
+                    "Callable[[object, SoIntersectingPrimitive, "
                     "SoIntersectingPrimitive], int]"
                 ),
-                "closure": "Any | None",
+                "closure": "object | None",
             },
             "None",
         ),
@@ -292,8 +292,8 @@ CALLBACK_METHOD_CHECKS = {
             "SoSceneManager",
             "setRenderCallback",
             {
-                "pyfunc": "Callable[[Any, SoSceneManager], None]",
-                "userData": "Any | None",
+                "pyfunc": "Callable[[object, SoSceneManager], None]",
+                "userData": "object | None",
             },
             "None",
         ),
@@ -301,33 +301,33 @@ CALLBACK_METHOD_CHECKS = {
             "SoRenderManager",
             "setRenderCallback",
             {
-                "pyfunc": "Callable[[Any, SoRenderManager], None]",
-                "userData": "Any | None",
+                "pyfunc": "Callable[[object, SoRenderManager], None]",
+                "userData": "object | None",
             },
             "None",
         ),
         (
             "SoRenderManager",
             "addPreRenderCallback",
-            {"pyfunc": "Callable[[Any, SoRenderManager], None]", "data": "Any"},
+            {"pyfunc": "Callable[[object, SoRenderManager], None]", "data": "object"},
             "None",
         ),
         (
             "SoRenderManager",
             "removePreRenderCallback",
-            {"pyfunc": "Callable[[Any, SoRenderManager], None]", "data": "Any"},
+            {"pyfunc": "Callable[[object, SoRenderManager], None]", "data": "object"},
             "None",
         ),
         (
             "SoRenderManager",
             "addPostRenderCallback",
-            {"pyfunc": "Callable[[Any, SoRenderManager], None]", "data": "Any"},
+            {"pyfunc": "Callable[[object, SoRenderManager], None]", "data": "object"},
             "None",
         ),
         (
             "SoRenderManager",
             "removePostRenderCallback",
-            {"pyfunc": "Callable[[Any, SoRenderManager], None]", "data": "Any"},
+            {"pyfunc": "Callable[[object, SoRenderManager], None]", "data": "object"},
             "None",
         ),
         (
@@ -335,7 +335,7 @@ CALLBACK_METHOD_CHECKS = {
             "addDeleteCallback",
             {
                 "pyfunc": "ScXMLStateMachineDeleteCallback",
-                "userdata": "Any",
+                "userdata": "object",
             },
             "None",
         ),
@@ -344,7 +344,7 @@ CALLBACK_METHOD_CHECKS = {
             "removeDeleteCallback",
             {
                 "pyfunc": "ScXMLStateMachineDeleteCallback",
-                "userdata": "Any",
+                "userdata": "object",
             },
             "None",
         ),
@@ -355,7 +355,7 @@ CALLBACK_METHOD_CHECKS = {
                 "pyfunc": (
                     "ScXMLStateChangeCallback"
                 ),
-                "userdata": "Any",
+                "userdata": "object",
             },
             "None",
         ),
@@ -366,7 +366,7 @@ CALLBACK_METHOD_CHECKS = {
                 "pyfunc": (
                     "ScXMLStateChangeCallback"
                 ),
-                "userdata": "Any",
+                "userdata": "object",
             },
             "None",
         ),
@@ -1444,7 +1444,7 @@ PYTHON_HELPER_METHOD_CHECKS = {
         (
             "_SwigNonDynamicMeta",
             "__setattr__",
-            {"name": "str", "value": "Any"},
+            {"name": "str", "value": "object"},
             "None",
         ),
         (
@@ -1462,7 +1462,7 @@ PYTHON_HELPER_METHOD_CHECKS = {
         (
             "SoFieldContainer",
             "__setattr__",
-            {"name": "str", "value": "Any"},
+            {"name": "str", "value": "object"},
             "None",
         ),
         (
@@ -1486,7 +1486,7 @@ PYTHON_HELPER_METHOD_CHECKS = {
         (
             "SoBaseKit",
             "__setattr__",
-            {"name": "str", "value": "Any"},
+            {"name": "str", "value": "object"},
             "None",
         ),
         (
@@ -1498,7 +1498,7 @@ PYTHON_HELPER_METHOD_CHECKS = {
         (
             "SoEngine",
             "__setattr__",
-            {"name": "str", "value": "Any"},
+            {"name": "str", "value": "object"},
             "None",
         ),
         (
@@ -1542,7 +1542,7 @@ PYTHON_HELPER_METHOD_CHECKS = {
         (
             "_SwigNonDynamicMeta",
             "__setattr__",
-            {"name": "str", "value": "Any"},
+            {"name": "str", "value": "object"},
             "None",
         ),
     ),
@@ -2169,7 +2169,7 @@ dragger.removeOtherEventCallback(dragger_callback, None)
 
 def event_callback(data: Any, event: SoEventCallback) -> None: ...
 event_node = SoEventCallback()
-event_handle: tuple[Callable[[Any, SoEventCallback], None], Any] = (
+event_handle: tuple[Callable[[object, SoEventCallback], None], object] = (
     event_node.addEventCallback(SoType.badType(), event_callback, None)
 )
 event_node.removeEventCallback(SoType.badType(), event_handle)

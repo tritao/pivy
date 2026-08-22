@@ -34,5 +34,9 @@
     self.deleteValues(0)
     self.setValues(0, len(arr), arr)
 
+  def getValuesSnapshot(self):
+    """Return an owned Python list of the current field values."""
+    return list(self)
+
 %}
 }
