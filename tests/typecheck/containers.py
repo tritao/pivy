@@ -1,6 +1,6 @@
 # pyright: reportMissingModuleSource=false
 
-from typing import Any, Iterator, Sequence
+from typing import Iterator, Sequence
 from typing_extensions import assert_type
 
 from pivy import coin
@@ -10,9 +10,9 @@ def check_untyped_and_scalar_lists() -> None:
     pointers = coin.SbPList()
     pointers.append(object())
     pointers.set(0, "value")
-    assert_type(pointers.get(0), Any)
-    assert_type(pointers[0], Any)
-    assert_type(iter(pointers), Iterator[Any])
+    assert_type(pointers.get(0), object)
+    assert_type(pointers[0], object)
+    assert_type(iter(pointers), Iterator[object])
 
     integers = coin.SbIntList()
     integers.append(1)

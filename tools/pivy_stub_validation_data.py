@@ -75,7 +75,7 @@ POINTER_HELPER_TYPES = {
 ITER_CONTAINER_TYPES = {
     "SbIntList": "int",
     "SbName": "str",
-    "SbPList": "Any",
+    "SbPList": "object",
     "SbString": "str",
     "SbVec2d": "float",
     "SbVec2f": "float",
@@ -85,7 +85,7 @@ ITER_CONTAINER_TYPES = {
     "SbVec3s": "int",
     "SbVec4d": "float",
     "SbVec4f": "float",
-    "SoMField": "Any",
+    "SoMField": "object",
     "SoBaseList": "SoBase",
     "SoGroup": "SoNode",
     "SoNodeList": "SoNode",
@@ -1892,12 +1892,12 @@ reveal_type(coin_cast)
 reveal_type(soqt_cast)
 
 owned: bool = intp().thisown
-raw: Any = intp().cast()
+raw: object = intp().cast()
 text: str = charp().value()
 number: int = intp().value()
 ints: Iterator[int] = iter(SbIntList())
 nodes: Iterator[SoNode] = iter(SoNodeList())
-unknowns: Iterator[Any] = iter(SbPList())
+unknowns: Iterator[object] = iter(SbPList())
 
 vec = SbVec3f([1.0, 2.0, 3.0])
 vec.setValue([4.0, 5.0, 6.0])

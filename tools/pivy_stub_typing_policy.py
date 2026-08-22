@@ -1572,10 +1572,15 @@ SENSOR_CALLBACK_CONSTRUCTOR_TYPES = {
 KNOWN_ITER_ELEMENT_TYPES = {
     "SbIntList": "int",
     "SbName": "str",
-    "SbPList": "Any",
+    # SbPList is intentionally heterogeneous.  ``object`` keeps callers
+    # honest at this untyped legacy boundary; typed subclasses below provide
+    # concrete element types where Coin guarantees them.
+    "SbPList": "object",
     "SbString": "str",
     **vector_iter_element_types(),
-    "SoMField": "Any",
+    # The base multifield has no element type.  Concrete SoMF* classes are
+    # normalized from MULTIFIELD_TYPE_POLICIES below.
+    "SoMField": "object",
     "SoNodeKitPath": "SoNode",
     "SoPath": "SoNode",
 }

@@ -63,7 +63,7 @@ class TypingQualityBaseline:
 # accidental generator or dependency drift must not silently lower quality.
 TYPING_QUALITY_BASELINE = TypingQualityBaseline(
     min_concrete_annotations=21576,
-    max_any_annotations=23,
+    max_any_annotations=0,
     max_incomplete_annotations=443,
     max_incomplete_by_category=(
         ("raw C pointers", 105),

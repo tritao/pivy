@@ -158,8 +158,8 @@ def assert_pointer_helper_classes(path, tree):
         checks = (
             ("assign", "None", (("value", value_type),)),
             ("value", value_type, ()),
-            ("cast", "Any", ()),
-            ("frompointer", class_name, (("t", "Any"),)),
+            ("cast", "object", ()),
+            ("frompointer", class_name, (("t", "object"),)),
         )
         for method_name, return_type, args in checks:
             method = methods.get(method_name)

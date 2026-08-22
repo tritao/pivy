@@ -1241,14 +1241,16 @@ def normalize_swig_helpers(text):
                 updated.append("%sdef value(self) -> %s: ..." % (indent, value_type))
                 continue
             if re.match(r"\s*def cast\(self\)(?:\s*->\s*[^:]+)?: \.\.\.$", line):
-                updated.append("%sdef cast(self) -> Any: ..." % indent)
+                # The native cast result is intentionally opaque.  ``object``
+                # prevents an unchecked Any from escaping the pointer helper.
+                updated.append("%sdef cast(self) -> object: ..." % indent)
                 continue
             if re.match(
                 r"\s*def frompointer\(t[^)]*\)(?:\s*->\s*[^:]+)?: \.\.\.$",
                 line,
             ):
                 updated.append(
-                    "%sdef frompointer(t: Any) -> %s: ..."
+                    "%sdef frompointer(t: object) -> %s: ..."
                     % (indent, current_pointer_helper)
                 )
                 continue
@@ -1292,7 +1294,7 @@ def collect_container_element_types(lines):
         if getitem_match:
             element_type = getitem_match.group("type")
             if element_type == "Incomplete" and current_class == "SbPList":
-                element_type = "Any"
+                element_type = "object"
             if element_type not in {"None", "Incomplete"}:
                 element_types[current_class] = element_type
 
@@ -1715,7 +1717,7 @@ def normalize_multifield_snapshots(text):
         if current_class == "SoMField" and re.match(
             r"\s*def getValuesSnapshot\(self\)", line
         ):
-            updated.append("    def getValuesSnapshot(self) -> list[Any]: ...")
+            updated.append("    def getValuesSnapshot(self) -> list[object]: ...")
             skip_snapshot_docstring = True
             continue
         updated.append(line)
