@@ -1413,6 +1413,57 @@ INCOMPLETE_CATEGORY_ACTIONS = {
     "uncategorized": "triage and classify before merging",
 }
 
+
+@dataclass(frozen=True)
+class IncompleteCategoryPolicy:
+    """Disposition and rationale for one reviewed ``Incomplete`` category."""
+
+    disposition: str
+    rationale: str
+
+
+INCOMPLETE_CATEGORY_POLICIES = {
+    "raw C pointers": IncompleteCategoryPolicy(
+        disposition="intentional",
+        rationale=(
+            "SWIG exposes a borrowed pointer or ABI-level pointer without a "
+            "stable Python owner."
+        ),
+    ),
+    "callbacks": IncompleteCategoryPolicy(
+        disposition="intentional",
+        rationale=(
+            "The native callback boundary still needs an explicit Python "
+            "lifecycle and ownership contract."
+        ),
+    ),
+    "unknown output parameters": IncompleteCategoryPolicy(
+        disposition="zero budget",
+        rationale=(
+            "Output parameters must be represented by a typed return tuple "
+            "or helper before they are accepted."
+        ),
+    ),
+    "function pointers": IncompleteCategoryPolicy(
+        disposition="intentional",
+        rationale=(
+            "A native C function-pointer ABI is not directly callable as a "
+            "safe Python value."
+        ),
+    ),
+    "dynamic/runtime API": IncompleteCategoryPolicy(
+        disposition="intentional",
+        rationale=(
+            "Dynamic factories, opaque objects, and runtime field storage "
+            "cannot be recovered from a static declaration alone."
+        ),
+    ),
+    "uncategorized": IncompleteCategoryPolicy(
+        disposition="zero budget",
+        rationale="Every remaining Incomplete site must have a reviewed category.",
+    ),
+}
+
 DYNAMIC_RUNTIME_SUBCATEGORIES = (
     "runtime factory returns",
     "opaque pointer/object returns",

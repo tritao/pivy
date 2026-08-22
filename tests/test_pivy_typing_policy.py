@@ -24,6 +24,7 @@ from tools.pivy_stub_typing_policy import (
     FIELD_TYPE_POLICIES,
     INCOMPLETE_CATEGORIES,
     INCOMPLETE_CATEGORY_ACTIONS,
+    INCOMPLETE_CATEGORY_POLICIES,
     factory_method_return_type,
     MULTIFIELD_TYPE_POLICIES,
     classify_incomplete,
@@ -715,6 +716,17 @@ class PolicyBoundaryTests(unittest.TestCase):
         self.assertEqual(set(INCOMPLETE_CATEGORY_ACTIONS), set(INCOMPLETE_CATEGORIES))
         self.assertIn("adapter", INCOMPLETE_CATEGORY_ACTIONS["raw C pointers"])
         self.assertIn("triage", INCOMPLETE_CATEGORY_ACTIONS["uncategorized"])
+
+    def test_incomplete_categories_have_documented_dispositions(self):
+        self.assertEqual(
+            set(INCOMPLETE_CATEGORY_POLICIES),
+            set(INCOMPLETE_CATEGORIES),
+        )
+        documentation = " ".join(Path("docs/typing-boundaries.md").read_text().split())
+        for category, category_policy in INCOMPLETE_CATEGORY_POLICIES.items():
+            self.assertIn("### %s" % category, documentation)
+            self.assertIn(category_policy.disposition, documentation)
+            self.assertIn(" ".join(category_policy.rationale.split()), documentation)
 
     def test_quality_regressions_enforces_category_budget(self):
         report = collect_report(Path("pivy/coin.pyi"))

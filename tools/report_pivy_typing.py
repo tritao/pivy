@@ -14,6 +14,7 @@ from tools.pivy_stub_typing_policy import (
     DYNAMIC_RUNTIME_SUBCATEGORIES,
     INCOMPLETE_CATEGORIES,
     INCOMPLETE_CATEGORY_ACTIONS,
+    INCOMPLETE_CATEGORY_POLICIES,
     classify_incomplete,
     classify_dynamic_runtime_site,
 )
@@ -288,14 +289,15 @@ def format_report(report: TypingReport, stub_path: Path) -> str:
         "",
         "Incomplete categories",
         "---------------------",
-        "Category                        Count    Share  Next action",
+        "Category                        Status       Count    Share  Next action",
     ]
     for category in INCOMPLETE_CATEGORIES:
         count = report.incomplete_categories[category]
         lines.append(
-            "%-30s %6d    %-6s  %s"
+            "%-30s %-12s %6d    %-6s  %s"
             % (
                 category,
+                INCOMPLETE_CATEGORY_POLICIES[category].disposition,
                 count,
                 percentage(count, report.incomplete_annotations),
                 INCOMPLETE_CATEGORY_ACTIONS[category],
