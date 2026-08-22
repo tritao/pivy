@@ -257,7 +257,7 @@ def check_event_and_selection_callbacks() -> None:
     )
     assert_type(
         event_handle,
-        tuple[Callable[[object, coin.SoEventCallback], None], object],
+        tuple[coin.SoEventCallbackHandler, object],
     )
     event_node.removeEventCallback(coin.SoType.badType(), event_handle)
 

@@ -1,6 +1,5 @@
 # pyright: reportMissingModuleSource=false
 
-from typing import Callable
 from typing_extensions import assert_type
 
 from pivy import coin
@@ -25,10 +24,10 @@ def check_soqt_lifecycle_contract() -> None:
     ) -> None:
         del message, code, data
 
-    previous_handler: Callable[[coin.SbString, int, object], None] | None = (
+    previous_handler: soqt.SoQtFatalErrorCallback | None = (
         soqt.SoQt.setFatalErrorHandler(fatal_error_callback, None)
     )
-    assert_type(previous_handler, Callable[[coin.SbString, int, object], None] | None)
+    assert_type(previous_handler, soqt.SoQtFatalErrorCallback | None)
 
 
 def check_soqt_render_area_contract() -> None:
@@ -120,8 +119,10 @@ def check_soqt_devices_and_utility_contract() -> None:
     def menu_callback(item_id: int, data: object) -> None:
         del item_id, data
 
-    popup.addMenuSelectionCallback(menu_callback, None)
-    popup.removeMenuSelectionCallback(menu_callback, None)
+    menu_callback_contract: soqt.SoQtMenuSelectionCallback = menu_callback
+
+    popup.addMenuSelectionCallback(menu_callback_contract, None)
+    popup.removeMenuSelectionCallback(menu_callback_contract, None)
     assert_type(popup.newMenu("File"), int)
     assert_type(popup.getMenuTitle(1), str)
     assert_type(popup.getMenuItemEnabled(1), bool)
@@ -147,7 +148,9 @@ def check_soqt_viewer_contract() -> None:
         del data
         return nearfar
 
-    viewer.setAutoClippingStrategy(0, cb=auto_clipping_callback)
+    auto_clipping_contract: soqt.SoQtAutoClippingCallback = auto_clipping_callback
+
+    viewer.setAutoClippingStrategy(0, cb=auto_clipping_contract)
     viewer.addStartCallback(viewer_callback)
     viewer.addFinishCallback(viewer_callback)
     viewer.removeStartCallback(viewer_callback)

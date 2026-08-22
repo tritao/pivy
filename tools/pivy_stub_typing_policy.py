@@ -831,50 +831,209 @@ PYTHON_PROTOCOL_DEFINITIONS = (
         "class SoNodeKitAccess(Protocol):\n"
         "    def __getattr__(self, name: str) -> SoNode | SoField: ...",
     ),
+    (
+        "SoCallbackActionNodeCallback",
+        ("SoCallbackAction", "SoNode"),
+        "class SoCallbackActionNodeCallback(Protocol):\n"
+        "    def __call__(\n"
+        "        self, data: object, action: SoCallbackAction, node: SoNode, /\n"
+        "    ) -> int: ...",
+    ),
+    (
+        "SoActionCallback",
+        ("SoAction",),
+        "class SoActionCallback(Protocol):\n"
+        "    def __call__(self, data: object, action: SoAction, /) -> None: ...",
+    ),
+    (
+        "SoDraggerCallback",
+        ("SoDragger",),
+        "class SoDraggerCallback(Protocol):\n"
+        "    def __call__(self, data: object, dragger: SoDragger, /) -> None: ...",
+    ),
+    (
+        "SoEventCallbackHandler",
+        ("SoEventCallback",),
+        "class SoEventCallbackHandler(Protocol):\n"
+        "    def __call__(\n"
+        "        self, data: object, eventcallback: SoEventCallback, /\n"
+        "    ) -> None: ...",
+    ),
+    (
+        "SoGLPreRenderCallback",
+        ("SoGLRenderAction",),
+        "class SoGLPreRenderCallback(Protocol):\n"
+        "    def __call__(\n"
+        "        self, data: object, action: SoGLRenderAction, /\n"
+        "    ) -> None: ...",
+    ),
+    (
+        "SoGLRenderAbortCallback",
+        (),
+        "class SoGLRenderAbortCallback(Protocol):\n"
+        "    def __call__(self, data: object, /) -> int: ...",
+    ),
+    (
+        "SoGLRenderPassCallback",
+        (),
+        "class SoGLRenderPassCallback(Protocol):\n"
+        "    def __call__(self, data: object, /) -> None: ...",
+    ),
+    (
+        "SoIntersectionCallback",
+        ("SoIntersectingPrimitive",),
+        "class SoIntersectionCallback(Protocol):\n"
+        "    def __call__(\n"
+        "        self, data: object, first: SoIntersectingPrimitive,\n"
+        "        second: SoIntersectingPrimitive, /\n"
+        "    ) -> int: ...",
+    ),
+    (
+        "SoIntersectionFilterCallback",
+        ("SoPath",),
+        "class SoIntersectionFilterCallback(Protocol):\n"
+        "    def __call__(\n"
+        "        self, data: object, first: SoPath, second: SoPath, /\n"
+        "    ) -> bool: ...",
+    ),
+    (
+        "SoIntersectionVisitationCallback",
+        ("SoPath",),
+        "class SoIntersectionVisitationCallback(Protocol):\n"
+        "    def __call__(self, data: object, path: SoPath, /) -> int: ...",
+    ),
+    (
+        "SoLineSegmentCallback",
+        ("SoCallbackAction", "SoPrimitiveVertex"),
+        "class SoLineSegmentCallback(Protocol):\n"
+        "    def __call__(\n"
+        "        self, data: object, action: SoCallbackAction,\n"
+        "        first: SoPrimitiveVertex, second: SoPrimitiveVertex, /\n"
+        "    ) -> None: ...",
+    ),
+    (
+        "SoPointCallback",
+        ("SoCallbackAction", "SoPrimitiveVertex"),
+        "class SoPointCallback(Protocol):\n"
+        "    def __call__(\n"
+        "        self, data: object, action: SoCallbackAction,\n"
+        "        vertex: SoPrimitiveVertex, /\n"
+        "    ) -> None: ...",
+    ),
+    (
+        "SoRenderManagerCallback",
+        ("SoRenderManager",),
+        "class SoRenderManagerCallback(Protocol):\n"
+        "    def __call__(\n"
+        "        self, data: object, manager: SoRenderManager, /\n"
+        "    ) -> None: ...",
+    ),
+    (
+        "SoSceneManagerCallback",
+        ("SoSceneManager",),
+        "class SoSceneManagerCallback(Protocol):\n"
+        "    def __call__(\n"
+        "        self, data: object, manager: SoSceneManager, /\n"
+        "    ) -> None: ...",
+    ),
+    (
+        "SoSelectionClassCallback",
+        ("SoSelection",),
+        "class SoSelectionClassCallback(Protocol):\n"
+        "    def __call__(\n"
+        "        self, data: object, selection: SoSelection, /\n"
+        "    ) -> None: ...",
+    ),
+    (
+        "SoSelectionPathCallback",
+        ("SoPath",),
+        "class SoSelectionPathCallback(Protocol):\n"
+        "    def __call__(self, data: object, path: SoPath, /) -> None: ...",
+    ),
+    (
+        "SoSelectionPickCallback",
+        ("SoPath", "SoPickedPoint"),
+        "class SoSelectionPickCallback(Protocol):\n"
+        "    def __call__(\n"
+        "        self, data: object, point: SoPickedPoint, /\n"
+        "    ) -> SoPath: ...",
+    ),
+    (
+        "SoTriangleCallback",
+        ("SoCallbackAction", "SoPrimitiveVertex"),
+        "class SoTriangleCallback(Protocol):\n"
+        "    def __call__(\n"
+        "        self, data: object, action: SoCallbackAction,\n"
+        "        first: SoPrimitiveVertex, second: SoPrimitiveVertex,\n"
+        "        third: SoPrimitiveVertex, /\n"
+        "    ) -> None: ...",
+    ),
+    (
+        "SoQtRenderAreaCallback",
+        ("QEvent",),
+        "class SoQtRenderAreaCallback(Protocol):\n"
+        "    def __call__(self, data: object, event: QEvent, /) -> object: ...",
+    ),
+    (
+        "SoQtFatalErrorCallback",
+        ("SbString",),
+        "class SoQtFatalErrorCallback(Protocol):\n"
+        "    def __call__(\n"
+        "        self, message: SbString, line: int, data: object, /\n"
+        "    ) -> None: ...",
+    ),
+    (
+        "SoQtAutoClippingCallback",
+        ("SbVec2f",),
+        "class SoQtAutoClippingCallback(Protocol):\n"
+        "    def __call__(\n"
+        "        self, data: object, value: SbVec2f, /\n"
+        "    ) -> SbVec2f: ...",
+    ),
+    (
+        "SoQtMenuSelectionCallback",
+        (),
+        "class SoQtMenuSelectionCallback(Protocol):\n"
+        "    def __call__(self, menu_id: int, data: object, /) -> None: ...",
+    ),
 )
+# Protocols belong to the module that owns the binding surface, even when
+# their arguments are classes imported from the sibling stub.
+PYTHON_PROTOCOL_MODULES = {
+    name: "pivy.gui.soqt" if name.startswith("SoQt") else "pivy.coin"
+    for name, _, _ in PYTHON_PROTOCOL_DEFINITIONS
+}
 CALLBACK_TYPE_SIGNATURES = {
     "ScXMLStateChangeCB": "ScXMLStateChangeCallback",
     "ScXMLStateMachineDeleteCB": "ScXMLStateMachineDeleteCallback",
-    "SoCallbackAction::SoCallbackActionCB": (
-        "Callable[[object, SoCallbackAction, SoNode], int]"
-    ),
-    "SoCallbackCB": "Callable[[object, SoAction], None]",
-    "SoDraggerCB": "Callable[[object, SoDragger], None]",
-    "SoEventCallbackCB": "Callable[[object, SoEventCallback], None]",
-    "SoGLPreRenderCB": "Callable[[object, SoGLRenderAction], None]",
-    "SoGLRenderAction::SoGLRenderAbortCB": "Callable[[object], int]",
-    "SoGLRenderPassCB": "Callable[[object], None]",
-    "SoIntersectionDetectionAction::SoIntersectionCB": (
-        "Callable[[object, SoIntersectingPrimitive, SoIntersectingPrimitive], int]"
-    ),
-    "SoIntersectionDetectionAction::SoIntersectionFilterCB": (
-        "Callable[[object, SoPath, SoPath], bool]"
-    ),
-    "SoIntersectionDetectionAction::SoIntersectionVisitationCB": (
-        "Callable[[object, SoPath], int]"
-    ),
-    "SoLineSegmentCB": (
-        "Callable[[object, SoCallbackAction, SoPrimitiveVertex, "
-        "SoPrimitiveVertex], None]"
-    ),
-    "SoPointCB": "Callable[[object, SoCallbackAction, SoPrimitiveVertex], None]",
-    "SoRenderManagerRenderCB": "Callable[[object, SoRenderManager], None]",
-    "SoSceneManagerRenderCB": "Callable[[object, SoSceneManager], None]",
-    "SoSelectionClassCB": "Callable[[object, SoSelection], None]",
-    "SoSelectionPathCB": "Callable[[object, SoPath], None]",
-    "SoSelectionPickCB": "Callable[[object, SoPickedPoint], SoPath]",
+    "SoCallbackAction::SoCallbackActionCB": "SoCallbackActionNodeCallback",
+    "SoCallbackCB": "SoActionCallback",
+    "SoDraggerCB": "SoDraggerCallback",
+    "SoEventCallbackCB": "SoEventCallbackHandler",
+    "SoGLPreRenderCB": "SoGLPreRenderCallback",
+    "SoGLRenderAction::SoGLRenderAbortCB": "SoGLRenderAbortCallback",
+    "SoGLRenderPassCB": "SoGLRenderPassCallback",
+    "SoIntersectionDetectionAction::SoIntersectionCB": "SoIntersectionCallback",
+    "SoIntersectionDetectionAction::SoIntersectionFilterCB": "SoIntersectionFilterCallback",
+    "SoIntersectionDetectionAction::SoIntersectionVisitationCB": "SoIntersectionVisitationCallback",
+    "SoLineSegmentCB": "SoLineSegmentCallback",
+    "SoPointCB": "SoPointCallback",
+    "SoRenderManagerRenderCB": "SoRenderManagerCallback",
+    "SoSceneManagerRenderCB": "SoSceneManagerCallback",
+    "SoSelectionClassCB": "SoSelectionClassCallback",
+    "SoSelectionPathCB": "SoSelectionPathCallback",
+    "SoSelectionPickCB": "SoSelectionPickCallback",
     "SoTriangleCB": (
-        "Callable[[object, SoCallbackAction, SoPrimitiveVertex, "
-        "SoPrimitiveVertex, SoPrimitiveVertex], None]"
+        "SoTriangleCallback"
     ),
     "SoSensorCB": "SoSensorCallback[SoSensor]",
     "SoErrorCB": "SoErrorCallback",
-    "SoQtRenderAreaEventCB": "Callable[[object, QEvent], object]",
-    "SoQtFatalErrorCB": "Callable[[SbString, int, object], None]",
+    "SoQtRenderAreaEventCB": "SoQtRenderAreaCallback",
+    "SoQtFatalErrorCB": "SoQtFatalErrorCallback",
     "SoQtComponentCB": "SoQtComponentCallback",
     "SoQtViewerCB": "SoQtViewerCallback",
-    "SoQtAutoClippingCB": "Callable[[object, SbVec2f], SbVec2f]",
-    "SoQtMenuSelectionCallback": "Callable[[int, object], None]",
+    "SoQtAutoClippingCB": "SoQtAutoClippingCallback",
+    "SoQtMenuSelectionCallback": "SoQtMenuSelectionCallback",
 }
 
 
@@ -1009,13 +1168,13 @@ class CallbackMethodPolicy:
 CALLBACK_METHOD_POLICIES = {
     ("SoQt", "setFatalErrorHandler"): CallbackMethodPolicy(
         (
-            ("cb", "Callable[[SbString, int, object], None]"),
+            ("cb", "SoQtFatalErrorCallback"),
             ("userdata", "object"),
         ),
         (
-            "cb: Callable[[SbString, int, object], None], "
+            "cb: SoQtFatalErrorCallback, "
             "userdata: object",
-            "Callable[[SbString, int, object], None] | None",
+            "SoQtFatalErrorCallback | None",
         ),
     ),
     ("SoQtComponent", "setWindowCloseCallback"): CallbackMethodPolicy(
@@ -1030,33 +1189,33 @@ CALLBACK_METHOD_POLICIES = {
     ),
     ("SoQtViewer", "setAutoClippingStrategy"): CallbackMethodPolicy(
         (
-            ("cb", "Callable[[object, SbVec2f], SbVec2f] | None"),
+            ("cb", "SoQtAutoClippingCallback | None"),
             ("cbuserdata", "object | None"),
         ),
         (
             "self, strategy: int, value: float = ..., "
-            "cb: Callable[[object, SbVec2f], SbVec2f] | None = ..., "
+            "cb: SoQtAutoClippingCallback | None = ..., "
             "cbuserdata: object | None = ...",
             "None",
         ),
     ),
     ("SoQtPopupMenu", "addMenuSelectionCallback"): CallbackMethodPolicy(
         (
-            ("callback", "Callable[[int, object], None]"),
+            ("callback", "SoQtMenuSelectionCallback"),
             ("data", "object"),
         ),
         (
-            "self, callback: Callable[[int, object], None], data: object",
+            "self, callback: SoQtMenuSelectionCallback, data: object",
             "None",
         ),
     ),
     ("SoQtPopupMenu", "removeMenuSelectionCallback"): CallbackMethodPolicy(
         (
-            ("callback", "Callable[[int, object], None]"),
+            ("callback", "SoQtMenuSelectionCallback"),
             ("data", "object"),
         ),
         (
-            "self, callback: Callable[[int, object], None], data: object",
+            "self, callback: SoQtMenuSelectionCallback, data: object",
             "None",
         ),
     ),

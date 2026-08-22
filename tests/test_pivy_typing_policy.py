@@ -211,7 +211,7 @@ class FieldTypePolicyTests(unittest.TestCase):
     def test_soqt_event_callback_type(self):
         self.assertEqual(
             policy.CALLBACK_TYPE_SIGNATURES["SoQtRenderAreaEventCB"],
-            "Callable[[object, QEvent], object]",
+            "SoQtRenderAreaCallback",
         )
         self.assertEqual(
             policy.PYTHON_PARAMETER_TYPE_OVERRIDES[
@@ -219,6 +219,34 @@ class FieldTypePolicyTests(unittest.TestCase):
             ],
             "object",
         )
+
+    def test_soqt_callback_adapters_use_named_protocols(self):
+        self.assertEqual(
+            policy.CALLBACK_METHOD_POLICIES[
+                ("SoQt", "setFatalErrorHandler")
+            ].parameter_types,
+            (
+                ("cb", "SoQtFatalErrorCallback"),
+                ("userdata", "object"),
+            ),
+        )
+        self.assertEqual(
+            policy.CALLBACK_METHOD_POLICIES[
+                ("SoQtViewer", "setAutoClippingStrategy")
+            ].parameter_types[0],
+            ("cb", "SoQtAutoClippingCallback | None"),
+        )
+        for method_name in (
+            "addMenuSelectionCallback",
+            "removeMenuSelectionCallback",
+        ):
+            with self.subTest(method_name=method_name):
+                self.assertEqual(
+                    policy.CALLBACK_METHOD_POLICIES[
+                        ("SoQtPopupMenu", method_name)
+                    ].parameter_types[0],
+                    ("callback", "SoQtMenuSelectionCallback"),
+                )
 
     def test_single_enum_sequence_policy(self):
         self.assertEqual(
@@ -747,6 +775,12 @@ class CallbackTypePolicyTests(unittest.TestCase):
             definitions["SoNodeKitAccess"],
             ("SoBaseKit", "SoField", "SoNode"),
         )
+        self.assertFalse(
+            any(
+                "Callable[" in signature
+                for signature in policy.CALLBACK_TYPE_SIGNATURES.values()
+            )
+        )
 
     def test_adapted_callback_protocols_are_emitted_in_public_stubs(self):
         coin_stub = Path("pivy/coin.pyi").read_text()
@@ -767,6 +801,24 @@ class CallbackTypePolicyTests(unittest.TestCase):
             "SoFieldContainerAccess",
             "SoEngineAccess",
             "SoNodeKitAccess",
+            "SoCallbackActionNodeCallback",
+            "SoActionCallback",
+            "SoDraggerCallback",
+            "SoEventCallbackHandler",
+            "SoGLPreRenderCallback",
+            "SoGLRenderAbortCallback",
+            "SoGLRenderPassCallback",
+            "SoIntersectionCallback",
+            "SoIntersectionFilterCallback",
+            "SoIntersectionVisitationCallback",
+            "SoLineSegmentCallback",
+            "SoPointCallback",
+            "SoRenderManagerCallback",
+            "SoSceneManagerCallback",
+            "SoSelectionClassCallback",
+            "SoSelectionPathCallback",
+            "SoSelectionPickCallback",
+            "SoTriangleCallback",
         ):
             with self.subTest(name=name):
                 self.assertIn("class %s(Protocol" % name, coin_stub)
@@ -777,6 +829,14 @@ class CallbackTypePolicyTests(unittest.TestCase):
         self.assertNotIn("class SbVec2s:", soqt_stub)
         self.assertIn("class SoQtComponentCallback(Protocol):", soqt_stub)
         self.assertIn("class SoQtViewerCallback(Protocol):", soqt_stub)
+        for name in (
+            "SoQtRenderAreaCallback",
+            "SoQtFatalErrorCallback",
+            "SoQtAutoClippingCallback",
+            "SoQtMenuSelectionCallback",
+        ):
+            with self.subTest(name=name):
+                self.assertIn("class %s(Protocol" % name, soqt_stub)
         self.assertIn("SoEvent", soqt_stub.splitlines()[7])
         self.assertIn("SbVec2s", soqt_stub.splitlines()[7])
 
@@ -940,9 +1000,9 @@ class PolicyBoundaryTests(unittest.TestCase):
     def test_verifytypes_summary_parser(self):
         output = """
 Symbols exported by "pivy.coin": 13752
-  With known type: 8394
+  With known type: 8406
   With ambiguous type: 0
-  With unknown type: 5358
+  With unknown type: 5382
 
 Other symbols referenced but not exported by "pivy.coin": 0
   With known type: 0
@@ -958,9 +1018,9 @@ Type completeness score: 61%
             VerifyTypesReport(
                 module="pivy.coin",
                 exported_symbols=13752,
-                known_symbols=8394,
+                known_symbols=8406,
                 ambiguous_symbols=0,
-                unknown_symbols=5358,
+                unknown_symbols=5382,
                 completeness_score=61.0,
                 pyright_returncode=1,
             ),
@@ -981,7 +1041,7 @@ Type completeness score: 61%
         )
 
         violations = verifytypes_regressions(report, baseline)
-        self.assertEqual(len(violations), 4)
+        self.assertEqual(len(violations), 2)
 
 
 if __name__ == "__main__":

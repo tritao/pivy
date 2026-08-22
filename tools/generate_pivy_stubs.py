@@ -51,6 +51,7 @@ try:
         CALLBACK_PARAMETER_NAMES,
         CALLBACK_PARAMETER_TYPE_OVERRIDES,
         PYTHON_PROTOCOL_DEFINITIONS,
+        PYTHON_PROTOCOL_MODULES,
         CALLBACK_TYPE_SIGNATURES,
         COMPARISON_METHODS,
         factory_method_return_type,
@@ -101,6 +102,7 @@ except ImportError:
         CALLBACK_PARAMETER_NAMES,
         CALLBACK_PARAMETER_TYPE_OVERRIDES,
         PYTHON_PROTOCOL_DEFINITIONS,
+        PYTHON_PROTOCOL_MODULES,
         CALLBACK_TYPE_SIGNATURES,
         COMPARISON_METHODS,
         factory_method_return_type,
@@ -1215,12 +1217,23 @@ def add_generated_header(text):
     return GENERATED_HEADER + "\n".join(lines) + "\n"
 
 
-def add_python_protocols(text, class_names):
+def add_python_protocols(
+    text,
+    class_names,
+    external_class_modules=None,
+    module=None,
+):
     """Add named Protocols for Python-facing binding adapters."""
 
+    available_types = set(class_names)
     definitions = []
     for name, required_classes, definition in PYTHON_PROTOCOL_DEFINITIONS:
-        if not set(required_classes).issubset(class_names):
+        target_module = PYTHON_PROTOCOL_MODULES.get(name)
+        if target_module is not None and target_module != module:
+            continue
+        if target_module == module and external_class_modules:
+            available_types.update(external_class_modules)
+        if not set(required_classes).issubset(available_types):
             continue
         if re.search(r"^class\s+%s\b" % re.escape(name), text, flags=re.MULTILINE):
             continue
@@ -2122,7 +2135,12 @@ def postprocess_stub(path, module, output_dir):
     processed = normalize_method_return_overrides(processed)
     processed = remove_swig_meta_classmethod(processed)
     processed = add_runtime_unsupported_notes(processed, module)
-    processed = add_python_protocols(processed, class_names - removed_classes)
+    processed = add_python_protocols(
+        processed,
+        class_names - removed_classes,
+        external_class_modules,
+        module,
+    )
     processed = add_typing_import(processed, "Any")
     processed = add_typing_import(processed, "Callable")
     processed = add_typing_import(processed, "Iterator")
