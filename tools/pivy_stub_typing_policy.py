@@ -29,6 +29,14 @@ class VectorTypePolicy:
     width: int
 
 
+@dataclass(frozen=True)
+class PythonMethodPolicy:
+    """Python-facing signature for a binding-added or normalized method."""
+
+    parameters: str
+    return_type: str
+
+
 VECTOR_TYPE_POLICIES = {
     "SbVec2b": VectorTypePolicy("int8_t", "int", 2),
     "SbVec2s": VectorTypePolicy("short", "int", 2),
@@ -220,52 +228,70 @@ STRING_POINTER_PARAMETERS = {
     ("SbString", "__nq__", "u"),
 }
 INPLACE_DIVISION_METHODS = {"__idiv__", "__itruediv__"}
-PYTHON_HELPER_METHOD_TYPES = {
-    ("_SwigNonDynamicMeta", "__setattr__"): (
+PYTHON_HELPER_METHOD_POLICIES = {
+    ("_SwigNonDynamicMeta", "__setattr__"): PythonMethodPolicy(
         "cls, name: str, value: Any",
         "None",
     ),
-    ("SoBase", "__nonzero__"): ("self", "bool"),
-    ("SoBaseKit", "__getattr__"): ("self, name: str", "SoNode | SoField"),
-    ("SoBaseKit", "__setattr__"): ("self, name: str, value: Any", "None"),
-    ("SoEngine", "__getattr__"): (
+    ("SoBase", "__nonzero__"): PythonMethodPolicy("self", "bool"),
+    ("SoBaseKit", "__getattr__"): PythonMethodPolicy(
+        "self, name: str", "SoNode | SoField"
+    ),
+    ("SoBaseKit", "__setattr__"): PythonMethodPolicy(
+        "self, name: str, value: Any", "None"
+    ),
+    ("SoEngine", "__getattr__"): PythonMethodPolicy(
         "self, name: str",
         "SoField | SoEngineOutput",
     ),
-    ("SoEngine", "getOutput"): (
+    ("SoEngine", "getOutput"): PythonMethodPolicy(
         "self, outputname: SbName | str",
         "SoEngineOutput | None",
     ),
-    ("SoEngine", "getOutputNameValue"): (
+    ("SoEngine", "getOutputNameValue"): PythonMethodPolicy(
         "self, output: SoEngineOutput",
         "tuple[bool, str]",
     ),
-    ("SoCallbackAction", "getTextureImage2dValue"): (
+    ("SoCallbackAction", "getTextureImage2dValue"): PythonMethodPolicy(
         "self",
         "tuple[bytes | None, SbVec2s, int]",
     ),
-    ("SoCallbackAction", "getTextureImage3dValue"): (
+    ("SoCallbackAction", "getTextureImage3dValue"): PythonMethodPolicy(
         "self",
         "tuple[bytes | None, SbVec3s, int]",
     ),
-    ("SoSFImage", "getSubTextureValue"): (
+    ("SoSFImage", "getSubTextureValue"): PythonMethodPolicy(
         "self, idx: int",
         "tuple[bytes | None, SbVec2s, SbVec2s, int]",
     ),
-    ("SoEngine", "__setattr__"): ("self, name: str, value: Any", "None"),
-    ("SoFieldContainer", "__dir__"): ("self", "list[str]"),
-    ("SoFieldContainer", "__getattr__"): ("self, name: str", "SoField"),
-    ("SoFieldContainer", "__setattr__"): (
+    ("SoEngine", "__setattr__"): PythonMethodPolicy(
+        "self, name: str, value: Any", "None"
+    ),
+    ("SoFieldContainer", "__dir__"): PythonMethodPolicy("self", "list[str]"),
+    ("SoFieldContainer", "__getattr__"): PythonMethodPolicy(
+        "self, name: str", "SoField"
+    ),
+    ("SoFieldContainer", "__setattr__"): PythonMethodPolicy(
         "self, name: str, value: Any",
         "None",
     ),
-    ("SoGroup", "__iadd__"): ("self, other: SoNode | Sequence[SoNode]", "SoGroup"),
-    ("SoGroup", "__isub__"): ("self, other: SoNode | Sequence[SoNode]", "SoGroup"),
-    ("SoGroup", "__contains__"): ("self, node: SoNode", "bool"),
-    ("SoGroup", "getByName"): ("self, name: SbName | str", "SoNode | None"),
-    ("SoNodeKitPath", "index"): ("self", "Iterator[int]"),
-    ("SoPath", "index"): ("self", "Iterator[int]"),
-    ("SoType", "fromName"): ("name: SbName | str", "SoType"),
+    ("SoGroup", "__iadd__"): PythonMethodPolicy(
+        "self, other: SoNode | Sequence[SoNode]", "SoGroup"
+    ),
+    ("SoGroup", "__isub__"): PythonMethodPolicy(
+        "self, other: SoNode | Sequence[SoNode]", "SoGroup"
+    ),
+    ("SoGroup", "__contains__"): PythonMethodPolicy(
+        "self, node: SoNode", "bool"
+    ),
+    ("SoGroup", "getByName"): PythonMethodPolicy(
+        "self, name: SbName | str", "SoNode | None"
+    ),
+    ("SoNodeKitPath", "index"): PythonMethodPolicy("self", "Iterator[int]"),
+    ("SoPath", "index"): PythonMethodPolicy("self", "Iterator[int]"),
+    ("SoType", "fromName"): PythonMethodPolicy(
+        "name: SbName | str", "SoType"
+    ),
 }
 METHOD_RETURN_TYPE_OVERRIDES = {
     # The Python-level SbImage adapter snapshots the native pixel buffer, so

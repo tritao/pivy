@@ -69,7 +69,7 @@ try:
         POINTER_HELPER_TYPES,
         PYTHON_PARAMETER_TYPE_OVERRIDES,
         PRIVATE_EXTENSION_STUB,
-        PYTHON_HELPER_METHOD_TYPES,
+        PYTHON_HELPER_METHOD_POLICIES,
         PYTHON_SHADOW_METHOD_TYPES,
         RUNTIME_UNSUPPORTED_METHOD_NOTES,
         RUNTIME_UNSUPPORTED_NOTE,
@@ -117,7 +117,7 @@ except ImportError:
         POINTER_HELPER_TYPES,
         PYTHON_PARAMETER_TYPE_OVERRIDES,
         PRIVATE_EXTENSION_STUB,
-        PYTHON_HELPER_METHOD_TYPES,
+        PYTHON_HELPER_METHOD_POLICIES,
         PYTHON_SHADOW_METHOD_TYPES,
         RUNTIME_UNSUPPORTED_METHOD_NOTES,
         RUNTIME_UNSUPPORTED_NOTE,
@@ -1762,14 +1762,18 @@ def normalize_python_helpers(text):
             r"(?: -> [^:]+)?: \.\.\.$",
             line,
         )
-        signature = PYTHON_HELPER_METHOD_TYPES.get(
+        method_policy = PYTHON_HELPER_METHOD_POLICIES.get(
             (current_class, match.group("name")) if match else None
         )
-        if signature is not None:
-            args, return_type = signature
+        if method_policy is not None:
             updated.append(
                 "%sdef %s(%s) -> %s: ..."
-                % (match.group("indent"), match.group("name"), args, return_type)
+                % (
+                    match.group("indent"),
+                    match.group("name"),
+                    method_policy.parameters,
+                    method_policy.return_type,
+                )
             )
             continue
 

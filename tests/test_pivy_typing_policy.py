@@ -153,20 +153,22 @@ class FieldTypePolicyTests(unittest.TestCase):
 
     def test_reflection_helpers_are_derived_from_policy(self):
         self.assertEqual(
-            policy.PYTHON_HELPER_METHOD_TYPES[("SoFieldContainer", "__getattr__")],
-            ("self, name: str", "SoField"),
+            policy.PYTHON_HELPER_METHOD_POLICIES[("SoFieldContainer", "__getattr__")],
+            policy.PythonMethodPolicy("self, name: str", "SoField"),
         )
         self.assertEqual(
-            policy.PYTHON_HELPER_METHOD_TYPES[("SoType", "fromName")],
-            ("name: SbName | str", "SoType"),
+            policy.PYTHON_HELPER_METHOD_POLICIES[("SoType", "fromName")],
+            policy.PythonMethodPolicy("name: SbName | str", "SoType"),
         )
         self.assertEqual(
-            policy.PYTHON_HELPER_METHOD_TYPES[("SoBaseKit", "__getattr__")],
-            ("self, name: str", "SoNode | SoField"),
+            policy.PYTHON_HELPER_METHOD_POLICIES[("SoBaseKit", "__getattr__")],
+            policy.PythonMethodPolicy("self, name: str", "SoNode | SoField"),
         )
         self.assertEqual(
-            policy.PYTHON_HELPER_METHOD_TYPES[("SoEngine", "__getattr__")],
-            ("self, name: str", "SoField | SoEngineOutput"),
+            policy.PYTHON_HELPER_METHOD_POLICIES[("SoEngine", "__getattr__")],
+            policy.PythonMethodPolicy(
+                "self, name: str", "SoField | SoEngineOutput"
+            ),
         )
 
     def test_sensor_shadow_methods_have_python_signatures(self):
