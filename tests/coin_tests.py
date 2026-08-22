@@ -944,6 +944,7 @@ class FieldSetValue(unittest.TestCase):
             (SoMFVec3b, SbVec3b, (1, 2, 3)),
             (SoMFVec3s, SbVec3s, (1, 2, 3)),
             (SoMFVec3i32, SbVec3i32, (1, 2, 3)),
+            (SoMFVec3d, SbVec3d, (1.0, 2.0, 3.0)),
             (SoMFVec4b, SbVec4b, (1, 2, 3, 4)),
             (SoMFVec4ub, SbVec4ub, (1, 2, 3, 4)),
             (SoMFVec4s, SbVec4s, (1, 2, 3, 4)),

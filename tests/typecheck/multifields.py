@@ -109,6 +109,72 @@ def check_vector_multifield() -> None:
     values[0] = coin.SbVec3f()
 
 
+def check_numeric_vector_multifield_families() -> None:
+    vec2b = coin.SoMFVec2b()
+    vec2b.setValues([(1, 2)])
+    assert_type(vec2b[0], coin.SbVec2b)
+    assert_type(vec2b.getValues(), list[coin.SbVec2b])
+
+    vec2s = coin.SoMFVec2s()
+    vec2s.setValues([(1, 2)])
+    assert_type(vec2s[0], coin.SbVec2s)
+
+    vec2i32 = coin.SoMFVec2i32()
+    vec2i32.setValues([(1, 2)])
+    assert_type(vec2i32[0], coin.SbVec2i32)
+
+    vec2d = coin.SoMFVec2d()
+    vec2d.setValues([(1.0, 2.0)])
+    assert_type(vec2d[0], coin.SbVec2d)
+    assert_type(vec2d.getValues(), list[coin.SbVec2d])
+
+    vec3b = coin.SoMFVec3b()
+    vec3b.setValues([(1, 2, 3)])
+    assert_type(vec3b[0], coin.SbVec3b)
+
+    vec3s = coin.SoMFVec3s()
+    vec3s.setValues([(1, 2, 3)])
+    assert_type(vec3s[0], coin.SbVec3s)
+
+    vec3i32 = coin.SoMFVec3i32()
+    vec3i32.setValues([(1, 2, 3)])
+    assert_type(vec3i32[0], coin.SbVec3i32)
+
+    vec3d = coin.SoMFVec3d()
+    vec3d.setValues([(1.0, 2.0, 3.0)])
+    assert_type(vec3d[0], coin.SbVec3d)
+    assert_type(iter(vec3d), Iterator[coin.SbVec3d])
+
+    vec4b = coin.SoMFVec4b()
+    vec4b.setValues([(1, 2, 3, 4)])
+    assert_type(vec4b[0], coin.SbVec4b)
+
+    vec4ub = coin.SoMFVec4ub()
+    vec4ub.setValues([(1, 2, 3, 4)])
+    assert_type(vec4ub[0], coin.SbVec4ub)
+
+    vec4s = coin.SoMFVec4s()
+    vec4s.setValues([(1, 2, 3, 4)])
+    assert_type(vec4s[0], coin.SbVec4s)
+
+    vec4us = coin.SoMFVec4us()
+    vec4us.setValues([(1, 2, 3, 4)])
+    assert_type(vec4us[0], coin.SbVec4us)
+
+    vec4i32 = coin.SoMFVec4i32()
+    vec4i32.setValues([(1, 2, 3, 4)])
+    assert_type(vec4i32[0], coin.SbVec4i32)
+
+    vec4ui32 = coin.SoMFVec4ui32()
+    vec4ui32.setValues([(1, 2, 3, 4)])
+    assert_type(vec4ui32[0], coin.SbVec4ui32)
+
+    vec4d = coin.SoMFVec4d()
+    vec4d.setValues([(1.0, 2.0, 3.0, 4.0)])
+    assert_type(vec4d[0], coin.SbVec4d)
+    assert_type(vec4d.getValues(), list[coin.SbVec4d])
+
+
 def check_color_multifield() -> None:
     values = coin.SoMFColor()
     rgb: Sequence[float] = (0.2, 0.4, 0.8)
