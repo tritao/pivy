@@ -137,6 +137,54 @@ def check_field_attribute_inventory() -> None:
     assert_type(hints.vertexOrdering, coin.SoSFEnum)
     assert_type(hints.windingType, coin.SoSFEnum)
 
+    draw_style = coin.SoDrawStyle()
+    assert_type(draw_style.linePattern, coin.SoSFUShort)
+    assert_type(draw_style.linePatternScaleFactor, coin.SoSFInt32)
+    assert_type(draw_style.lineWidth, coin.SoSFFloat)
+    assert_type(draw_style.pointSize, coin.SoSFFloat)
+    assert_type(draw_style.style, coin.SoSFEnum)
+
+    environment = coin.SoEnvironment()
+    assert_type(environment.ambientColor, coin.SoSFColor)
+    assert_type(environment.ambientIntensity, coin.SoSFFloat)
+    assert_type(environment.attenuation, coin.SoSFVec3f)
+    assert_type(environment.fogColor, coin.SoSFColor)
+    assert_type(environment.fogType, coin.SoSFEnum)
+    assert_type(environment.fogVisibility, coin.SoSFFloat)
+
+    texture = coin.SoTexture3()
+    assert_type(texture.blendColor, coin.SoSFColor)
+    assert_type(texture.enableCompressedTexture, coin.SoSFBool)
+    assert_type(texture.filenames, coin.SoMFString)
+    assert_type(texture.images, coin.SoSFImage3)
+    assert_type(texture.wrapR, coin.SoSFEnum)
+
+    assert_type(coin.SoTexture2Transform().center, coin.SoSFVec2f)
+    assert_type(coin.SoTexture2Transform().rotation, coin.SoSFFloat)
+    assert_type(coin.SoTexture2Transform().scaleFactor, coin.SoSFVec2f)
+    assert_type(coin.SoTexture3Transform().scaleOrientation, coin.SoSFRotation)
+
+    assert_type(coin.SoFont().name, coin.SoSFName)
+    assert_type(coin.SoFont().size, coin.SoSFFloat)
+    assert_type(coin.SoFontStyle().family, coin.SoSFEnum)
+    assert_type(coin.SoFontStyle().style, coin.SoSFBitMask)
+    assert_type(coin.SoText3().string, coin.SoMFString)
+    assert_type(coin.SoText3().parts, coin.SoSFBitMask)
+
+    assert_type(coin.SoClipPlane().on, coin.SoSFBool)
+    assert_type(coin.SoClipPlane().plane, coin.SoSFPlane)
+    assert_type(coin.SoPolygonOffset().factor, coin.SoSFFloat)
+    assert_type(coin.SoPolygonOffset().styles, coin.SoSFBitMask)
+    assert_type(coin.SoUnits().units, coin.SoSFEnum)
+    assert_type(coin.SoBaseColor().rgb, coin.SoMFColor)
+
+    assert_type(coin.SoProfileCoordinate2().point, coin.SoMFVec2f)
+    assert_type(coin.SoProfileCoordinate3().point, coin.SoMFVec3f)
+    assert_type(coin.SoCoordinate4().point, coin.SoMFVec4f)
+    assert_type(coin.SoIndexedShape().coordIndex, coin.SoMFInt32)
+    assert_type(coin.SoVertexProperty().orderedRGBA, coin.SoMFUInt32)
+    assert_type(coin.SoVertexProperty().texCoord3, coin.SoMFVec3f)
+
 
 def check_nullable_fields() -> None:
     node = coin.SoSFNode()
