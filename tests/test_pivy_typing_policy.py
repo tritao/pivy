@@ -474,6 +474,12 @@ class IncompletePolicyTests(unittest.TestCase):
             "raw C pointers",
         )
 
+    def test_sb_image_snapshot_is_a_safe_python_value(self):
+        self.assertEqual(
+            policy.METHOD_RETURN_TYPE_OVERRIDES[("SbImage", "getValue")],
+            "tuple[bytes | None, SbVec2s | SbVec3s, int]",
+        )
+
     def test_known_reference_helpers_are_site_specific(self):
         self.assertEqual(
             policy.SCALAR_REFERENCE_HELPER_PARAMETERS[

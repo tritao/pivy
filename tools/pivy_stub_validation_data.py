@@ -652,7 +652,7 @@ DEFERRED_RAW_METHOD_CHECKS = {
             "SbImage",
             "getValue",
             {},
-            "Incomplete",
+            "tuple[bytes | None, SbVec2s | SbVec3s, int]",
         ),
         (
             "SoMultiTextureImageElement",

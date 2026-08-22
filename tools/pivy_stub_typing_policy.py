@@ -248,6 +248,10 @@ PYTHON_HELPER_METHOD_TYPES = {
     ("SoType", "fromName"): ("name: SbName | str", "SoType"),
 }
 METHOD_RETURN_TYPE_OVERRIDES = {
+    # The Python-level SbImage adapter snapshots the native pixel buffer, so
+    # callers never receive a borrowed C pointer.  ``None`` represents an
+    # image with no allocated pixel data.
+    ("SbImage", "getValue"): "tuple[bytes | None, SbVec2s | SbVec3s, int]",
     # SWIG's image typemaps expose the native pixel pointer together with the
     # dimensions and component count as a Python tuple.
     ("SoSFImage", "getValue"): "tuple[str, SbVec2s, int]",

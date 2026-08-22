@@ -1317,6 +1317,15 @@ class SoGroupMethods(unittest.TestCase):
 
 class SbBaseClasses(unittest.TestCase):
     """checks methods and operators of and between various Sb* classes"""
+
+    def testSbImageDataSnapshot(self):
+        image = SbImage()
+        pixels, size, components = image.getValue()
+
+        self.assertIsNone(pixels)
+        self.assertIsInstance(size, SbVec2s)
+        self.assertEqual(components, 0)
+
     def testByteBufferDataSnapshot(self):
         buffer = SbByteBuffer(4, "a\x00cd")
         snapshot = buffer.data()

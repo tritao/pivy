@@ -29,6 +29,15 @@ def check_byte_buffer_snapshot() -> None:
     assert_type(buffer.data(), bytes)
 
 
+def check_sb_image_snapshot() -> None:
+    image = coin.SbImage()
+    pixels, size, components = image.getValue()
+
+    assert_type(pixels, bytes | None)
+    assert_type(size, coin.SbVec2s | coin.SbVec3s)
+    assert_type(components, int)
+
+
 def check_fixed_width_integer_vectors() -> None:
     vector = coin.SbVec4ui32([1, 2, 3, 4])
 
