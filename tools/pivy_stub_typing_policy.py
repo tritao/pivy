@@ -1158,6 +1158,13 @@ SENSOR_CALLBACK_CLASSES = {
     "SoTimerQueueSensor",
     "SoTimerSensor",
 }
+SENSOR_CALLBACK_CONSTRUCTOR_TYPES = {
+    class_name: (
+        "Callable[[object, %s], None]" % class_name,
+        "object | None",
+    )
+    for class_name in SENSOR_CALLBACK_CLASSES
+}
 KNOWN_ITER_ELEMENT_TYPES = {
     "SbIntList": "int",
     "SbName": "str",

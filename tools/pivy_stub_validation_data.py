@@ -11,6 +11,8 @@ from tools.pivy_stub_typing_policy import (
     multifield_single_value_types,
     multifield_setvalues_types,
     MULTIFIELD_TYPE_POLICIES,
+    SENSOR_CALLBACK_CLASSES,
+    SENSOR_CALLBACK_CONSTRUCTOR_TYPES,
     vector_iter_element_types,
 )
 
@@ -1801,17 +1803,6 @@ PROPERTY_ATTRIBUTE_CHECKS = {
         ("SoNormalBundle", "generator", "SoNormalGenerator | None"),
         ("SoSearchAction", "duringSearchAll", "bool"),
     ),
-}
-SENSOR_CALLBACK_CLASSES = {
-    "SoAlarmSensor",
-    "SoDelayQueueSensor",
-    "SoFieldSensor",
-    "SoIdleSensor",
-    "SoNodeSensor",
-    "SoOneShotSensor",
-    "SoPathSensor",
-    "SoTimerQueueSensor",
-    "SoTimerSensor",
 }
 MYPY_SNIPPET = """
 from typing import Any, Callable, Iterator, Sequence

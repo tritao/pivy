@@ -33,6 +33,7 @@ from tools.pivy_stub_validation_data import (
     RUNTIME_UNSUPPORTED_METHOD_CHECKS,
     RUNTIME_UNSUPPORTED_NOTE,
     SENSOR_CALLBACK_CLASSES,
+    SENSOR_CALLBACK_CONSTRUCTOR_TYPES,
     SOQT_COIN_DUPLICATE_CLASSES,
     STUB_SPECS,
     StubKind,
@@ -550,10 +551,10 @@ def assert_callback_helpers(path, tree, checks):
                 "%s is missing %s empty constructor" % (path, class_name)
             )
 
-        callback_type = "Callable[[Any, %s], None]" % class_name
+        callback_type, data_type = SENSOR_CALLBACK_CONSTRUCTOR_TYPES[class_name]
         if not any(
             argument_annotations(method).get("func") == callback_type
-            and argument_annotations(method).get("data") == "Any"
+            and argument_annotations(method).get("data") == data_type
             and annotation_text(method.returns) == "None"
             for method in init_methods
         ):

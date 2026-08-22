@@ -141,6 +141,15 @@ class FieldTypePolicyTests(unittest.TestCase):
             ),
         )
 
+    def test_sensor_constructor_callback_types(self):
+        self.assertEqual(
+            policy.SENSOR_CALLBACK_CONSTRUCTOR_TYPES["SoTimerSensor"],
+            (
+                "Callable[[object, SoTimerSensor], None]",
+                "object | None",
+            ),
+        )
+
     def test_database_shadow_methods_have_python_signatures(self):
         self.assertEqual(
             policy.PYTHON_SHADOW_METHOD_TYPES[("SoDB", "registerHeader")],

@@ -1,19 +1,31 @@
 # pyright: reportMissingModuleSource=false
 
-from typing import Any, assert_type
+from typing import assert_type
 
 from pivy import coin
 
 
-def sensor_callback(data: Any, sensor: coin.SoSensor) -> None:
+def sensor_callback(data: object, sensor: coin.SoSensor) -> None:
     pass
 
 
 def check_sensor_lifecycle() -> None:
-    timer = coin.SoTimerSensor(sensor_callback, None)
-    alarm = coin.SoAlarmSensor(sensor_callback, None)
-    idle = coin.SoIdleSensor(sensor_callback, None)
-    oneshot = coin.SoOneShotSensor(sensor_callback, None)
+    def timer_callback(data: object, sensor: coin.SoTimerSensor) -> None:
+        pass
+
+    def alarm_callback(data: object, sensor: coin.SoAlarmSensor) -> None:
+        pass
+
+    def idle_callback(data: object, sensor: coin.SoIdleSensor) -> None:
+        pass
+
+    def oneshot_callback(data: object, sensor: coin.SoOneShotSensor) -> None:
+        pass
+
+    timer = coin.SoTimerSensor(timer_callback, None)
+    alarm = coin.SoAlarmSensor(alarm_callback, None)
+    idle = coin.SoIdleSensor(idle_callback, None)
+    oneshot = coin.SoOneShotSensor(oneshot_callback, None)
 
     assert_type(timer, coin.SoTimerSensor)
     assert_type(alarm, coin.SoAlarmSensor)
@@ -49,13 +61,13 @@ def check_delay_sensor_contract() -> None:
 
 
 def check_data_sensor_contract() -> None:
-    def field_callback(data: Any, sensor: coin.SoFieldSensor) -> None:
+    def field_callback(data: object, sensor: coin.SoFieldSensor) -> None:
         pass
 
-    def node_callback(data: Any, sensor: coin.SoNodeSensor) -> None:
+    def node_callback(data: object, sensor: coin.SoNodeSensor) -> None:
         pass
 
-    def path_callback(data: Any, sensor: coin.SoPathSensor) -> None:
+    def path_callback(data: object, sensor: coin.SoPathSensor) -> None:
         pass
 
     field = coin.SoFieldSensor(field_callback, None)

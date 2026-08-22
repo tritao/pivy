@@ -76,6 +76,7 @@ try:
         SCALAR_REFERENCE_HELPER_PARAMETERS,
         SCALAR_REFERENCE_HELPER_TYPES,
         SENSOR_CALLBACK_CLASSES,
+        SENSOR_CALLBACK_CONSTRUCTOR_TYPES,
         SEQUENCE_ARRAY_PARAMETERS,
         SEQUENCE_POINTER_PARAMETERS,
         SEQUENCE_VALUE_RETURN_TYPES,
@@ -122,6 +123,7 @@ except ImportError:
         SCALAR_REFERENCE_HELPER_PARAMETERS,
         SCALAR_REFERENCE_HELPER_TYPES,
         SENSOR_CALLBACK_CLASSES,
+        SENSOR_CALLBACK_CONSTRUCTOR_TYPES,
         SEQUENCE_ARRAY_PARAMETERS,
         SEQUENCE_POINTER_PARAMETERS,
         SEQUENCE_VALUE_RETURN_TYPES,
@@ -1402,12 +1404,13 @@ def normalize_container_helpers(text):
 
 
 def render_sensor_init_methods(class_name):
-    callback_type = "Callable[[Any, %s], None]" % class_name
+    callback_type, data_type = SENSOR_CALLBACK_CONSTRUCTOR_TYPES[class_name]
     return [
         "    @overload",
         "    def __init__(self) -> None: ...",
         "    @overload",
-        "    def __init__(self, func: %s, data: Any) -> None: ..." % callback_type,
+        "    def __init__(self, func: %s, data: %s) -> None: ..."
+        % (callback_type, data_type),
     ]
 
 
