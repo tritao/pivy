@@ -63,7 +63,11 @@ check_typing_policy_coverage = { cmd = ["python", "-m", "tools.check_pivy_policy
 typecheck_stubs_pyright = { cmd = ["pyright", "--warnings", "tests/typecheck"]}
 typecheck_stubs_pyrefly = { cmd = ["pyrefly", "check", "--summary=none", "--search-path", ".", "tests/typecheck"]}
 typecheck_stubs = { depends-on = ["typecheck_stubs_pyright", "typecheck_stubs_pyrefly"]}
+typecheck_negative = { cmd = ["python", "-m", "tools.check_pivy_negative_typing"]}
+typecheck_stubs_strict_pyright = { cmd = ["pyright", "--warnings", "tests/typecheck_strict"]}
+typecheck_stubs_strict_pyrefly = { cmd = ["pyrefly", "check", "--summary=none", "--search-path", ".", "tests/typecheck_strict"]}
+typecheck_stubs_strict = { depends-on = ["typecheck_stubs_strict_pyright", "typecheck_stubs_strict_pyrefly"]}
 typecheck_stubs_matrix = { cmd = ["python", "-m", "tools.check_pivy_typing_matrix"]}
 typecheck_report = { cmd = ["python", "-m", "tools.report_pivy_typing", "--check-baseline", "pivy/coin.pyi"]}
 typecheck_report_json = { cmd = ["python", "-m", "tools.report_pivy_typing", "--json", "pivy/coin.pyi"]}
-typecheck_quality = { depends-on = ["typecheck_stubs", "typecheck_stubs_matrix", "test_typing_policy", "check_typing_policy_coverage", "typecheck_report"]}
+typecheck_quality = { depends-on = ["typecheck_stubs", "typecheck_negative", "typecheck_stubs_strict", "typecheck_stubs_matrix", "test_typing_policy", "check_typing_policy_coverage", "typecheck_report"]}
