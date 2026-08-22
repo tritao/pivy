@@ -258,6 +258,9 @@ METHOD_RETURN_TYPE_OVERRIDES = {
     # SoColorPacker's SWIG extension snapshots the owned internal color array
     # using getSize(), so callers never receive a borrowed C pointer.
     ("SoColorPacker", "getPackedColors"): "bytes",
+    # SoByteStream's SWIG extension snapshots its internal buffer using the
+    # exact byte count returned by getNumBytes().
+    ("SoByteStream", "getData"): "bytes",
     # SWIG's image typemaps expose the native pixel pointer together with the
     # dimensions and component count as a Python tuple.
     ("SoSFImage", "getValue"): "tuple[str, SbVec2s, int]",

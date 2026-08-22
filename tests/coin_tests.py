@@ -1327,6 +1327,14 @@ class SbBaseClasses(unittest.TestCase):
         self.assertIsInstance(snapshot, bytes)
         self.assertEqual(len(snapshot), 2 * 4)
 
+    def testByteStreamDataSnapshot(self):
+        stream = SoByteStream()
+        stream.convert(SoCube())
+        snapshot = stream.getData()
+
+        self.assertIsInstance(snapshot, bytes)
+        self.assertEqual(len(snapshot), stream.getNumBytes())
+
     def testSbImageDataSnapshot(self):
         image = SbImage()
         pixels, size, components = image.getValue()

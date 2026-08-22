@@ -69,7 +69,7 @@ TYPING_QUALITY_BASELINE = TypingQualityBaseline(
         ("callbacks", 30),
         ("unknown output parameters", 0),
         ("function pointers", 36),
-        ("dynamic/runtime API", 293),
+        ("dynamic/runtime API", 292),
         ("uncategorized", 0),
     ),
 )

@@ -1502,6 +1502,37 @@ def normalize_shadow_methods(text):
     return "\n".join(updated) + "\n"
 
 
+def normalize_method_return_overrides(text):
+    """Apply return policies even when stubgen omits a method docstring."""
+    lines = text.splitlines()
+    updated = []
+    current_class = None
+
+    for line in lines:
+        class_match = re.match(r"^class\s+([A-Za-z_]\w*)", line)
+        if class_match:
+            current_class = class_match.group(1)
+        elif current_class and is_top_level_statement(line):
+            current_class = None
+
+        match = DEF_RE.match(line)
+        if match and (current_class, match.group("name")) in METHOD_RETURN_TYPE_OVERRIDES:
+            updated.append(
+                "%sdef %s(%s) -> %s: ..."
+                % (
+                    match.group("indent"),
+                    match.group("name"),
+                    match.group("args"),
+                    METHOD_RETURN_TYPE_OVERRIDES[(current_class, match.group("name"))],
+                )
+            )
+            continue
+
+        updated.append(line)
+
+    return "\n".join(updated) + "\n"
+
+
 def is_scalar_division_class(class_name):
     return class_name is not None and (
         class_name.startswith("SbVec") or class_name == "SbColor4f"
@@ -2000,6 +2031,7 @@ def postprocess_stub(path, module, output_dir):
     processed = normalize_container_helpers(processed)
     processed = normalize_callback_helpers(processed)
     processed = normalize_shadow_methods(processed)
+    processed = normalize_method_return_overrides(processed)
     processed = remove_swig_meta_classmethod(processed)
     processed = add_runtime_unsupported_notes(processed, module)
     processed = add_callback_protocols(processed, class_names)

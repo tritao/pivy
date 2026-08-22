@@ -111,6 +111,19 @@ SoColorPacker.getPackedColors = (
 )
 %}
 
+/* Return an owned snapshot for SoByteStream's internal buffer. */
+%extend SoByteStream {
+  PyObject *_pivy_getDataBytes() {
+    return PyBytes_FromStringAndSize(
+      (const char *)self->getData(),
+      self->getNumBytes());
+  }
+}
+
+%pythoncode %{
+SoByteStream.getData = lambda self: self._pivy_getDataBytes()
+%}
+
 /* Expose SbByteBuffer::data() as an owned Python bytes snapshot.  SWIG's
    default char * conversion treats the pointer as text and can leak both
    embedded NULs and the buffer's lifetime semantics into Python. */

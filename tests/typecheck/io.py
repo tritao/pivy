@@ -55,3 +55,9 @@ def check_color_packer_buffer_contract() -> None:
     packer = coin.SoColorPacker()
     assert_type(packer.getPackedColors(), bytes)
     assert_type(packer.getSize(), int)
+
+
+def check_byte_stream_buffer_contract() -> None:
+    stream = coin.SoByteStream()
+    assert_type(stream.getData(), bytes)
+    assert_type(stream.getNumBytes(), int)

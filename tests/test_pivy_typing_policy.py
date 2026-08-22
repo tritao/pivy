@@ -543,6 +543,12 @@ class IncompletePolicyTests(unittest.TestCase):
             ("self", "bytes"),
         )
 
+    def test_byte_stream_snapshot_is_a_safe_python_value(self):
+        self.assertEqual(
+            policy.METHOD_RETURN_TYPE_OVERRIDES[("SoByteStream", "getData")],
+            "bytes",
+        )
+
     def test_known_reference_helpers_are_site_specific(self):
         self.assertEqual(
             policy.SCALAR_REFERENCE_HELPER_PARAMETERS[
@@ -798,7 +804,7 @@ class PolicyBoundaryTests(unittest.TestCase):
         baseline = replace(
             TYPING_QUALITY_BASELINE,
             max_incomplete_by_category=(
-                ("dynamic/runtime API", 292),
+                ("dynamic/runtime API", 291),
             ),
         )
         violations = quality_regressions(report, baseline)
@@ -818,7 +824,7 @@ class PolicyBoundaryTests(unittest.TestCase):
             dict(report.dynamic_runtime_subcategories),
             {
                 "runtime factory returns": 4,
-                "opaque pointer/object returns": 41,
+                "opaque pointer/object returns": 40,
                 "opaque parameter boundaries": 247,
                 "opaque field storage": 1,
             },
