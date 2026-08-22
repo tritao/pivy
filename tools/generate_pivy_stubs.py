@@ -50,7 +50,7 @@ try:
         CALLBACK_HANDLE_PARAMETER_NAMES,
         CALLBACK_PARAMETER_NAMES,
         CALLBACK_PARAMETER_TYPE_OVERRIDES,
-        CALLBACK_PROTOCOL_DEFINITIONS,
+        PYTHON_PROTOCOL_DEFINITIONS,
         CALLBACK_TYPE_SIGNATURES,
         COMPARISON_METHODS,
         factory_method_return_type,
@@ -98,7 +98,7 @@ except ImportError:
         CALLBACK_HANDLE_PARAMETER_NAMES,
         CALLBACK_PARAMETER_NAMES,
         CALLBACK_PARAMETER_TYPE_OVERRIDES,
-        CALLBACK_PROTOCOL_DEFINITIONS,
+        PYTHON_PROTOCOL_DEFINITIONS,
         CALLBACK_TYPE_SIGNATURES,
         COMPARISON_METHODS,
         factory_method_return_type,
@@ -859,7 +859,7 @@ def collect_referenced_external_types(text, class_names, external_class_modules)
     used_external_types = set()
     local_callback_protocols = {
         name
-        for name, required_classes, _ in CALLBACK_PROTOCOL_DEFINITIONS
+        for name, required_classes, _ in PYTHON_PROTOCOL_DEFINITIONS
         if set(required_classes).issubset(class_names)
     }
     for name in re.findall(r"\b[A-Z][A-Za-z_]\w*\b", text):
@@ -1157,11 +1157,11 @@ def add_generated_header(text):
     return GENERATED_HEADER + "\n".join(lines) + "\n"
 
 
-def add_callback_protocols(text, class_names):
-    """Add named Protocols for Python-facing callback adapters."""
+def add_python_protocols(text, class_names):
+    """Add named Protocols for Python-facing binding adapters."""
 
     definitions = []
-    for name, required_classes, definition in CALLBACK_PROTOCOL_DEFINITIONS:
+    for name, required_classes, definition in PYTHON_PROTOCOL_DEFINITIONS:
         if not set(required_classes).issubset(class_names):
             continue
         if re.search(r"^class\s+%s\b" % re.escape(name), text, flags=re.MULTILINE):
@@ -2005,7 +2005,7 @@ def postprocess_stub(path, module, output_dir):
     processed = normalize_method_return_overrides(processed)
     processed = remove_swig_meta_classmethod(processed)
     processed = add_runtime_unsupported_notes(processed, module)
-    processed = add_callback_protocols(processed, class_names - removed_classes)
+    processed = add_python_protocols(processed, class_names - removed_classes)
     processed = add_typing_import(processed, "Any")
     processed = add_typing_import(processed, "Callable")
     processed = add_typing_import(processed, "Iterator")

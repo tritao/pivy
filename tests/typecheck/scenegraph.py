@@ -42,6 +42,9 @@ def check_path_contract() -> None:
 
 def check_field_and_name_lookups() -> None:
     cube = coin.SoCube()
+    field_access: coin.SoFieldContainerAccess = cube
+    assert_type(field_access.__getattr__("width"), coin.SoField)
+    assert_type(field_access.__dir__(), list[str])
     assert_type(cube.width, coin.SoSFFloat)
     assert_type(cube.__getattr__("width"), coin.SoField)
     assert_type(cube.__dir__(), list[str])
@@ -58,6 +61,8 @@ def check_field_and_name_lookups() -> None:
 
 def check_nodekit_lookup() -> None:
     kit = coin.SoShapeKit()
+    nodekit_access: coin.SoNodeKitAccess = kit
+    assert_type(nodekit_access.__getattr__("shape"), coin.SoNode | coin.SoField)
     assert_type(kit.shape, coin.SoNode | coin.SoField)
     assert_type(kit.appearance, coin.SoNode | coin.SoField)
 

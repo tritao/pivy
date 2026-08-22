@@ -675,10 +675,10 @@ class CallbackTypePolicyTests(unittest.TestCase):
             "object | None",
         )
 
-    def test_adapted_callback_protocols_have_required_bindings(self):
+    def test_python_protocols_have_required_bindings(self):
         definitions = {
             name: required_classes
-            for name, required_classes, _ in policy.CALLBACK_PROTOCOL_DEFINITIONS
+            for name, required_classes, _ in policy.PYTHON_PROTOCOL_DEFINITIONS
         }
         self.assertEqual(
             definitions["SoSensorCallback"],
@@ -696,6 +696,18 @@ class CallbackTypePolicyTests(unittest.TestCase):
             policy.CALLBACK_TYPE_SIGNATURES["ScXMLStateChangeCB"],
             "ScXMLStateChangeCallback",
         )
+        self.assertEqual(
+            definitions["SoFieldContainerAccess"],
+            ("SoField", "SoFieldContainer"),
+        )
+        self.assertEqual(
+            definitions["SoEngineAccess"],
+            ("SoEngine", "SoEngineOutput", "SoField"),
+        )
+        self.assertEqual(
+            definitions["SoNodeKitAccess"],
+            ("SoBaseKit", "SoField", "SoNode"),
+        )
 
     def test_adapted_callback_protocols_are_emitted_in_public_stubs(self):
         coin_stub = Path("pivy/coin.pyi").read_text()
@@ -706,6 +718,14 @@ class CallbackTypePolicyTests(unittest.TestCase):
             "ScXMLStateChangeCallback",
         }
         for name in coin_protocols:
+            with self.subTest(name=name):
+                self.assertIn("class %s(Protocol" % name, coin_stub)
+
+        for name in (
+            "SoFieldContainerAccess",
+            "SoEngineAccess",
+            "SoNodeKitAccess",
+        ):
             with self.subTest(name=name):
                 self.assertIn("class %s(Protocol" % name, coin_stub)
 

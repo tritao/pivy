@@ -110,4 +110,11 @@ def check_representative_engine_fields() -> None:
 
 def check_dynamic_engine_and_nodekit_access() -> None:
     engine = coin.SoBoolOperation()
+    engine_access: coin.SoEngineAccess = engine
+    assert_type(
+        engine_access.__getattr__("output"), coin.SoField | coin.SoEngineOutput
+    )
+    assert_type(
+        engine_access.getOutput("output"), coin.SoEngineOutput | None
+    )
     assert_type(engine.__getattr__("output"), coin.SoField | coin.SoEngineOutput)

@@ -695,7 +695,7 @@ CALLBACK_DATA_PARAMETER_NAMES = {
     "userData",
 }
 CALLBACK_HANDLE_PARAMETER_NAMES = {"tuple"}
-CALLBACK_PROTOCOL_DEFINITIONS = (
+PYTHON_PROTOCOL_DEFINITIONS = (
     (
         "SoSensorCallback",
         ("SoSensor",),
@@ -751,6 +751,30 @@ CALLBACK_PROTOCOL_DEFINITIONS = (
         "    def __call__(\n"
         "        self, data: object, viewer: SoQtViewer, /\n"
         "    ) -> None: ...",
+    ),
+    (
+        "SoFieldContainerAccess",
+        ("SoField", "SoFieldContainer"),
+        "class SoFieldContainerAccess(Protocol):\n"
+        "    def __getattr__(self, name: str) -> SoField: ...\n"
+        "    def __dir__(self) -> list[str]: ...",
+    ),
+    (
+        "SoEngineAccess",
+        ("SoEngine", "SoEngineOutput", "SoField"),
+        "class SoEngineAccess(Protocol):\n"
+        "    def __getattr__(\n"
+        "        self, name: str\n"
+        "    ) -> SoField | SoEngineOutput: ...\n"
+        "    def getOutput(\n"
+        "        self, outputname: SbName | str\n"
+        "    ) -> SoEngineOutput | None: ...",
+    ),
+    (
+        "SoNodeKitAccess",
+        ("SoBaseKit", "SoField", "SoNode"),
+        "class SoNodeKitAccess(Protocol):\n"
+        "    def __getattr__(self, name: str) -> SoNode | SoField: ...",
     ),
 )
 CALLBACK_TYPE_SIGNATURES = {
