@@ -6,6 +6,18 @@ from pivy._coin import cast as cast
 from typing import Callable, ClassVar, Iterator, Protocol, Sequence, TypeVar, overload
 from types import BuiltinFunctionType as builtin_function_or_method
 
+_SoFieldValueT_co = TypeVar("_SoFieldValueT_co", covariant=True)
+
+class SoSingleFieldReader(Protocol[_SoFieldValueT_co]):
+    def getValue(self) -> _SoFieldValueT_co: ...
+
+_SoMultiFieldValueT_co = TypeVar("_SoMultiFieldValueT_co", covariant=True)
+
+class SoMultiFieldReader(Protocol[_SoMultiFieldValueT_co]):
+    def __len__(self) -> int: ...
+    def __iter__(self) -> Iterator[_SoMultiFieldValueT_co]: ...
+    def getValuesSnapshot(self) -> list[_SoMultiFieldValueT_co]: ...
+
 class SoCallbackListCallback(Protocol):
     def __call__(
         self, data: object, callbackdata: object, /

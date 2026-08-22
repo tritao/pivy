@@ -773,6 +773,8 @@ class CallbackTypePolicyTests(unittest.TestCase):
             definitions["SoEngineAccess"],
             ("SoEngine", "SoEngineOutput", "SoField"),
         )
+        self.assertEqual(definitions["SoSingleFieldReader"], ("SoSField",))
+        self.assertEqual(definitions["SoMultiFieldReader"], ("SoMField",))
         self.assertEqual(
             definitions["SoNodeKitAccess"],
             ("SoBaseKit", "SoField", "SoNode"),
@@ -802,6 +804,8 @@ class CallbackTypePolicyTests(unittest.TestCase):
         for name in (
             "SoFieldContainerAccess",
             "SoEngineAccess",
+            "SoSingleFieldReader",
+            "SoMultiFieldReader",
             "SoNodeKitAccess",
             "SoCallbackActionNodeCallback",
             "SoActionCallback",

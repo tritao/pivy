@@ -55,6 +55,19 @@ def check_multifield_snapshots() -> None:
     assert_type(names.getValuesSnapshot(), list[coin.SbName])
 
 
+def check_reusable_field_reader_protocols() -> None:
+    scalar_reader: coin.SoSingleFieldReader[float] = coin.SoSFFloat()
+    assert_type(scalar_reader.getValue(), float)
+
+    vector_reader: coin.SoSingleFieldReader[coin.SbVec3f] = coin.SoSFVec3f()
+    assert_type(vector_reader.getValue(), coin.SbVec3f)
+
+    vector_values: coin.SoMultiFieldReader[coin.SbVec3f] = coin.SoMFVec3f()
+    assert_type(len(vector_values), int)
+    assert_type(iter(vector_values), Iterator[coin.SbVec3f])
+    assert_type(vector_values.getValuesSnapshot(), list[coin.SbVec3f])
+
+
 def check_extended_single_value_fields() -> None:
     trigger = coin.SoSFTrigger()
     assert_type(trigger.getValue(), None)

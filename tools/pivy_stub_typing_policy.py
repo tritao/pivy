@@ -839,6 +839,24 @@ PYTHON_PROTOCOL_DEFINITIONS = (
         "    def getForwardConnections(self, slavelist: SoFieldList) -> int: ...",
     ),
     (
+        "SoSingleFieldReader",
+        ("SoSField",),
+        "_SoFieldValueT_co = TypeVar(\"_SoFieldValueT_co\", covariant=True)\n"
+        "\n"
+        "class SoSingleFieldReader(Protocol[_SoFieldValueT_co]):\n"
+        "    def getValue(self) -> _SoFieldValueT_co: ...",
+    ),
+    (
+        "SoMultiFieldReader",
+        ("SoMField",),
+        "_SoMultiFieldValueT_co = TypeVar(\"_SoMultiFieldValueT_co\", covariant=True)\n"
+        "\n"
+        "class SoMultiFieldReader(Protocol[_SoMultiFieldValueT_co]):\n"
+        "    def __len__(self) -> int: ...\n"
+        "    def __iter__(self) -> Iterator[_SoMultiFieldValueT_co]: ...\n"
+        "    def getValuesSnapshot(self) -> list[_SoMultiFieldValueT_co]: ...",
+    ),
+    (
         "SoNodeAccess",
         ("SoNode", "SoType"),
         "class SoNodeAccess(Protocol):\n"
