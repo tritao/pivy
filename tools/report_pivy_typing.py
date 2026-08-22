@@ -62,15 +62,15 @@ class TypingQualityBaseline:
 # should make the relevant bound stricter in the same reviewed change; an
 # accidental generator or dependency drift must not silently lower quality.
 TYPING_QUALITY_BASELINE = TypingQualityBaseline(
-    min_concrete_annotations=21170,
-    max_any_annotations=104,
-    max_incomplete_annotations=466,
+    min_concrete_annotations=21578,
+    max_any_annotations=23,
+    max_incomplete_annotations=443,
     max_incomplete_by_category=(
-        ("raw C pointers", 107),
+        ("raw C pointers", 105),
         ("callbacks", 30),
         ("unknown output parameters", 0),
         ("function pointers", 36),
-        ("dynamic/runtime API", 292),
+        ("dynamic/runtime API", 272),
         ("uncategorized", 0),
     ),
 )
