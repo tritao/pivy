@@ -94,6 +94,76 @@ if (init_file_emulator() < 0) {
 %ignore SoDepthBufferElement::get;
 %include coin_header_includes.h
 
+/* Return scalar box output parameters as owned Python tuples.  The native
+   short-reference overloads have no usable Python proxy type, while the
+   vector overloads require callers to allocate temporary wrappers. */
+%extend SbBox2s {
+  PyObject *_pivy_getBoundsTuple() const {
+    short xmin, ymin, xmax, ymax;
+    self->getBounds(xmin, ymin, xmax, ymax);
+    return Py_BuildValue("(hhhh)", xmin, ymin, xmax, ymax);
+  }
+
+  PyObject *_pivy_getOriginTuple() const {
+    short originX, originY;
+    self->getOrigin(originX, originY);
+    return Py_BuildValue("(hh)", originX, originY);
+  }
+}
+
+%extend SbBox3s {
+  PyObject *_pivy_getBoundsTuple() const {
+    short xmin, ymin, zmin, xmax, ymax, zmax;
+    self->getBounds(xmin, ymin, zmin, xmax, ymax, zmax);
+    return Py_BuildValue("(hhhhhh)", xmin, ymin, zmin, xmax, ymax, zmax);
+  }
+
+  PyObject *_pivy_getOriginTuple() const {
+    short originX, originY, originZ;
+    self->getOrigin(originX, originY, originZ);
+    return Py_BuildValue("(hhh)", originX, originY, originZ);
+  }
+}
+
+%extend SbBox2i32 {
+  PyObject *_pivy_getBoundsTuple() const {
+    int32_t xmin, ymin, xmax, ymax;
+    self->getBounds(xmin, ymin, xmax, ymax);
+    return Py_BuildValue("(iiii)", xmin, ymin, xmax, ymax);
+  }
+
+  PyObject *_pivy_getOriginTuple() const {
+    int32_t originX, originY;
+    self->getOrigin(originX, originY);
+    return Py_BuildValue("(ii)", originX, originY);
+  }
+}
+
+%extend SbBox3i32 {
+  PyObject *_pivy_getBoundsTuple() const {
+    int32_t xmin, ymin, zmin, xmax, ymax, zmax;
+    self->getBounds(xmin, ymin, zmin, xmax, ymax, zmax);
+    return Py_BuildValue("(iiiiii)", xmin, ymin, zmin, xmax, ymax, zmax);
+  }
+
+  PyObject *_pivy_getOriginTuple() const {
+    int32_t originX, originY, originZ;
+    self->getOrigin(originX, originY, originZ);
+    return Py_BuildValue("(iii)", originX, originY, originZ);
+  }
+}
+
+%pythoncode %{
+SbBox2s.getBounds = lambda self: self._pivy_getBoundsTuple()
+SbBox2s.getOrigin = lambda self: self._pivy_getOriginTuple()
+SbBox3s.getBounds = lambda self: self._pivy_getBoundsTuple()
+SbBox3s.getOrigin = lambda self: self._pivy_getOriginTuple()
+SbBox2i32.getBounds = lambda self: self._pivy_getBoundsTuple()
+SbBox2i32.getOrigin = lambda self: self._pivy_getOriginTuple()
+SbBox3i32.getBounds = lambda self: self._pivy_getBoundsTuple()
+SbBox3i32.getOrigin = lambda self: self._pivy_getOriginTuple()
+%}
+
 /* Return an owned Python snapshot instead of exposing SoColorPacker's
    borrowed internal uint32_t array.  This extension is declared after the
    aggregate Coin header so SWIG has seen the complete class definition. */

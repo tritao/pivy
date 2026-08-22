@@ -123,11 +123,11 @@ def check_int32_scalar_output_helpers() -> None:
     assert_type(vector4.getValue(scalar, scalar, scalar, scalar), None)
 
     box2 = coin.SbBox2i32(1, 2, 3, 4)
-    assert_type(box2.getBounds(scalar, scalar, scalar, scalar), None)
-    assert_type(box2.getOrigin(scalar, scalar), None)
-    assert_type(box2.getSize(scalar, scalar), None)
+    assert_type(box2.getBounds(), tuple[int, int, int, int])
+    assert_type(box2.getOrigin(), tuple[int, int])
+    assert_type(box2.getSize(), coin.SbVec2i32)
 
     box3 = coin.SbBox3i32(1, 2, 3, 4, 5, 6)
-    assert_type(box3.getBounds(scalar, scalar, scalar, scalar, scalar, scalar), None)
-    assert_type(box3.getOrigin(scalar, scalar, scalar), None)
-    assert_type(box3.getSize(scalar, scalar, scalar), None)
+    assert_type(box3.getBounds(), tuple[int, int, int, int, int, int])
+    assert_type(box3.getOrigin(), tuple[int, int, int])
+    assert_type(box3.getSize(), coin.SbVec3i32)

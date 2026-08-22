@@ -48,3 +48,23 @@ def check_numeric_sequence_inputs() -> None:
     field = coin.SoMFEnum()
     assert_type(field.setEnums(1, [0], coin.SbName("ZERO")), None)
     assert_type(field.setEnums(2, [0, 1], ["ZERO", coin.SbName("ONE")]), None)
+
+
+def check_box_scalar_output_helpers() -> None:
+    box2s = coin.SbBox2s(1, 2, 3, 4)
+    assert_type(box2s.getBounds(), tuple[int, int, int, int])
+    assert_type(box2s.getOrigin(), tuple[int, int])
+    assert_type(box2s.getSize(), coin.SbVec2s)
+
+    box3s = coin.SbBox3s(1, 2, 3, 4, 5, 6)
+    assert_type(box3s.getBounds(), tuple[int, int, int, int, int, int])
+    assert_type(box3s.getOrigin(), tuple[int, int, int])
+    assert_type(box3s.getSize(), coin.SbVec3s)
+
+    box2i32 = coin.SbBox2i32(1, 2, 3, 4)
+    assert_type(box2i32.getBounds(), tuple[int, int, int, int])
+    assert_type(box2i32.getOrigin(), tuple[int, int])
+
+    box3i32 = coin.SbBox3i32(1, 2, 3, 4, 5, 6)
+    assert_type(box3i32.getBounds(), tuple[int, int, int, int, int, int])
+    assert_type(box3i32.getOrigin(), tuple[int, int, int])

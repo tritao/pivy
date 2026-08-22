@@ -1436,24 +1436,31 @@ def normalize_shadow_methods(text):
     lines = text.splitlines()
     updated = []
     current_class = None
+    shadowed_methods = set()
 
     for line in lines:
         class_match = re.match(r"^class\s+([A-Za-z_]\w*)", line)
         if class_match:
             current_class = class_match.group(1)
+            shadowed_methods = set()
         elif current_class and is_top_level_statement(line):
             current_class = None
+            shadowed_methods = set()
 
         match = DEF_RE.match(line)
-        signature = PYTHON_SHADOW_METHOD_TYPES.get(
-            (current_class, match.group("name")) if match else None
-        )
+        method_key = (current_class, match.group("name")) if match else None
+        signature = PYTHON_SHADOW_METHOD_TYPES.get(method_key)
         if signature is not None:
+            while updated and updated[-1].strip() == "@overload":
+                updated.pop()
+            if method_key in shadowed_methods:
+                continue
             args, return_type = signature
             updated.append(
                 "%sdef %s(%s) -> %s: ..."
                 % (match.group("indent"), match.group("name"), args, return_type)
             )
+            shadowed_methods.add(method_key)
             continue
 
         updated.append(line)

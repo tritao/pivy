@@ -1402,29 +1402,24 @@ class SbBaseClasses(unittest.TestCase):
         self.assertEqual((x.value(), y.value(), z.value(), w.value()), (1, 2, 3, 4))
 
         box2 = SbBox2i32(1, 2, 3, 4)
-        xmin, ymin, xmax, ymax = intp(), intp(), intp(), intp()
-        box2.getBounds(xmin, ymin, xmax, ymax)
-        self.assertEqual((xmin.value(), ymin.value(), xmax.value(), ymax.value()), (1, 2, 3, 4))
-        origin_x, origin_y = intp(), intp()
-        box2.getOrigin(origin_x, origin_y)
-        self.assertEqual((origin_x.value(), origin_y.value()), (1, 2))
-        size_x, size_y = intp(), intp()
-        box2.getSize(size_x, size_y)
-        self.assertEqual((size_x.value(), size_y.value()), (2, 2))
+        self.assertEqual(box2.getBounds(), (1, 2, 3, 4))
+        self.assertEqual(box2.getOrigin(), (1, 2))
+        self.assertEqual(tuple(box2.getSize()), (2, 2))
+
+        box2s = SbBox2s(1, 2, 3, 4)
+        self.assertEqual(box2s.getBounds(), (1, 2, 3, 4))
+        self.assertEqual(box2s.getOrigin(), (1, 2))
+        self.assertEqual(tuple(box2s.getSize()), (2, 2))
 
         box3 = SbBox3i32(1, 2, 3, 4, 5, 6)
-        xmin, ymin, zmin, xmax, ymax, zmax = (intp() for _ in range(6))
-        box3.getBounds(xmin, ymin, zmin, xmax, ymax, zmax)
-        self.assertEqual(
-            (xmin.value(), ymin.value(), zmin.value(), xmax.value(), ymax.value(), zmax.value()),
-            (1, 2, 3, 4, 5, 6),
-        )
-        origin_x, origin_y, origin_z = intp(), intp(), intp()
-        box3.getOrigin(origin_x, origin_y, origin_z)
-        self.assertEqual((origin_x.value(), origin_y.value(), origin_z.value()), (1, 2, 3))
-        size_x, size_y, size_z = intp(), intp(), intp()
-        box3.getSize(size_x, size_y, size_z)
-        self.assertEqual((size_x.value(), size_y.value(), size_z.value()), (3, 3, 3))
+        self.assertEqual(box3.getBounds(), (1, 2, 3, 4, 5, 6))
+        self.assertEqual(box3.getOrigin(), (1, 2, 3))
+        self.assertEqual(tuple(box3.getSize()), (3, 3, 3))
+
+        box3s = SbBox3s(1, 2, 3, 4, 5, 6)
+        self.assertEqual(box3s.getBounds(), (1, 2, 3, 4, 5, 6))
+        self.assertEqual(box3s.getOrigin(), (1, 2, 3))
+        self.assertEqual(tuple(box3s.getSize()), (3, 3, 3))
 
     def testVecMatrixOperators(self):
         """tests operators between vec and matrix classes"""

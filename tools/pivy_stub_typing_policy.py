@@ -1418,6 +1418,22 @@ PYTHON_SHADOW_METHOD_TYPES[("SoSFEnum", "setEnums")] = (
     "None",
 )
 PYTHON_SHADOW_METHOD_TYPES[("SbByteBuffer", "data")] = ("self", "bytes")
+for _box_class, _bounds_type, _origin_type in (
+    ("SbBox2s", "tuple[int, int, int, int]", "tuple[int, int]"),
+    ("SbBox3s", "tuple[int, int, int, int, int, int]", "tuple[int, int, int]"),
+    ("SbBox2i32", "tuple[int, int, int, int]", "tuple[int, int]"),
+    ("SbBox3i32", "tuple[int, int, int, int, int, int]", "tuple[int, int, int]"),
+):
+    PYTHON_SHADOW_METHOD_TYPES[(_box_class, "getBounds")] = (
+        "self",
+        _bounds_type,
+    )
+    PYTHON_SHADOW_METHOD_TYPES[(_box_class, "getOrigin")] = (
+        "self",
+        _origin_type,
+    )
+PYTHON_SHADOW_METHOD_TYPES[("SbBox2s", "getSize")] = ("self", "SbVec2s")
+PYTHON_SHADOW_METHOD_TYPES[("SbBox3s", "getSize")] = ("self", "SbVec3s")
 CALLBACK_PARAMETER_TYPE_OVERRIDES = {
     (class_name, method_name, parameter_name): annotation
     for (class_name, method_name), method_policy in CALLBACK_METHOD_POLICIES.items()
