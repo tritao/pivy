@@ -85,6 +85,28 @@ def check_scenegraph_collections() -> None:
     root -= (cube,)
 
 
+def check_base_family_protocols() -> None:
+    cube = coin.SoCube()
+
+    base: coin.SoBaseAccess = cube
+    base.ref()
+    base.unrefNoDelete()
+    assert_type(base.getRefCount(), int)
+    assert_type(base.getTypeId(), coin.SoType)
+    assert_type(base.isOfType(coin.SoNode.getClassTypeId()), bool)
+
+    field_access: coin.SoFieldAccess = cube.width
+    assert_type(field_access.getContainer(), coin.SoFieldContainer)
+    assert_type(field_access.getNumConnections(), int)
+    assert_type(field_access.getConnections(coin.SoFieldList()), int)
+    assert_type(field_access.getForwardConnections(coin.SoFieldList()), int)
+
+    node_access: coin.SoNodeAccess = cube
+    assert_type(node_access.getNodeType(), int)
+    node_access.setNodeType(coin.SoNode.OTHER_INSTANCE)
+    assert_type(node_access.affectsState(), bool)
+
+
 def check_paths() -> None:
     root = coin.SoSeparator()
     child = coin.SoGroup()

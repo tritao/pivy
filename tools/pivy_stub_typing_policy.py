@@ -812,7 +812,40 @@ PYTHON_PROTOCOL_DEFINITIONS = (
         ("SoField", "SoFieldContainer"),
         "class SoFieldContainerAccess(Protocol):\n"
         "    def __getattr__(self, name: str) -> SoField: ...\n"
-        "    def __dir__(self) -> list[str]: ...",
+        "    def __setattr__(self, name: str, value: object) -> None: ...\n"
+        "    def __dir__(self) -> list[str]: ...\n"
+        "    def getField(self, name: SbName | str) -> SoField | None: ...\n"
+        "    def getEventIn(self, name: SbName | str) -> SoField | None: ...\n"
+        "    def getEventOut(self, name: SbName | str) -> SoField | None: ...",
+    ),
+    (
+        "SoBaseAccess",
+        ("SoBase", "SoType"),
+        "class SoBaseAccess(Protocol):\n"
+        "    def ref(self) -> None: ...\n"
+        "    def unref(self) -> None: ...\n"
+        "    def unrefNoDelete(self) -> None: ...\n"
+        "    def getRefCount(self) -> int: ...\n"
+        "    def getTypeId(self) -> SoType: ...\n"
+        "    def isOfType(self, type: SoType) -> bool: ...",
+    ),
+    (
+        "SoFieldAccess",
+        ("SoField", "SoFieldContainer", "SoFieldList"),
+        "class SoFieldAccess(Protocol):\n"
+        "    def getContainer(self) -> SoFieldContainer: ...\n"
+        "    def getNumConnections(self) -> int: ...\n"
+        "    def getConnections(self, masterlist: SoFieldList) -> int: ...\n"
+        "    def getForwardConnections(self, slavelist: SoFieldList) -> int: ...",
+    ),
+    (
+        "SoNodeAccess",
+        ("SoNode", "SoType"),
+        "class SoNodeAccess(Protocol):\n"
+        "    def getNodeType(self) -> int: ...\n"
+        "    def setNodeType(self, type: int) -> None: ...\n"
+        "    def affectsState(self) -> bool: ...\n"
+        "    def isOfType(self, type: SoType) -> bool: ...",
     ),
     (
         "SoEngineAccess",
