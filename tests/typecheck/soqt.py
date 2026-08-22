@@ -35,8 +35,82 @@ def check_soqt_render_area_contract() -> None:
     assert_type(area.getOverlaySceneManager(), coin.SoSceneManager)
     assert_type(area.getGLRenderAction(), coin.SoGLRenderAction)
     assert_type(area.getOverlayGLRenderAction(), coin.SoGLRenderAction)
+    assert_type(area.getBackgroundColor(), coin.SbColor)
+    assert_type(area.getBackgroundIndex(), int)
+    assert_type(area.getOverlayBackgroundIndex(), int)
+    assert_type(area.getViewportRegion(), coin.SbViewportRegion)
+    assert_type(area.getTransparencyType(), int)
+    assert_type(area.isAutoRedraw(), bool)
+    assert_type(area.isClearBeforeRender(), bool)
+    assert_type(area.isClearZBufferBeforeRender(), bool)
     assert_type(area.getWidget(), soqt.QWidget)
     assert_type(area.getParentWidget(), soqt.QWidget)
+    assert_type(area.sendSoEvent(soqt.SoEvent()), bool)
+
+
+def check_soqt_component_and_gl_widget_contract() -> None:
+    component = soqt.SoQtComponent()
+    assert_type(component.getWidget(), soqt.QWidget)
+    assert_type(component.getBaseWidget(), soqt.QWidget)
+    assert_type(component.getShellWidget(), soqt.QWidget)
+    assert_type(component.getParentWidget(), soqt.QWidget)
+    assert_type(component.getSize(), soqt.SbVec2s)
+    assert_type(component.getTitle(), str)
+    assert_type(component.getIconTitle(), str)
+    assert_type(component.getWidgetName(), str)
+    assert_type(component.getClassName(), str)
+    assert_type(component.isFullScreen(), bool)
+    assert_type(component.isVisible(), bool)
+    assert_type(component.isTopLevelShell(), bool)
+
+    gl_widget = soqt.SoQtGLWidget()
+    assert_type(gl_widget.isBorder(), bool)
+    assert_type(gl_widget.isDoubleBuffer(), bool)
+    assert_type(gl_widget.isOverlayRender(), bool)
+    assert_type(gl_widget.getAccumulationBuffer(), bool)
+    assert_type(gl_widget.getSampleBuffers(), int)
+    assert_type(gl_widget.getGLWidget(), soqt.QWidget)
+    assert_type(gl_widget.getNormalWidget(), soqt.QWidget)
+    assert_type(gl_widget.getOverlayWidget(), soqt.QWidget)
+    assert_type(gl_widget.hasOverlayGLArea(), bool)
+
+
+def check_soqt_viewer_family_contract() -> None:
+    viewer = soqt.SoQtConstrainedViewer()
+    assert_type(viewer.getUpDirection(), coin.SbVec3f)
+    assert_type(viewer.getCamera(), coin.SoCamera | None)
+
+    plane = soqt.SoQtPlaneViewer()
+    plane.setViewing(True)
+    plane.setCamera(coin.SoOrthographicCamera())
+
+    examiner = soqt.SoQtExaminerViewer()
+    assert_type(examiner.isAnimationEnabled(), bool)
+    assert_type(examiner.isAnimating(), bool)
+    assert_type(examiner.isFeedbackVisible(), bool)
+    assert_type(examiner.getFeedbackSize(), int)
+
+    fly = soqt.SoQtFlyViewer()
+    fly.setViewing(True)
+    fly.setCamera(coin.SoPerspectiveCamera())
+
+
+def check_soqt_devices_and_utility_contract() -> None:
+    device = soqt.SoQtKeyboard()
+    assert_type(device.translateEvent(soqt.QEvent()), soqt.SoEvent)
+
+    popup = soqt.SoQtPopupMenu()
+    assert_type(popup.newMenu("File"), int)
+    assert_type(popup.getMenuTitle(1), str)
+    assert_type(popup.getMenuItemEnabled(1), bool)
+    assert_type(popup.getRadioGroupSize(1), int)
+
+    cursor = soqt.SoQtCursor()
+    assert_type(cursor.getShape(), int)
+    assert_type(cursor.getCustomCursor(), int)
+    assert_type(cursor.getZoomCursor(), soqt.SoQtCursor)
+    assert_type(cursor.getPanCursor(), soqt.SoQtCursor)
+    assert_type(cursor.getRotateCursor(), soqt.SoQtCursor)
 
 
 def check_soqt_viewer_contract() -> None:
