@@ -480,6 +480,20 @@ class IncompletePolicyTests(unittest.TestCase):
             "tuple[bytes | None, SbVec2s | SbVec3s, int]",
         )
 
+    def test_offscreen_buffer_snapshot_is_a_safe_python_value(self):
+        self.assertEqual(
+            policy.METHOD_RETURN_TYPE_OVERRIDES[
+                ("SoOffscreenRenderer", "getBuffer")
+            ],
+            "bytes",
+        )
+        self.assertEqual(
+            policy.EXTEND_HELPER_METHOD_TYPES[
+                ("SoOffscreenRenderer", "getBuffer", "self")
+            ],
+            ("self", "bytes"),
+        )
+
     def test_known_reference_helpers_are_site_specific(self):
         self.assertEqual(
             policy.SCALAR_REFERENCE_HELPER_PARAMETERS[

@@ -252,6 +252,9 @@ METHOD_RETURN_TYPE_OVERRIDES = {
     # callers never receive a borrowed C pointer.  ``None`` represents an
     # image with no allocated pixel data.
     ("SbImage", "getValue"): "tuple[bytes | None, SbVec2s | SbVec3s, int]",
+    # SoOffscreenRenderer's SWIG extension copies the borrowed render buffer
+    # into a Python bytes object before returning it.
+    ("SoOffscreenRenderer", "getBuffer"): "bytes",
     # SWIG's image typemaps expose the native pixel pointer together with the
     # dimensions and component count as a Python tuple.
     ("SoSFImage", "getValue"): "tuple[str, SbVec2s, int]",
@@ -525,6 +528,7 @@ def factory_method_return_type(class_name, method_name):
         return class_name
     return None
 EXTEND_HELPER_METHOD_TYPES = {
+    ("SoOffscreenRenderer", "getBuffer", "self"): ("self", "bytes"),
     ("SoSensor", "getFunction", "self"): (
         "self",
         "SoSensorCallback[SoSensor] | None",

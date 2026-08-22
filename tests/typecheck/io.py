@@ -44,3 +44,8 @@ def check_write_action_output() -> None:
     output = coin.SoOutput()
     action = coin.SoWriteAction(output)
     assert_type(action.getOutput(), coin.SoOutput)
+
+
+def check_offscreen_buffer_contract() -> None:
+    renderer = coin.SoOffscreenRenderer(coin.SbViewportRegion(32, 32))
+    assert_type(renderer.getBuffer(), bytes)
