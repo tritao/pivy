@@ -32,6 +32,46 @@ import unittest
 import math
 import gc
 
+ENGINE_FACTORY_TYPES = (
+    SoBoolOperation,
+    SoCalculator,
+    SoComposeVec2f,
+    SoComposeVec3f,
+    SoComposeVec4f,
+    SoDecomposeVec2f,
+    SoDecomposeVec3f,
+    SoDecomposeVec4f,
+    SoComposeRotation,
+    SoDecomposeRotation,
+    SoComposeMatrix,
+    SoDecomposeMatrix,
+    SoComposeRotationFromTo,
+    SoComputeBoundingBox,
+    SoConcatenate,
+    SoCounter,
+    SoElapsedTime,
+    SoGate,
+    SoInterpolateFloat,
+    SoInterpolateVec2f,
+    SoInterpolateVec3f,
+    SoInterpolateVec4f,
+    SoInterpolateRotation,
+    SoOnOff,
+    SoOneShot,
+    SoSelectOne,
+    SoTimeCounter,
+    SoTransformVec3f,
+    SoTriggerAny,
+    SoHeightMapToNormalMap,
+    SoVRMLColorInterpolator,
+    SoVRMLCoordinateInterpolator,
+    SoVRMLNormalInterpolator,
+    SoVRMLOrientationInterpolator,
+    SoVRMLPositionInterpolator,
+    SoVRMLScalarInterpolator,
+    SoVRMLTimeSensor,
+)
+
 class Autocasting(unittest.TestCase):
     def testFieldAutocast(self):
         """check autocasting for SoSFBool created through createInstance()"""
@@ -102,18 +142,12 @@ class FieldFactoryTests(unittest.TestCase):
 
 class EngineFactoryTests(unittest.TestCase):
     def testEngineFactoryAutocastAndOwnership(self):
-        engines = (
-            SoBoolOperation.createInstance(),
-            SoComposeVec3f.createInstance(),
-            SoVRMLTimeSensor.createInstance(),
-        )
-        self.assertIsInstance(engines[0], SoBoolOperation)
-        self.assertIsInstance(engines[1], SoComposeVec3f)
-        self.assertIsInstance(engines[2], SoVRMLTimeSensor)
-        self.assertTrue(isinstance(engines[0], SoEngine))
-        self.assertTrue(isinstance(engines[1], SoEngine))
-        self.assertTrue(isinstance(engines[2], SoNodeEngine))
-        self.assertTrue(all(engine.thisown for engine in engines))
+        self.assertEqual(len(ENGINE_FACTORY_TYPES), 37)
+        for factory_type in ENGINE_FACTORY_TYPES:
+            with self.subTest(factory_type=factory_type.__name__):
+                engine = factory_type.createInstance()
+                self.assertIsInstance(engine, factory_type)
+                self.assertTrue(engine.thisown)
 
 
 class EngineOutputTests(unittest.TestCase):
