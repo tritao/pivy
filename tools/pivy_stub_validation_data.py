@@ -361,7 +361,10 @@ CALLBACK_METHOD_CHECKS = {
         (
             "SoQtRenderArea",
             "setEventCallback",
-            {"pyfunc": "Callable[[Any, QEvent], Any]", "user": "Any | None"},
+            {
+                "pyfunc": "Callable[[object, QEvent], object]",
+                "user": "object | None",
+            },
             "None",
         ),
         (
@@ -2226,6 +2229,6 @@ state_machine.removeStateChangeCallback(scxml_state_callback, None)
 def timer_callback(data: Any, sensor: SoTimerSensor) -> None: ...
 timer = SoTimerSensor(timer_callback, None)
 
-def qevent_callback(data: Any, event: QEvent) -> object: ...
+def qevent_callback(data: object, event: QEvent) -> object: ...
 SoQtRenderArea().setEventCallback(qevent_callback, None)
 """

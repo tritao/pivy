@@ -150,6 +150,18 @@ class FieldTypePolicyTests(unittest.TestCase):
             ),
         )
 
+    def test_soqt_event_callback_type(self):
+        self.assertEqual(
+            policy.CALLBACK_TYPE_SIGNATURES["SoQtRenderAreaEventCB"],
+            "Callable[[object, QEvent], object]",
+        )
+        self.assertEqual(
+            policy.PYTHON_PARAMETER_TYPE_OVERRIDES[
+                ("SoQtRenderArea", "setEventCallback", "user")
+            ],
+            "object",
+        )
+
     def test_database_shadow_methods_have_python_signatures(self):
         self.assertEqual(
             policy.PYTHON_SHADOW_METHOD_TYPES[("SoDB", "registerHeader")],

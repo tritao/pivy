@@ -287,6 +287,7 @@ PYTHON_PARAMETER_TYPE_OVERRIDES = {
     ("SoSFImage", "setValue", "pixels"): "str | bytes",
     ("SoSFImage3", "setValue", "bytes"): "str | bytes",
     ("SoSFImage3", "setValue", "pixels"): "str | bytes",
+    ("SoQtRenderArea", "setEventCallback", "user"): "object",
 }
 
 # Coin's element and field header macros expose these class-specific factories
@@ -679,7 +680,7 @@ CALLBACK_TYPE_SIGNATURES = {
     ),
     "SoSensorCB": "Callable[[object, SoSensor], None]",
     "SoErrorCB": "Callable[[object, SoError], None]",
-    "SoQtRenderAreaEventCB": "Callable[[Any, QEvent], Any]",
+    "SoQtRenderAreaEventCB": "Callable[[object, QEvent], object]",
 }
 @dataclass(frozen=True)
 class CallbackMethodPolicy:

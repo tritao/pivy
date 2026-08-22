@@ -23,6 +23,12 @@ def check_soqt_lifecycle_contract() -> None:
 def check_soqt_render_area_contract() -> None:
     area = soqt.SoQtRenderArea()
 
+    def event_callback(data: object, event: soqt.QEvent) -> object:
+        return event
+
+    area.setEventCallback(event_callback, {"source": "typing"})
+    area.setEventCallback(event_callback)
+
     assert_type(area.getSceneGraph(), coin.SoNode | None)
     assert_type(area.getOverlaySceneGraph(), coin.SoNode | None)
     assert_type(area.getSceneManager(), coin.SoSceneManager)
