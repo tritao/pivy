@@ -27,11 +27,7 @@ jobs:
     - run: pixi run test
     - run: pixi run test_stubs
     - run: pixi run check_stub_drift
-    - run: pixi run typecheck_stubs
-    - run: pixi run typecheck_stubs_matrix
-    - run: pixi run test_typing_policy
-    - run: pixi run check_typing_policy_coverage
-    - run: pixi run typecheck_report
+    - run: pixi run typecheck_quality
     - run: pixi run typecheck_report_json
     - name: Write typing quality report
       run: pixi run python -m tools.report_pivy_typing --json pivy/coin.pyi > "typing-report-${{ matrix.os }}.json"

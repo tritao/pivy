@@ -85,9 +85,13 @@ otherwise resolved.
 ## Checking the boundary policy
 
 ```bash
-pixi run typecheck_report
-pixi run test_typing_policy
+pixi run typecheck_quality
 ```
+
+`typecheck_quality` runs the two static checkers, the supported-version
+matrix, policy tests, policy coverage, and the reviewed quality baseline as a
+single CI gate. `typecheck_report_json` remains available separately for CI
+artifacts and local dashboards.
 
 Use `--show-category` on `tools.report_pivy_typing` to inspect the individual
 sites behind a category. Use `--show-opaque-returns` to print the reviewed
