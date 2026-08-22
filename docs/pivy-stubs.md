@@ -64,6 +64,12 @@ adapters and accept Python callables with `(userdata, SoInput)` and
 `(userdata, SbName, fraction, interruptible)` arguments respectively. Header
 output callback pointers remain intentionally incomplete.
 
+The public SoQt callback surface is typed where the SWIG wrapper accepts a
+Python callable: fatal-error handlers, component window-close callbacks,
+viewer start/finish and auto-clipping callbacks, and popup-menu callbacks.
+The viewer/component callbacks use reusable protocols tied to their SoQt
+receiver type; the remaining callback signatures use `Callable` annotations.
+
 `SoSFImage` and `SoSFImage3` expose their pixel data through Python tuples of
 `(str, size, component_count)` for `getValue()` and `startEditing()`. Their
 pixel setters accept the strings or bytes used by the existing SWIG typemaps.
@@ -140,10 +146,6 @@ Representative surfaces now validator-guarded to stay `Incomplete`:
 
 - Callback and function-table surfaces:
   `SoActionMethodList.{addMethod,__setitem__,__getitem__,get}`,
-  `SoQt.setFatalErrorHandler`,
-  `SoQtComponent.setWindowCloseCallback`,
-  `SoQtViewer.{addStartCallback,addFinishCallback,removeStartCallback,removeFinishCallback}`,
-  `SoQtPopupMenu.{addMenuSelectionCallback,removeMenuSelectionCallback}`,
   `SbHeapFuncs.*`, and `SbOctTreeFuncs.*`.
 - Raw file and buffer surfaces:
   `SoInput.{setFilePointer,getCurFile,setBuffer,readBinaryArray}`,

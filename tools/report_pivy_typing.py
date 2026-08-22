@@ -16,6 +16,7 @@ from tools.pivy_stub_typing_policy import (
     INCOMPLETE_CATEGORIES,
     INCOMPLETE_CATEGORY_ACTIONS,
     INCOMPLETE_CATEGORY_POLICIES,
+    OPAQUE_RETURN_AUDIT,
     classify_incomplete,
     classify_dynamic_runtime_site,
 )
@@ -346,8 +347,8 @@ def report_to_dict(report: TypingReport, stub_path: Path) -> dict[str, object]:
             "next_action": INCOMPLETE_CATEGORY_ACTIONS[category],
         }
 
-    return {
-        "schema_version": 1,
+    payload = {
+        "schema_version": 2,
         "stub": str(stub_path),
         "classes": report.classes,
         "methods": report.methods,
@@ -362,6 +363,9 @@ def report_to_dict(report: TypingReport, stub_path: Path) -> dict[str, object]:
             for subcategory in DYNAMIC_RUNTIME_SUBCATEGORIES
         },
     }
+    if stub_path.name == "coin.pyi":
+        payload["opaque_return_audit"] = opaque_return_audit_summary(report)
+    return payload
 
 
 def format_site(site: AnnotationSite) -> str:
@@ -370,6 +374,75 @@ def format_site(site: AnnotationSite) -> str:
     if site.kind == "return":
         return "%s.%s() -> return" % (site.class_name, site.method_name)
     return "%s.%s(%s)" % (site.class_name, site.method_name, site.name)
+
+
+def format_site_key(key: tuple[str, str, str, str]) -> str:
+    kind, class_name, method_name, name = key
+    if kind == "return":
+        return "%s.%s() -> return" % (class_name, method_name)
+    if kind == "attribute":
+        return "%s.%s" % (class_name, name)
+    return "%s.%s(%s)" % (class_name, method_name, name)
+
+
+def opaque_return_sites(report: TypingReport) -> set[tuple[str, str, str, str]]:
+    """Return the currently observed opaque pointer/object return keys."""
+
+    return {
+        (site.kind, site.class_name, site.method_name or "", site.name)
+        for site, category in report.incomplete_sites
+        if category == "dynamic/runtime API"
+        and classify_dynamic_runtime_site(
+            kind=site.kind,
+            method_name=site.method_name,
+        )
+        == "opaque pointer/object returns"
+    }
+
+
+def opaque_return_audit_issues(report: TypingReport) -> tuple[str, ...]:
+    """Return missing or stale entries in the reviewed opaque-return audit."""
+
+    observed = opaque_return_sites(report)
+    audited = set(OPAQUE_RETURN_AUDIT)
+    issues = []
+    for key in sorted(observed - audited):
+        issues.append("opaque return is not audited: %s" % (key[1:3],))
+    for key in sorted(audited - observed):
+        issues.append("opaque return audit entry is stale: %s" % (key[1:3],))
+    return tuple(issues)
+
+
+def opaque_return_audit_summary(report: TypingReport) -> dict[str, object]:
+    """Return a compact machine-readable summary of the opaque-return audit."""
+
+    observed = opaque_return_sites(report)
+    dispositions = Counter(
+        OPAQUE_RETURN_AUDIT[key].disposition
+        for key in observed
+        if key in OPAQUE_RETURN_AUDIT
+    )
+    return {
+        "observed": len(observed),
+        "audited": len(observed & set(OPAQUE_RETURN_AUDIT)),
+        "dispositions": dict(sorted(dispositions.items())),
+    }
+
+
+def format_opaque_return_audit(report: TypingReport) -> str:
+    lines = ["", "Opaque pointer/object return audit", "---------------------------------"]
+    for key in sorted(opaque_return_sites(report)):
+        audit = OPAQUE_RETURN_AUDIT[key]
+        lines.append(
+            "%s: %s; %s; next: %s"
+            % (
+                format_site_key(key),
+                audit.disposition,
+                audit.rationale,
+                audit.next_action,
+            )
+        )
+    return "\n".join(lines)
 
 
 def format_uncategorized(report: TypingReport) -> str:
@@ -397,6 +470,11 @@ def parse_args() -> argparse.Namespace:
         "--show-category",
         choices=INCOMPLETE_CATEGORIES,
         help="list individual Incomplete sites in one category",
+    )
+    parser.add_argument(
+        "--show-opaque-returns",
+        action="store_true",
+        help="list the reviewed opaque pointer/object return audit",
     )
     parser.add_argument(
         "--check-baseline",
@@ -434,6 +512,8 @@ def main() -> int:
             output += "\n" + "\n".join(
                 "%s (line %d)" % (format_site(site), site.line) for site in sites
             )
+        if args.show_opaque_returns:
+            output += format_opaque_return_audit(report)
         print(output)
     uncategorized = report.incomplete_categories["uncategorized"]
     if uncategorized:
@@ -442,6 +522,12 @@ def main() -> int:
             file=sys.stderr,
         )
         return 1
+    if args.stub.name == "coin.pyi":
+        audit_issues = opaque_return_audit_issues(report)
+        if audit_issues:
+            for issue in audit_issues:
+                print("error: typing audit: %s" % issue, file=sys.stderr)
+            return 1
     if args.check_baseline:
         violations = quality_regressions(report)
         if violations:

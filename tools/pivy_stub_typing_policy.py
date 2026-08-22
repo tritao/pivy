@@ -1586,6 +1586,15 @@ def classify_dynamic_runtime_site(*, kind: str, method_name: str | None) -> str:
 
 
 @dataclass(frozen=True)
+class OpaqueReturnAudit:
+    """Review record for one intentionally opaque native return."""
+
+    disposition: str
+    rationale: str
+    next_action: str
+
+
+@dataclass(frozen=True)
 class FieldTypePolicy:
     """Python-level value policy for a single-value Coin field."""
 
@@ -2363,6 +2372,105 @@ TRIAGED_INCOMPLETE_SITES = frozenset(
         ('return', 'SoVRMLAudioClip', 'open', 'return'),
     }
 )
+
+
+def _opaque_return_audits(
+    methods: tuple[tuple[str, str], ...],
+    *,
+    rationale: str,
+    next_action: str,
+) -> dict[tuple[str, str, str, str], OpaqueReturnAudit]:
+    return {
+        ("return", class_name, method_name, "return"): OpaqueReturnAudit(
+            disposition="intentional native boundary",
+            rationale=rationale,
+            next_action=next_action,
+        )
+        for class_name, method_name in methods
+    }
+
+
+# Every current ``opaque pointer/object returns`` site has a concrete review
+# record. Keep this separate from the broad triage inventory so a future site
+# cannot silently inherit the category without an ownership/lifetime decision.
+OPAQUE_RETURN_AUDIT = {
+    **_opaque_return_audits(
+        (
+            ("SoAuditorList", "getObject"),
+            ("SoActionMethodList", "__getitem__"),
+            ("SoActionMethodList", "get"),
+            ("SoFieldContainer", "getUserData"),
+            ("SoLazyElement", "getColorIndices"),
+            ("SoLazyElement", "getPackedPointer"),
+            ("SoReorganizeAction", "getSimplifier"),
+            ("SbBSPTree", "getUserData"),
+            ("SoConvexDataCache", "getCoordIndices"),
+            ("SoConvexDataCache", "getMaterialIndices"),
+            ("SoConvexDataCache", "getNormalIndices"),
+            ("SoConvexDataCache", "getTexIndices"),
+            ("SoNormalCache", "getIndices"),
+            ("SoMultiTextureEnabledElement", "getEnabledUnits"),
+            ("SoGLVBOElement", "getVertexVBO"),
+            ("SoGLVBOElement", "getNormalVBO"),
+            ("SoGLVBOElement", "getColorVBO"),
+            ("SoGLVBOElement", "getTexCoordVBO"),
+            ("SoShininessElement", "getArrayPtr"),
+            ("SoTransparencyElement", "getArrayPtr"),
+            ("SoLockManager", "GetUnlockString"),
+            ("SoOffscreenRenderer", "getDC"),
+            ("SbHeap", "extractMin"),
+            ("SbHeap", "getMin"),
+            ("SbStorage", "get"),
+            ("SoVRMLAudioClip", "open"),
+        ),
+        rationale=(
+            "The wrapper returns a borrowed native object or pointer without "
+            "a stable Python owner or lifetime contract."
+        ),
+        next_action=(
+            "Add an owning or copying adapter after confirming native "
+            "ownership and teardown semantics."
+        ),
+    ),
+    **_opaque_return_audits(
+        (
+            ("SoMFBool", "startEditing"),
+            ("SoMFEnum", "startEditing"),
+            ("SoMFFloat", "startEditing"),
+            ("SoMFDouble", "startEditing"),
+            ("SoMFInt32", "startEditing"),
+            ("SoMFShort", "startEditing"),
+            ("SoMFUInt32", "startEditing"),
+            ("SoMFUShort", "startEditing"),
+        ),
+        rationale=(
+            "The return aliases mutable field storage whose validity ends "
+            "with the native edit session."
+        ),
+        next_action=(
+            "Expose an edit-session or snapshot wrapper before typing the "
+            "buffer as a Python sequence."
+        ),
+    ),
+    **_opaque_return_audits(
+        (
+            ("SoGlyph", "getFaceIndices"),
+            ("SoGlyph", "getEdgeIndices"),
+            ("SoGlyph", "getNextCWEdge"),
+            ("SoGlyph", "getNextCCWEdge"),
+            ("SoGlyph", "getBitmap"),
+            ("SbClip", "getVertexData"),
+        ),
+        rationale=(
+            "The return exposes geometry or bitmap storage owned by a "
+            "native cache/object, not an independent Python value."
+        ),
+        next_action=(
+            "Add a copying adapter or a lifetime-bound view with explicit "
+            "ownership semantics."
+        ),
+    ),
+}
 
 # These are intentionally opaque pointer-to-pointer or platform-structure
 # surfaces. Keep them visible in the report without pretending that the raw

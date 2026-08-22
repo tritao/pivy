@@ -8,6 +8,9 @@ keep `uncategorized` at zero.
 The exact dynamic/runtime inventory lives in `TRIAGED_INCOMPLETE_SITES`, while
 special cases are recorded in `INCOMPLETE_CATEGORY_OVERRIDES`. New sites must
 be covered by one of those explicit rules or by a safe Python-level adapter.
+The 40 current opaque pointer/object returns also have per-site review records
+in `OPAQUE_RETURN_AUDIT`; the quality report fails if an observed site is
+missing from that audit or an audit entry becomes stale.
 
 ## Review dispositions
 
@@ -63,8 +66,11 @@ recovered from a static declaration alone.
 
 The report separates runtime factory returns, opaque pointer/object returns,
 opaque parameter boundaries, and opaque field storage so each group has a
-concrete follow-up. Promote a site when runtime behavior becomes stable enough
-to model.
+concrete follow-up. The opaque-return audit currently groups its sites into
+borrowed native objects/pointers, mutable field-edit buffers, and cached
+geometry/bitmap storage. Promote a site when runtime behavior becomes stable
+enough to model; the normal target is an owning/copying adapter or an
+explicit lifetime-bound view.
 
 ### uncategorized
 
@@ -84,4 +90,5 @@ pixi run test_typing_policy
 ```
 
 Use `--show-category` on `tools.report_pivy_typing` to inspect the individual
-sites behind a category.
+sites behind a category. Use `--show-opaque-returns` to print the reviewed
+opaque-return records and their next actions.

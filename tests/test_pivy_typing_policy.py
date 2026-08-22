@@ -16,6 +16,8 @@ from tools.check_pivy_typing_matrix import SUPPORTED_PYTHON_VERSIONS
 from tools.report_pivy_typing import (
     TYPING_QUALITY_BASELINE,
     collect_report,
+    opaque_return_audit_issues,
+    opaque_return_audit_summary,
     quality_regressions,
     report_to_dict,
 )
@@ -768,7 +770,7 @@ class PolicyBoundaryTests(unittest.TestCase):
         payload = report_to_dict(report, stub_path)
 
         json.dumps(payload)
-        self.assertEqual(payload["schema_version"], 1)
+        self.assertEqual(payload["schema_version"], 2)
         self.assertEqual(payload["annotation_sites"], report.annotation_sites)
         self.assertEqual(
             payload["incomplete_categories"]["uncategorized"]["count"],
@@ -778,6 +780,17 @@ class PolicyBoundaryTests(unittest.TestCase):
             payload["dynamic_runtime_subcategories"],
             dict(report.dynamic_runtime_subcategories),
         )
+        self.assertEqual(
+            payload["opaque_return_audit"], opaque_return_audit_summary(report)
+        )
+
+    def test_opaque_pointer_return_audit_is_complete(self):
+        report = collect_report(Path("pivy/coin.pyi"))
+        self.assertEqual(opaque_return_audit_issues(report), ())
+        self.assertEqual(len(policy.OPAQUE_RETURN_AUDIT), 40)
+        for key in policy.OPAQUE_RETURN_AUDIT:
+            with self.subTest(key=key):
+                self.assertIn(key, policy.TRIAGED_INCOMPLETE_SITES)
 
     def test_policy_managed_fields_are_covered(self):
         self.assertEqual(policy_coverage_errors(Path("pivy/coin.pyi")), ())
