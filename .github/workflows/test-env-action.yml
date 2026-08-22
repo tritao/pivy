@@ -32,3 +32,4 @@ jobs:
     - run: pixi run test_typing_policy
     - run: pixi run check_typing_policy_coverage
     - run: pixi run typecheck_report
+    - run: pixi run typecheck_report_json

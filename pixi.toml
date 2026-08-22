@@ -65,3 +65,4 @@ typecheck_stubs_pyrefly = { cmd = ["pyrefly", "check", "--summary=none", "--sear
 typecheck_stubs = { depends-on = ["typecheck_stubs_pyright", "typecheck_stubs_pyrefly"]}
 typecheck_stubs_matrix = { cmd = ["python", "-m", "tools.check_pivy_typing_matrix"]}
 typecheck_report = { cmd = ["python", "-m", "tools.report_pivy_typing", "--check-baseline", "pivy/coin.pyi"]}
+typecheck_report_json = { cmd = ["python", "-m", "tools.report_pivy_typing", "--json", "pivy/coin.pyi"]}

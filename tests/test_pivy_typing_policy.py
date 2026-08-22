@@ -1,4 +1,5 @@
 import re
+import json
 import unittest
 from dataclasses import replace
 from pathlib import Path
@@ -16,6 +17,7 @@ from tools.report_pivy_typing import (
     TYPING_QUALITY_BASELINE,
     collect_report,
     quality_regressions,
+    report_to_dict,
 )
 from tools.check_pivy_policy_coverage import policy_coverage_errors
 from tools.pivy_stub_typing_policy import (
@@ -710,6 +712,23 @@ class PolicyBoundaryTests(unittest.TestCase):
     def test_checked_stub_meets_reviewed_quality_baseline(self):
         report = collect_report(Path("pivy/coin.pyi"))
         self.assertEqual(quality_regressions(report), ())
+
+    def test_quality_report_has_a_stable_json_shape(self):
+        stub_path = Path("pivy/coin.pyi")
+        report = collect_report(stub_path)
+        payload = report_to_dict(report, stub_path)
+
+        json.dumps(payload)
+        self.assertEqual(payload["schema_version"], 1)
+        self.assertEqual(payload["annotation_sites"], report.annotation_sites)
+        self.assertEqual(
+            payload["incomplete_categories"]["uncategorized"]["count"],
+            0,
+        )
+        self.assertEqual(
+            payload["dynamic_runtime_subcategories"],
+            dict(report.dynamic_runtime_subcategories),
+        )
 
     def test_policy_managed_fields_are_covered(self):
         self.assertEqual(policy_coverage_errors(Path("pivy/coin.pyi")), ())

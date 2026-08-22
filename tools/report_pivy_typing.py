@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import ast
+import json
 import sys
 from collections import Counter
 from dataclasses import dataclass
@@ -328,6 +329,41 @@ def format_report(report: TypingReport, stub_path: Path) -> str:
     return "\n".join(lines)
 
 
+def report_to_dict(report: TypingReport, stub_path: Path) -> dict[str, object]:
+    """Return stable, JSON-serializable typing-quality data."""
+
+    incomplete_categories = {}
+    for category in INCOMPLETE_CATEGORIES:
+        count = report.incomplete_categories[category]
+        incomplete_categories[category] = {
+            "count": count,
+            "share_percent": (
+                0.0
+                if report.incomplete_annotations == 0
+                else round(100 * count / report.incomplete_annotations, 1)
+            ),
+            "disposition": INCOMPLETE_CATEGORY_POLICIES[category].disposition,
+            "next_action": INCOMPLETE_CATEGORY_ACTIONS[category],
+        }
+
+    return {
+        "schema_version": 1,
+        "stub": str(stub_path),
+        "classes": report.classes,
+        "methods": report.methods,
+        "parameters": report.parameters,
+        "annotation_sites": report.annotation_sites,
+        "concrete_annotations": report.concrete_annotations,
+        "any_annotations": report.any_annotations,
+        "incomplete_annotations": report.incomplete_annotations,
+        "incomplete_categories": incomplete_categories,
+        "dynamic_runtime_subcategories": {
+            subcategory: report.dynamic_runtime_subcategories[subcategory]
+            for subcategory in DYNAMIC_RUNTIME_SUBCATEGORIES
+        },
+    }
+
+
 def format_site(site: AnnotationSite) -> str:
     if site.kind == "attribute":
         return "%s.%s" % (site.class_name, site.name)
@@ -367,29 +403,38 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="fail if the reviewed typing-quality baseline regresses",
     )
+    parser.add_argument(
+        "--json",
+        dest="as_json",
+        action="store_true",
+        help="write a stable machine-readable JSON report",
+    )
     return parser.parse_args()
 
 
 def main() -> int:
     args = parse_args()
     report = collect_report(args.stub)
-    output = format_report(report, args.stub)
-    if args.show_uncategorized:
-        output += format_uncategorized(report)
-    if args.show_category:
-        sites = [
-            site
-            for site, category in report.incomplete_sites
-            if category == args.show_category
-        ]
-        output += "\n\n%s Incomplete sites\n%s" % (
-            args.show_category,
-            "-" * (len(args.show_category) + len(" Incomplete sites")),
-        )
-        output += "\n" + "\n".join(
-            "%s (line %d)" % (format_site(site), site.line) for site in sites
-        )
-    print(output)
+    if args.as_json:
+        print(json.dumps(report_to_dict(report, args.stub), indent=2, sort_keys=True))
+    else:
+        output = format_report(report, args.stub)
+        if args.show_uncategorized:
+            output += format_uncategorized(report)
+        if args.show_category:
+            sites = [
+                site
+                for site, category in report.incomplete_sites
+                if category == args.show_category
+            ]
+            output += "\n\n%s Incomplete sites\n%s" % (
+                args.show_category,
+                "-" * (len(args.show_category) + len(" Incomplete sites")),
+            )
+            output += "\n" + "\n".join(
+                "%s (line %d)" % (format_site(site), site.line) for site in sites
+            )
+        print(output)
     uncategorized = report.incomplete_categories["uncategorized"]
     if uncategorized:
         print(
