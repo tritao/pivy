@@ -80,8 +80,10 @@ try:
         PYTHON_PARAMETER_TYPE_OVERRIDES,
         PRIVATE_EXTENSION_STUB,
         PYTHON_CLASS_METHOD_POLICIES,
+        PYTHON_ENUM_CONSTANT_TYPES,
         PYTHON_HELPER_METHOD_POLICIES,
         PYTHON_SHADOW_METHOD_TYPES,
+        PYTHON_TYPE_ALIAS_DEFINITIONS,
         RUNTIME_UNSUPPORTED_METHOD_NOTES,
         RUNTIME_UNSUPPORTED_NOTE,
         SCALAR_POINTER_HELPER_PARAMETERS,
@@ -134,8 +136,10 @@ except ImportError:
         PYTHON_PARAMETER_TYPE_OVERRIDES,
         PRIVATE_EXTENSION_STUB,
         PYTHON_CLASS_METHOD_POLICIES,
+        PYTHON_ENUM_CONSTANT_TYPES,
         PYTHON_HELPER_METHOD_POLICIES,
         PYTHON_SHADOW_METHOD_TYPES,
+        PYTHON_TYPE_ALIAS_DEFINITIONS,
         RUNTIME_UNSUPPORTED_METHOD_NOTES,
         RUNTIME_UNSUPPORTED_NOTE,
         SCALAR_POINTER_HELPER_PARAMETERS,
@@ -2060,6 +2064,66 @@ def normalize_python_class_methods(text):
     return "\n".join(updated) + "\n"
 
 
+def add_python_type_aliases(text, module):
+    """Insert policy-owned aliases before the first generated class."""
+
+    definitions = PYTHON_TYPE_ALIAS_DEFINITIONS.get(module, ())
+    missing = [
+        definition
+        for definition in definitions
+        if not re.search(
+            r"^%s\s*=" % re.escape(definition.split(" =", 1)[0]),
+            text,
+            flags=re.MULTILINE,
+        )
+    ]
+    if not missing:
+        return text
+
+    lines = text.splitlines()
+    insert_at = next(
+        (index for index, line in enumerate(lines) if line.startswith("class ")),
+        len(lines),
+    )
+    block = ["", *missing, ""]
+    lines[insert_at:insert_at] = block
+    return "\n".join(lines) + "\n"
+
+
+def normalize_enum_constant_types(text, module):
+    """Apply reviewed Literal aliases to stable native enum constants."""
+
+    mappings = PYTHON_ENUM_CONSTANT_TYPES.get(module, {})
+    if not mappings:
+        return text
+
+    lines = []
+    current_class = None
+    for line in text.splitlines():
+        class_match = re.match(r"^class\s+([A-Za-z_]\w*)", line)
+        if class_match:
+            current_class = class_match.group(1)
+        elif current_class and is_top_level_statement(line):
+            current_class = None
+
+        if current_class is not None:
+            constant_match = re.match(
+                r"^(\s+)([A-Za-z_]\w*): ClassVar\[int\](\s*=.*)$", line
+            )
+            if constant_match:
+                alias = mappings.get((current_class, constant_match.group(2)))
+                if alias is not None:
+                    line = "%s%s: ClassVar[%s]%s" % (
+                        constant_match.group(1),
+                        constant_match.group(2),
+                        alias,
+                        constant_match.group(3),
+                    )
+        lines.append(line)
+
+    return "\n".join(lines) + "\n"
+
+
 def normalize_extend_helpers(text):
     lines = text.splitlines()
     updated = []
@@ -2377,6 +2441,10 @@ def postprocess_stub(path, module, output_dir):
                 "normalize Python class methods",
                 normalize_python_class_methods,
             ),
+            Stage(
+                "normalize enum constant types",
+                lambda text: normalize_enum_constant_types(text, module),
+            ),
             Stage("normalize shadow methods", normalize_shadow_methods),
             Stage("normalize method return overrides", normalize_method_return_overrides),
             Stage("remove SWIG metaclass methods", remove_swig_meta_classmethod),
@@ -2393,6 +2461,10 @@ def postprocess_stub(path, module, output_dir):
                     module,
                 ),
             ),
+            Stage(
+                "add Python type aliases",
+                lambda text: add_python_type_aliases(text, module),
+            ),
             Stage("add Any import", lambda text: add_typing_import(text, "Any")),
             Stage(
                 "add Callable import",
@@ -2401,6 +2473,10 @@ def postprocess_stub(path, module, output_dir):
             Stage(
                 "add Iterator import",
                 lambda text: add_typing_import(text, "Iterator"),
+            ),
+            Stage(
+                "add Literal import",
+                lambda text: add_typing_import(text, "Literal"),
             ),
             Stage(
                 "add Protocol import",

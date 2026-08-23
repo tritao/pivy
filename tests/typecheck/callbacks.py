@@ -126,12 +126,45 @@ def check_callback_list() -> None:
     def callback(data: object, callbackdata: object) -> None:
         pass
 
-    callback_contract: coin.SoCallbackListCallback = callback
+    callback_contract: coin.SoCallbackListCallback[object] = callback
 
     callback_list.addCallback(callback_contract, None)
     callback_api.addCallback(callback_contract, None)
     callback_list.removeCallback(callback_contract, None)
     callback_list.invokeCallbacks({"source": "typing"})
+
+    def typed_callback(data: str, callbackdata: object) -> None:
+        del data, callbackdata
+
+    typed_callback_contract: coin.SoCallbackListCallback[str] = typed_callback
+
+    class TypedCallbackList:
+        def addCallback(
+            self,
+            f: coin.SoCallbackListCallback[str],
+            userData: str | None = None,
+        ) -> None:
+            del f, userData
+
+        def removeCallback(
+            self,
+            f: coin.SoCallbackListCallback[str],
+            userdata: str | None = None,
+        ) -> None:
+            del f, userdata
+
+        def clearCallbacks(self) -> None:
+            pass
+
+        def getNumCallbacks(self) -> int:
+            return 0
+
+        def invokeCallbacks(self, callbackdata: object) -> None:
+            del callbackdata
+
+    typed_api: coin.SoCallbackListAPI[str] = TypedCallbackList()
+    typed_api.addCallback(typed_callback_contract, "owner")
+    typed_api.removeCallback(typed_callback_contract, "owner")
 
 
 def check_context_handler_callbacks() -> None:

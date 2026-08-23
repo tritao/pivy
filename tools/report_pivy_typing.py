@@ -16,6 +16,7 @@ from tools.pivy_stub_typing_policy import (
     INCOMPLETE_CATEGORIES,
     INCOMPLETE_CATEGORY_ACTIONS,
     INCOMPLETE_CATEGORY_POLICIES,
+    OPAQUE_PARAMETER_FAMILY_ACTIONS,
     OPAQUE_RETURN_AUDIT,
     RAW_POINTER_AUDIT,
     classify_incomplete,
@@ -417,7 +418,12 @@ def format_report(report: TypingReport, stub_path: Path) -> str:
     )
     for family in OPAQUE_PARAMETER_FAMILIES:
         lines.append(
-            "%-30s %6d" % (family, report.opaque_parameter_families[family])
+            "%-30s %6d    %s"
+            % (
+                family,
+                report.opaque_parameter_families[family],
+                OPAQUE_PARAMETER_FAMILY_ACTIONS[family],
+            )
         )
     return "\n".join(lines)
 
@@ -440,7 +446,7 @@ def report_to_dict(report: TypingReport, stub_path: Path) -> dict[str, object]:
         }
 
     payload = {
-        "schema_version": 4,
+        "schema_version": 5,
         "stub": str(stub_path),
         "classes": report.classes,
         "methods": report.methods,
@@ -456,6 +462,10 @@ def report_to_dict(report: TypingReport, stub_path: Path) -> dict[str, object]:
         },
         "opaque_parameter_families": {
             family: report.opaque_parameter_families[family]
+            for family in OPAQUE_PARAMETER_FAMILIES
+        },
+        "opaque_parameter_family_actions": {
+            family: OPAQUE_PARAMETER_FAMILY_ACTIONS[family]
             for family in OPAQUE_PARAMETER_FAMILIES
         },
     }

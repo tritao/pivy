@@ -117,7 +117,7 @@
             "addCallback": [
               {
                 "parameters": [
-                  {"name": "f", "type": "SoCallbackListCallback"},
+                  {"name": "f", "type": "SoCallbackListCallback[object]"},
                   {"name": "userData", "type": "object | None"}
                 ],
                 "return": "None"

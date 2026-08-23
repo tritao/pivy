@@ -56,11 +56,29 @@ class _Widget:
     def show(self) -> None:
         pass
 
+    def hide(self) -> None:
+        pass
+
+    def isVisible(self) -> bool:
+        return True
+
+    def setVisible(self, visible: bool) -> None:
+        del visible
+
     def setWindowTitle(self, title: str) -> None:
         pass
 
+    def windowTitle(self) -> str:
+        return "Pivy"
+
     def resize(self, width: int, height: int) -> None:
         pass
+
+    def width(self) -> int:
+        return 640
+
+    def height(self) -> int:
+        return 480
 
     def getSoRenderManager(self) -> coin.SoRenderManager:
         return coin.SoRenderManager()
@@ -86,7 +104,13 @@ class _Widget:
 def check_widget_contract() -> None:
     widget: sogui.SoGuiWidget = _Widget()
     widget.setWindowTitle("Pivy")
+    widget.hide()
+    assert_type(widget.isVisible(), bool)
+    widget.setVisible(True)
+    assert_type(widget.windowTitle(), str)
     widget.resize(640, 480)
+    assert_type(widget.width(), int)
+    assert_type(widget.height(), int)
     widget.show()
 
 

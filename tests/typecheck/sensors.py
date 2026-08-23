@@ -35,6 +35,7 @@ def check_sensor_lifecycle() -> None:
     for sensor in (timer, alarm, idle, oneshot):
         assert_type(sensor.isScheduled(), bool)
         assert_type(sensor.getNextInQueue(), coin.SoSensor | None)
+        assert_type(sensor.getFunction(), coin.SoSensorCallback[coin.SoSensor] | None)
         sensor.schedule()
         sensor.unschedule()
         sensor.trigger()
@@ -111,3 +112,11 @@ def check_sensor_manager_contract() -> None:
     manager.processImmediateQueue()
     manager.processDelayQueue(False)
     manager.processTimerQueue()
+
+
+def check_sensor_callback_data_contract() -> None:
+    sensor = coin.SoSensor()
+    sensor.setFunction(sensor_callback)
+    sensor.setData({"owner": "typing"})
+    assert_type(sensor.getFunction(), coin.SoSensorCallback[coin.SoSensor] | None)
+    assert_type(sensor.getData(), object | None)

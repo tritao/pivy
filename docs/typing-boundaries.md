@@ -72,6 +72,16 @@ geometry/bitmap storage. Promote a site when runtime behavior becomes stable
 enough to model; the normal target is an owning/copying adapter or an
 explicit lifetime-bound view.
 
+Opaque parameter boundaries are also grouped by family in the quality report.
+The family action is a review queue, not permission to widen a signature:
+
+* `geometry`: probe copy/sequence adapters and preserve cross-width overloads.
+* `image/buffer`: keep native storage opaque and prefer snapshot adapters.
+* `action`: model action handles only with ownership proof.
+* `array/output`: use typed pointer helpers or tuple outputs.
+* `callback/handle`: move userdata into a named callback contract.
+* `other`: require symbol-level review before typing.
+
 ### uncategorized
 
 Disposition: zero budget

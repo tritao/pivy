@@ -42,7 +42,7 @@ COVERAGE_BASELINES = {
     },
     "pivy/sogui.pyi": {
         "min_concrete_annotations": 70,
-        "max_any_annotations": 5,
+        "max_any_annotations": 1,
         "max_incomplete_annotations": 0,
         "max_incomplete_categories": {"uncategorized": 0},
     },

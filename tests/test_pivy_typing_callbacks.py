@@ -58,7 +58,7 @@ class CallbackContractTests(unittest.TestCase):
                 "SoQtViewer",
                 "setAutoClippingStrategy",
                 {
-                    "strategy": "int",
+                    "strategy": "SoQtNearPlaneMode",
                     "value": "float",
                     "cb": "SoQtAutoClippingCallback | None",
                     "cbuserdata": "object | None",

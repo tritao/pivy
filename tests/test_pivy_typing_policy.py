@@ -455,7 +455,7 @@ class FieldTypePolicyTests(unittest.TestCase):
         self.assertEqual(
             policy.PYTHON_SHADOW_METHOD_TYPES[("SoCallbackList", "addCallback")],
             (
-                "self, f: SoCallbackListCallback, "
+                "self, f: SoCallbackListCallback[object], "
                 "userData: object | None = ...",
                 "None",
             ),
@@ -1103,7 +1103,7 @@ class PolicyBoundaryTests(unittest.TestCase):
         payload = report_to_dict(report, stub_path)
 
         json.dumps(payload)
-        self.assertEqual(payload["schema_version"], 4)
+        self.assertEqual(payload["schema_version"], 5)
         self.assertEqual(payload["annotation_sites"], report.annotation_sites)
         self.assertEqual(
             payload["incomplete_categories"]["uncategorized"]["count"],
@@ -1122,6 +1122,26 @@ class PolicyBoundaryTests(unittest.TestCase):
         self.assertEqual(
             payload["opaque_parameter_families"],
             dict(report.opaque_parameter_families),
+        )
+        self.assertEqual(
+            payload["opaque_parameter_family_actions"],
+            policy.OPAQUE_PARAMETER_FAMILY_ACTIONS,
+        )
+
+    def test_opaque_parameter_families_have_reviewed_actions(self):
+        self.assertEqual(
+            set(policy.OPAQUE_PARAMETER_FAMILY_ACTIONS),
+            {
+                "geometry",
+                "image/buffer",
+                "action",
+                "array/output",
+                "callback/handle",
+                "other",
+            },
+        )
+        self.assertTrue(
+            all(policy.OPAQUE_PARAMETER_FAMILY_ACTIONS.values())
         )
 
     def test_opaque_pointer_return_audit_is_complete(self):

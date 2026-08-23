@@ -34,6 +34,17 @@ class TypingDashboardTests(unittest.TestCase):
                 "other": 121,
             },
         )
+        self.assertEqual(
+            set(coin["opaque_parameter_family_actions"]),
+            {
+                "geometry",
+                "image/buffer",
+                "action",
+                "array/output",
+                "callback/handle",
+                "other",
+            },
+        )
 
 
 if __name__ == "__main__":

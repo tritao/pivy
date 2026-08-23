@@ -85,3 +85,13 @@ def check_scxml_factory_contract() -> None:
         coin.ScXMLAppendOpExprDataObj,
     )
     assert_type(coin.ScXMLScriptElt.createInstance(), coin.ScXMLScriptElt)
+
+
+def check_element_factory_contract() -> None:
+    assert_type(
+        coin.SoDrawStyleElement.createInstance(), coin.SoDrawStyleElement
+    )
+    assert_type(
+        coin.SoMaterialBindingElement.createInstance(),
+        coin.SoMaterialBindingElement,
+    )

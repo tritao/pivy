@@ -790,12 +790,104 @@ PYTHON_HELPER_METHOD_POLICIES = {
 # SoQt and SoGui, even though stubgen does not discover them from the proxy
 # class declaration.
 PYTHON_CLASS_METHOD_POLICIES = {
+    "QEvent": {
+        "accept": PythonMethodPolicy("self", "None"),
+        "ignore": PythonMethodPolicy("self", "None"),
+        "isAccepted": PythonMethodPolicy("self", "bool"),
+        "setAccepted": PythonMethodPolicy("self, accepted: bool", "None"),
+        "spontaneous": PythonMethodPolicy("self", "bool"),
+        "type": PythonMethodPolicy("self", "int"),
+    },
     "QWidget": {
         "show": PythonMethodPolicy("self", "None"),
+        "hide": PythonMethodPolicy("self", "None"),
+        "isVisible": PythonMethodPolicy("self", "bool"),
+        "setVisible": PythonMethodPolicy("self, visible: bool", "None"),
         "setWindowTitle": PythonMethodPolicy("self, title: str", "None"),
+        "windowTitle": PythonMethodPolicy("self", "str"),
         "resize": PythonMethodPolicy(
             "self, width: int, height: int", "None"
         ),
+        "width": PythonMethodPolicy("self", "int"),
+        "height": PythonMethodPolicy("self", "int"),
+    },
+}
+
+# These aliases describe stable native enum domains.  They are intentionally
+# small: an alias is useful only when the binding's accepted values are both
+# documented and runtime-proven.  The generator applies them to constants and
+# selected toolkit methods below; arbitrary integer APIs remain ``int``.
+PYTHON_TYPE_ALIAS_DEFINITIONS = {
+    "pivy.coin": (
+        "SoDrawStyleValue = Literal[0, 1, 2, 3]",
+        "SoMaterialBindingValue = Literal[0, 1, 2, 3, 4, 5, 6, 7, 8]",
+    ),
+    "pivy.gui.soqt": (
+        "SoQtViewerType = Literal[0, 1]",
+        "SoQtDrawType = Literal[0, 1]",
+        "SoQtViewStyle = Literal[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]",
+        "SoQtBufferMode = Literal[0, 1, 2]",
+        "SoQtNearPlaneMode = Literal[0, 1]",
+        "SoQtStereoType = Literal[0, 1, 2, 3, 4]",
+    ),
+}
+
+PYTHON_ENUM_CONSTANT_TYPES = {
+    "pivy.coin": {
+        **{
+            (class_name, constant): "SoDrawStyleValue"
+            for class_name in ("SoDrawStyleElement", "SoDrawStyle")
+            for constant in ("FILLED", "LINES", "POINTS", "INVISIBLE")
+        },
+        **{
+            (class_name, constant): "SoMaterialBindingValue"
+            for class_name in ("SoMaterialBindingElement", "SoMaterialBinding")
+            for constant in (
+                "OVERALL",
+                "PER_PART",
+                "PER_PART_INDEXED",
+                "PER_FACE",
+                "PER_FACE_INDEXED",
+                "PER_VERTEX",
+                "PER_VERTEX_INDEXED",
+                "DEFAULT",
+                "NONE",
+            )
+        },
+    },
+    "pivy.gui.soqt": {
+        ("SoQtPlaneViewer", "BROWSER"): "SoQtViewerType",
+        ("SoQtPlaneViewer", "EDITOR"): "SoQtViewerType",
+        ("SoQtViewer", "BROWSER"): "SoQtViewerType",
+        ("SoQtViewer", "EDITOR"): "SoQtViewerType",
+        **{
+            ("SoQtViewer", constant): "SoQtViewStyle"
+            for constant in (
+                "VIEW_AS_IS",
+                "VIEW_HIDDEN_LINE",
+                "VIEW_NO_TEXTURE",
+                "VIEW_LOW_COMPLEXITY",
+                "VIEW_LINE",
+                "VIEW_POINT",
+                "VIEW_BBOX",
+                "VIEW_LOW_RES_LINE",
+                "VIEW_LOW_RES_POINT",
+                "VIEW_SAME_AS_STILL",
+                "VIEW_WIREFRAME_OVERLAY",
+            )
+        },
+        ("SoQtViewer", "STILL"): "SoQtDrawType",
+        ("SoQtViewer", "INTERACTIVE"): "SoQtDrawType",
+        ("SoQtViewer", "BUFFER_SINGLE"): "SoQtBufferMode",
+        ("SoQtViewer", "BUFFER_DOUBLE"): "SoQtBufferMode",
+        ("SoQtViewer", "BUFFER_INTERACTIVE"): "SoQtBufferMode",
+        ("SoQtViewer", "VARIABLE_NEAR_PLANE"): "SoQtNearPlaneMode",
+        ("SoQtViewer", "CONSTANT_NEAR_PLANE"): "SoQtNearPlaneMode",
+        ("SoQtViewer", "STEREO_NONE"): "SoQtStereoType",
+        ("SoQtViewer", "STEREO_ANAGLYPH"): "SoQtStereoType",
+        ("SoQtViewer", "STEREO_QUADBUFFER"): "SoQtStereoType",
+        ("SoQtViewer", "STEREO_INTERLEAVED_ROWS"): "SoQtStereoType",
+        ("SoQtViewer", "STEREO_INTERLEAVED_COLUMNS"): "SoQtStereoType",
     },
 }
 _METHOD_RETURN_TYPE_OVERRIDES = {
@@ -1295,20 +1387,24 @@ PYTHON_PROTOCOL_DEFINITIONS = (
     (
         "SoCallbackListCallback",
         ("SoCallbackList",),
-        "class SoCallbackListCallback(Protocol):\n"
+        "_CallbackDataT = TypeVar(\"_CallbackDataT\", contravariant=True)\n"
+        "\n"
+        "class SoCallbackListCallback(Protocol[_CallbackDataT]):\n"
         "    def __call__(\n"
-        "        self, data: object, callbackdata: object, /\n"
+        "        self, data: _CallbackDataT, callbackdata: object, /\n"
         "    ) -> None: ...",
     ),
     (
         "SoCallbackListAPI",
         ("SoCallbackList",),
-        "class SoCallbackListAPI(Protocol):\n"
+        "class SoCallbackListAPI(Protocol[_CallbackDataT]):\n"
         "    def addCallback(\n"
-        "        self, f: SoCallbackListCallback, userData: object | None = ..., /\n"
+        "        self, f: SoCallbackListCallback[_CallbackDataT], "
+        "userData: _CallbackDataT | None = ..., /\n"
         "    ) -> None: ...\n"
         "    def removeCallback(\n"
-        "        self, f: SoCallbackListCallback, userdata: object | None = ..., /\n"
+        "        self, f: SoCallbackListCallback[_CallbackDataT], "
+        "userdata: _CallbackDataT | None = ..., /\n"
         "    ) -> None: ...\n"
         "    def clearCallbacks(self) -> None: ...\n"
         "    def getNumCallbacks(self) -> int: ...\n"
@@ -1942,7 +2038,7 @@ CALLBACK_METHOD_POLICIES = {
             ("cbuserdata", "object | None"),
         ),
         (
-            "self, strategy: int, value: float = ..., "
+            "self, strategy: SoQtNearPlaneMode, value: float = ..., "
             "cb: SoQtAutoClippingCallback | None = ..., "
             "cbuserdata: object | None = ...",
             "None",
@@ -2010,22 +2106,22 @@ CALLBACK_METHOD_POLICIES = {
     ),
     ("SoCallbackList", "addCallback"): CallbackMethodPolicy(
         (
-            ("f", "SoCallbackListCallback"),
+            ("f", "SoCallbackListCallback[object]"),
             ("userData", "object | None"),
         ),
         (
-            "self, f: SoCallbackListCallback, "
+            "self, f: SoCallbackListCallback[object], "
             "userData: object | None = ...",
             "None",
         ),
     ),
     ("SoCallbackList", "removeCallback"): CallbackMethodPolicy(
         (
-            ("f", "SoCallbackListCallback"),
+            ("f", "SoCallbackListCallback[object]"),
             ("userdata", "object | None"),
         ),
         (
-            "self, f: SoCallbackListCallback, "
+            "self, f: SoCallbackListCallback[object], "
             "userdata: object | None = ...",
             "None",
         ),
@@ -2434,6 +2530,36 @@ for _box_class, _bounds_type, _origin_type in (
     )
 PYTHON_SHADOW_METHOD_TYPES[("SbBox2s", "getSize")] = ("self", "SbVec2s")
 PYTHON_SHADOW_METHOD_TYPES[("SbBox3s", "getSize")] = ("self", "SbVec3s")
+PYTHON_SHADOW_METHOD_TYPES[("SoQtViewer", "setDrawStyle")] = (
+    "self, type: SoQtDrawType, style: SoQtViewStyle",
+    "None",
+)
+PYTHON_SHADOW_METHOD_TYPES[("SoQtViewer", "getDrawStyle")] = (
+    "self, type: SoQtDrawType",
+    "SoQtViewStyle",
+)
+PYTHON_SHADOW_METHOD_TYPES[("SoQtViewer", "setBufferingType")] = (
+    "self, type: SoQtBufferMode",
+    "None",
+)
+PYTHON_SHADOW_METHOD_TYPES[("SoQtViewer", "getBufferingType")] = (
+    "self",
+    "SoQtBufferMode",
+)
+PYTHON_SHADOW_METHOD_TYPES[("SoQtViewer", "setStereoType")] = (
+    "self, s: SoQtStereoType",
+    "bool",
+)
+PYTHON_SHADOW_METHOD_TYPES[("SoQtViewer", "getStereoType")] = (
+    "self",
+    "SoQtStereoType",
+)
+PYTHON_SHADOW_METHOD_TYPES[("SoQtViewer", "setAutoClippingStrategy")] = (
+    "self, strategy: SoQtNearPlaneMode, value: float = ..., "
+    "cb: SoQtAutoClippingCallback | None = ..., "
+    "cbuserdata: object | None = ...",
+    "None",
+)
 CALLBACK_PARAMETER_TYPE_OVERRIDES = {
     (class_name, method_name, parameter_name): annotation
     for (class_name, method_name), method_policy in CALLBACK_METHOD_POLICIES.items()
@@ -2587,6 +2713,19 @@ DYNAMIC_RUNTIME_SUBCATEGORIES = (
     "opaque parameter boundaries",
     "opaque field storage",
 )
+
+# Family-level follow-up guidance makes the opaque-parameter report an audit
+# artifact rather than just a count.  The guidance is deliberately
+# conservative: each family must earn a concrete annotation through a safe
+# adapter or a runtime proof.
+OPAQUE_PARAMETER_FAMILY_ACTIONS = {
+    "geometry": "probe copy/sequence adapters; preserve cross-width overloads",
+    "image/buffer": "keep native storage opaque; prefer snapshot adapters",
+    "action": "model action handles only with ownership proof",
+    "array/output": "use typed pointer helpers or tuple outputs",
+    "callback/handle": "move userdata into a named callback contract",
+    "other": "require symbol-level review before typing",
+}
 
 
 def classify_dynamic_runtime_site(*, kind: str, method_name: str | None) -> str:

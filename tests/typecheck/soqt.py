@@ -19,8 +19,14 @@ def check_soqt_lifecycle_contract() -> None:
     assert_type(soqt.SoQt.getShellWidget(widget), soqt.QWidget)
     assert_type(soqt.SoQt.getWidgetSize(widget), coin.SbVec2s)
     widget.show()
+    widget.hide()
+    assert_type(widget.isVisible(), bool)
+    widget.setVisible(True)
     widget.setWindowTitle("Pivy")
+    assert_type(widget.windowTitle(), str)
     widget.resize(640, 480)
+    assert_type(widget.width(), int)
+    assert_type(widget.height(), int)
     gui_widget: sogui.SoGuiWidget = widget
     gui_widget.show()
 
@@ -117,7 +123,14 @@ def check_soqt_viewer_family_contract() -> None:
 
 def check_soqt_devices_and_utility_contract() -> None:
     device = soqt.SoQtKeyboard()
-    assert_type(device.translateEvent(soqt.QEvent()), coin.SoEvent)
+    event = soqt.QEvent()
+    event.accept()
+    event.ignore()
+    assert_type(event.isAccepted(), bool)
+    event.setAccepted(True)
+    assert_type(event.spontaneous(), bool)
+    assert_type(event.type(), int)
+    assert_type(device.translateEvent(event), coin.SoEvent)
 
     popup = soqt.SoQtPopupMenu()
 
@@ -156,6 +169,16 @@ def check_soqt_viewer_contract() -> None:
     auto_clipping_contract: soqt.SoQtAutoClippingCallback = auto_clipping_callback
 
     viewer.setAutoClippingStrategy(0, cb=auto_clipping_contract)
+    viewer.setDrawStyle(soqt.SoQtViewer.STILL, soqt.SoQtViewer.VIEW_LINE)
+    assert_type(
+        viewer.getDrawStyle(soqt.SoQtViewer.INTERACTIVE), soqt.SoQtViewStyle
+    )
+    viewer.setBufferingType(soqt.SoQtViewer.BUFFER_DOUBLE)
+    assert_type(viewer.getBufferingType(), soqt.SoQtBufferMode)
+    assert_type(
+        viewer.setStereoType(soqt.SoQtViewer.STEREO_NONE), bool
+    )
+    assert_type(viewer.getStereoType(), soqt.SoQtStereoType)
     viewer.addStartCallback(viewer_callback)
     viewer.addFinishCallback(viewer_callback)
     viewer.removeStartCallback(viewer_callback)
@@ -164,6 +187,9 @@ def check_soqt_viewer_contract() -> None:
     assert_type(viewer.getCamera(), coin.SoCamera | None)
     assert_type(viewer.getHeadlight(), coin.SoDirectionalLight)
     assert_type(viewer.getSceneGraph(), coin.SoNode | None)
+    assert_type(soqt.SoQtViewer.BROWSER, soqt.SoQtViewerType)
+    assert_type(soqt.SoQtViewer.VIEW_BBOX, soqt.SoQtViewStyle)
+    assert_type(soqt.SoQtViewer.BUFFER_INTERACTIVE, soqt.SoQtBufferMode)
 
     viewer.setCamera(coin.SoPerspectiveCamera())
     viewer.setSceneGraph(coin.SoSeparator())

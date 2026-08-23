@@ -1,6 +1,7 @@
 # pyright: reportMissingModuleSource=false
 
 from pivy import coin
+from pivy.gui import soqt
 
 
 def invalid_vector_input() -> None:
@@ -30,3 +31,10 @@ def invalid_callback_arity() -> None:
         pass
 
     callback_list.addCallback(callback, None)
+
+
+def invalid_stable_enum_value() -> None:
+    style: coin.SoDrawStyleValue = 4
+    viewer = soqt.SoQtViewer()
+    viewer.setDrawStyle(0, 99)
+    del style, viewer

@@ -268,7 +268,7 @@ _MANUAL_CALLBACK_CONTRACTS = (
     ("SoQtViewer", "addFinishCallback", {"func": "SoQtViewerCallback", "data": "object | None"}, "None"),
     ("SoQtViewer", "removeStartCallback", {"func": "SoQtViewerCallback", "data": "object | None"}, "None"),
     ("SoQtViewer", "removeFinishCallback", {"func": "SoQtViewerCallback", "data": "object | None"}, "None"),
-    ("SoQtViewer", "setAutoClippingStrategy", {"strategy": "int", "value": "float", "cb": "SoQtAutoClippingCallback | None", "cbuserdata": "object | None"}, "None"),
+    ("SoQtViewer", "setAutoClippingStrategy", {"strategy": "SoQtNearPlaneMode", "value": "float", "cb": "SoQtAutoClippingCallback | None", "cbuserdata": "object | None"}, "None"),
     ("SoQtPopupMenu", "addMenuSelectionCallback", {"callback": "SoQtMenuSelectionCallback", "data": "object"}, "None"),
     ("SoQtPopupMenu", "removeMenuSelectionCallback", {"callback": "SoQtMenuSelectionCallback", "data": "object"}, "None"),
 )

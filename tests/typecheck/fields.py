@@ -254,6 +254,16 @@ def check_extended_node_field_inventory() -> None:
     assert_type(coin.SoNormalBinding().value, coin.SoSFEnum)
 
 
+def check_enum_constant_contract() -> None:
+    assert_type(coin.SoDrawStyle.FILLED, coin.SoDrawStyleValue)
+    assert_type(coin.SoDrawStyleElement.INVISIBLE, coin.SoDrawStyleValue)
+    assert_type(coin.SoMaterialBinding.NONE, coin.SoMaterialBindingValue)
+    assert_type(
+        coin.SoMaterialBindingElement.PER_VERTEX,
+        coin.SoMaterialBindingValue,
+    )
+
+
 def check_runtime_registry_field_contracts() -> None:
     part = coin.SoNodeKitListPart()
     assert_type(part.containerTypeName, coin.SoSFName)
