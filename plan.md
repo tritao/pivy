@@ -458,3 +458,28 @@ already semantically equivalent to the reviewed public baseline.
 This completes the backend-neutral baseline roadmap. Future work is a bounded
 SWIG 4.5 experiment and subsequent policy improvements, not another tooling
 architecture rewrite.
+
+## Post-roadmap — Coin binding-friendliness analysis
+
+The next phase uses the completed architecture to identify the owner of
+remaining complexity instead of adding another generator layer. The command
+
+```bash
+pixi run typecheck_binding_friendliness
+```
+
+produces `build/typing/pivy-binding-friendliness.json` from the resolved Coin
+model. It classifies every reviewed `Incomplete` boundary and every major
+method/callback contract as:
+
+```text
+A — typing/backend limitation
+B — Pivy binding limitation
+C — Coin API limitation
+D — intentionally native
+```
+
+Existing audit records are marked `reviewed`; category-derived ownership is
+marked `provisional` and becomes the next review queue. The report also ranks
+Coin API candidates by boundary impact so follow-up work can become an
+additive Coin 4.x or Coin 5.x modernization proposal where appropriate.

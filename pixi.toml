@@ -66,6 +66,7 @@ test_typing_pipeline = { cmd = ["python", "-m", "unittest", "tests/test_pivy_typ
 test_typing_manifest = { cmd = ["python", "-m", "unittest", "tests/test_pivy_typing_manifest.py"]}
 test_typing_producers = { cmd = ["python", "-m", "unittest", "tests/test_pivy_typing_producers.py"], depends-on = ["typing_build"]}
 test_typing_callbacks = { cmd = ["python", "-m", "unittest", "tests/test_pivy_typing_callbacks.py"]}
+test_typing_binding_friendliness = { cmd = ["python", "-m", "unittest", "tests/test_pivy_binding_friendliness.py"]}
 check_typing_policy_coverage = { cmd = ["python", "-m", "tools.check_pivy_policy_coverage", "pivy/coin.pyi"]}
 check_typing_compatibility = { cmd = ["python", "-m", "tools.check_pivy_typing_compatibility"]}
 check_field_attribute_coverage = { cmd = ["python", "-m", "tools.check_pivy_field_coverage", "pivy/coin.pyi"], depends-on = ["typing_build"]}
@@ -79,6 +80,7 @@ typecheck_stubs_strict = { depends-on = ["typecheck_stubs_strict_pyright", "type
 typecheck_stubs_matrix = { cmd = ["python", "-m", "tools.check_pivy_typing_matrix"]}
 typecheck_report = { cmd = ["python", "-m", "tools.report_pivy_typing", "--check-baseline", "pivy/coin.pyi"]}
 typecheck_report_json = { cmd = ["python", "-m", "tools.report_pivy_typing", "--json", "pivy/coin.pyi"]}
+typecheck_binding_friendliness = { cmd = ["python", "-m", "tools.report_pivy_binding_friendliness", "pivy/coin.pyi", "--json", "--check-coverage", "--output", "build/typing/pivy-binding-friendliness.json"]}
 typecheck_manifest = { cmd = ["python", "-m", "tools.generate_pivy_typing_manifest", "pivy/coin.pyi", "--output", "build/typing/pivy-api.json"]}
 typecheck_manifest_baseline = { cmd = ["python", "-m", "tools.generate_pivy_typing_manifest", "pivy/coin.pyi", "--check-baseline"]}
 typecheck_producer_comparison = { cmd = ["python", "-m", "tools.compare_pivy_typing_producers", "pivy/coin.pyi", "build/pivy/coin.pyi"], depends-on = ["typing_build"]}
@@ -87,4 +89,4 @@ typecheck_verifytypes_json = { cmd = ["python", "-m", "tools.report_pivy_verifyt
 typecheck_stubtest_coin = { cmd = ["python", "-m", "tools.check_pivy_stubtest", "--module", "pivy.coin"], depends-on = ["typing_build"]}
 typecheck_stubtest_soqt = { cmd = ["python", "-m", "tools.check_pivy_stubtest", "--module", "pivy.gui.soqt"], depends-on = ["typing_build"]}
 typecheck_stubtest = { depends-on = ["typecheck_stubtest_coin", "typecheck_stubtest_soqt"]}
-typecheck_quality = { depends-on = ["typecheck_stubs", "typecheck_negative", "typecheck_stubs_strict", "typecheck_stubs_matrix", "test_typing_policy", "test_typing_model", "test_typing_pipeline", "test_typing_manifest", "test_typing_producers", "test_typing_callbacks", "check_typing_policy_coverage", "check_typing_compatibility", "check_field_attribute_coverage", "typecheck_report", "typecheck_manifest", "typecheck_manifest_baseline", "typecheck_producer_comparison", "typecheck_verifytypes", "test_stubs", "check_stub_drift", "check_stub_determinism", "typecheck_stubtest"]}
+typecheck_quality = { depends-on = ["typecheck_stubs", "typecheck_negative", "typecheck_stubs_strict", "typecheck_stubs_matrix", "test_typing_policy", "test_typing_model", "test_typing_pipeline", "test_typing_manifest", "test_typing_producers", "test_typing_callbacks", "test_typing_binding_friendliness", "check_typing_policy_coverage", "check_typing_compatibility", "check_field_attribute_coverage", "typecheck_report", "typecheck_binding_friendliness", "typecheck_manifest", "typecheck_manifest_baseline", "typecheck_producer_comparison", "typecheck_verifytypes", "test_stubs", "check_stub_drift", "check_stub_determinism", "typecheck_stubtest"]}

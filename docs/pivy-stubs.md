@@ -33,6 +33,29 @@ pixi run typecheck_stubs_pyrefly
 import check, and compares the generated files against the committed source
 stubs to catch drift.
 
+## Coin Binding-Friendliness Report
+
+The typing architecture also records who owns the remaining boundary
+complexity. Generate the reviewed Coin report with:
+
+```sh
+pixi run typecheck_binding_friendliness
+```
+
+The machine-readable report is written to
+`build/typing/pivy-binding-friendliness.json`. Each incomplete boundary and
+major method/callback contract is classified as one of:
+
+- `A`: typing/backend limitation
+- `B`: Pivy binding limitation
+- `C`: Coin API limitation
+- `D`: intentionally native
+
+Existing audit-backed decisions are marked `reviewed`; broad category-derived
+decisions are marked `provisional` and form the next review queue. The report
+also ranks multi-boundary Coin symbols to guide additive Coin API or Pivy
+adapter work.
+
 ## Stub TODOs
 
 ## Runtime-Unsupported SWIG Surfaces
