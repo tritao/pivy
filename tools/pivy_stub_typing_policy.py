@@ -1335,6 +1335,57 @@ PYTHON_PROTOCOL_DEFINITIONS = (
         "    ) -> None: ...",
     ),
     (
+        "SoSensorManagerChangedCallback",
+        (),
+        "class SoSensorManagerChangedCallback(Protocol):\n"
+        "    def __call__(self, data: object, /) -> None: ...",
+    ),
+    (
+        "SoDBHeaderCallback",
+        ("SoInput",),
+        "class SoDBHeaderCallback(Protocol):\n"
+        "    def __call__(self, data: object, input: SoInput, /) -> None: ...",
+    ),
+    (
+        "SoGLSortedObjectOrderCallback",
+        ("SoGLRenderAction",),
+        "class SoGLSortedObjectOrderCallback(Protocol):\n"
+        "    def __call__(\n"
+        "        self, data: object, action: SoGLRenderAction, /\n"
+        "    ) -> float: ...",
+    ),
+    (
+        "SoGLImageEndFrameCallback",
+        (),
+        "class SoGLImageEndFrameCallback(Protocol):\n"
+        "    def __call__(self, data: object, /) -> None: ...",
+    ),
+    (
+        "SoShaderEnableCallback",
+        ("SoState",),
+        "class SoShaderEnableCallback(Protocol):\n"
+        "    def __call__(\n"
+        "        self, data: object, state: SoState, enable: bool, /\n"
+        "    ) -> None: ...",
+    ),
+    (
+        "SoProtoFetchExternProtoCallback",
+        ("SoInput", "SoProto", "SbString"),
+        "class SoProtoFetchExternProtoCallback(Protocol):\n"
+        "    def __call__(\n"
+        "        self, data: object, input: SoInput, urls: list[SbString],\n"
+        "        numurls: int, /\n"
+        "    ) -> SoProto | None: ...",
+    ),
+    (
+        "SbImageReadImageCallback",
+        ("SbImage", "SbString"),
+        "class SbImageReadImageCallback(Protocol):\n"
+        "    def __call__(\n"
+        "        self, data: object, filename: SbString, image: SbImage, /\n"
+        "    ) -> bool: ...",
+    ),
+    (
         "ScXMLStateMachineDeleteCallback",
         ("ScXMLStateMachine",),
         "class ScXMLStateMachineDeleteCallback(Protocol):\n"
@@ -1678,6 +1729,13 @@ CALLBACK_TYPE_SIGNATURES = {
     "SoTriangleCB": (
         "SoTriangleCallback"
     ),
+    "SoSensorManagerChangedCB": "SoSensorManagerChangedCallback",
+    "SoDBHeaderCB": "SoDBHeaderCallback",
+    "SoGLSortedObjectOrderCB": "SoGLSortedObjectOrderCallback",
+    "SoGLImageEndFrameCB": "SoGLImageEndFrameCallback",
+    "SoShaderEnableCB": "SoShaderEnableCallback",
+    "SoProtoFetchExternProtoCB": "SoProtoFetchExternProtoCallback",
+    "SbImageReadImageCB": "SbImageReadImageCallback",
     "SoSensorCB": "SoSensorCallback[SoSensor]",
     "SoErrorCB": "SoErrorCallback",
     "SoQtRenderAreaEventCB": "SoQtRenderAreaCallback",
@@ -1818,6 +1876,30 @@ class CallbackMethodPolicy:
 
 
 CALLBACK_METHOD_POLICIES = {
+    ("SoSensorManager", "setChangedCallback"): CallbackMethodPolicy(
+        (
+            ("pyfunc", "SoSensorManagerChangedCallback"),
+            ("data", "object"),
+        ),
+        (
+            "self, pyfunc: SoSensorManagerChangedCallback, data: object",
+            "None",
+        ),
+    ),
+    ("SoDB", "registerHeader"): CallbackMethodPolicy(
+        (
+            ("precallback", "SoDBHeaderCallback"),
+            ("postcallback", "SoDBHeaderCallback"),
+            ("userdata", "object | None"),
+        ),
+        (
+            "headerstring: SbString, isbinary: bool, ivversion: float, "
+            "precallback: SoDBHeaderCallback, "
+            "postcallback: SoDBHeaderCallback, "
+            "userdata: object | None = ...",
+            "bool",
+        ),
+    ),
     ("SoQt", "setFatalErrorHandler"): CallbackMethodPolicy(
         (
             ("cb", "SoQtFatalErrorCallback"),
@@ -1962,18 +2044,18 @@ CALLBACK_METHOD_POLICIES = {
     ),
     ("SoGLRenderAction", "setSortedObjectOrderStrategy"): CallbackMethodPolicy(
         (
-            ("cb", "Callable[[object, SoGLRenderAction], float] | None"),
+            ("cb", "SoGLSortedObjectOrderCallback | None"),
             ("closure", "object | None"),
         ),
         (
             "self, strategy: int, "
-            "cb: Callable[[object, SoGLRenderAction], float] | None = ..., "
+            "cb: SoGLSortedObjectOrderCallback | None = ..., "
             "closure: object | None = ...",
             "None",
         ),
         (
             ("strategy", "int"),
-            ("cb", "Callable[[object, SoGLRenderAction], float] | None"),
+            ("cb", "SoGLSortedObjectOrderCallback | None"),
             ("closure", "object | None"),
         ),
     ),
@@ -1991,95 +2073,77 @@ CALLBACK_METHOD_POLICIES = {
     ),
     ("SoGLImage", "setEndFrameCallback"): CallbackMethodPolicy(
         (
-            ("cb", "Callable[[object], None] | None"),
+            ("cb", "SoGLImageEndFrameCallback | None"),
             ("closure", "object | None"),
         ),
         (
-            "self, cb: Callable[[object], None] | None, "
+            "self, cb: SoGLImageEndFrameCallback | None, "
             "closure: object | None = ...",
             "None",
         ),
     ),
     ("SoShaderProgram", "setEnableCallback"): CallbackMethodPolicy(
         (
-            ("cb", "Callable[[object, SoState, bool], None] | None"),
+            ("cb", "SoShaderEnableCallback | None"),
             ("closure", "object | None"),
         ),
         (
-            "self, cb: Callable[[object, SoState, bool], None] | None, "
+            "self, cb: SoShaderEnableCallback | None, "
             "closure: object | None = ...",
             "None",
         ),
     ),
     ("SoProto", "setFetchExternProtoCallback"): CallbackMethodPolicy(
         (
-            (
-                "cb",
-                "Callable[[object, SoInput, list[SbString], int], "
-                "SoProto | None] | None",
-            ),
+            ("cb", "SoProtoFetchExternProtoCallback | None"),
             ("closure", "object | None"),
         ),
         (
-            "cb: Callable[[object, SoInput, list[SbString], int], "
-            "SoProto | None] | None, closure: object | None = ...",
+            "cb: SoProtoFetchExternProtoCallback | None, "
+            "closure: object | None = ...",
             "None",
         ),
     ),
     ("SbImage", "addReadImageCB"): CallbackMethodPolicy(
         (
-            ("cb", "Callable[[object, SbString, SbImage], bool]"),
+            ("cb", "SbImageReadImageCallback"),
             ("closure", "object | None"),
         ),
         (
-            "cb: Callable[[object, SbString, SbImage], bool], "
+            "cb: SbImageReadImageCallback, "
             "closure: object | None = ...",
             "None",
         ),
     ),
     ("SbImage", "removeReadImageCB"): CallbackMethodPolicy(
         (
-            ("cb", "Callable[[object, SbString, SbImage], bool]"),
+            ("cb", "SbImageReadImageCallback"),
             ("closure", "object | None"),
         ),
         (
-            "cb: Callable[[object, SbString, SbImage], bool], "
+            "cb: SbImageReadImageCallback, "
             "closure: object | None = ...",
             "None",
         ),
     ),
     ("SbImage", "scheduleReadFile"): CallbackMethodPolicy(
         (
-            ("cb", "Callable[[object, SbString, SbImage], bool]"),
+            ("cb", "SbImageReadImageCallback"),
             ("closure", "object | None"),
         ),
         (
-            "self, cb: Callable[[object, SbString, SbImage], bool], "
+            "self, cb: SbImageReadImageCallback, "
             "closure: object | None, filename: SbString, "
             "searchdirectories: SbString | None = ..., "
             "numdirectories: int = ...",
             "bool",
         ),
         (
-            ("cb", "Callable[[object, SbString, SbImage], bool]"),
+            ("cb", "SbImageReadImageCallback"),
             ("closure", "object | None"),
             ("filename", "SbString"),
             ("searchdirectories", "SbString | None"),
             ("numdirectories", "int"),
-        ),
-    ),
-    ("SoDB", "registerHeader"): CallbackMethodPolicy(
-        (
-            ("precallback", "Callable[[object, SoInput], None]"),
-            ("postcallback", "Callable[[object, SoInput], None]"),
-            ("userdata", "object | None"),
-        ),
-        (
-            "headerstring: SbString, isbinary: bool, ivversion: float, "
-            "precallback: Callable[[object, SoInput], None], "
-            "postcallback: Callable[[object, SoInput], None], "
-            "userdata: object | None = ...",
-            "bool",
         ),
     ),
     ("SoDB", "addProgressCallback"): CallbackMethodPolicy(
@@ -3869,6 +3933,24 @@ INCOMPLETE_CATEGORY_OVERRIDES = {
     ("parameter", "SoFieldData", "getEnumData", "values"): "raw C pointers",
     ("parameter", "SoSensorManager", "doSelect", "userTimeOut"): "raw C pointers",
     ("parameter", "SoDB", "doSelect", "usertimeout"): "raw C pointers",
+    # SoQt exposes the native event-handler function pointer and closure
+    # directly.  There is no Python adapter for these low-level device hooks.
+    ("parameter", "SoQtDevice", "enable", "handler"): "function pointers",
+    ("parameter", "SoQtDevice", "disable", "handler"): "function pointers",
+    ("parameter", "SoQtDevice", "enable", "closure"): "raw C pointers",
+    ("parameter", "SoQtDevice", "disable", "closure"): "raw C pointers",
+    ("parameter", "SoQtKeyboard", "enable", "handler"): "function pointers",
+    ("parameter", "SoQtKeyboard", "disable", "handler"): "function pointers",
+    ("parameter", "SoQtKeyboard", "enable", "closure"): "raw C pointers",
+    ("parameter", "SoQtKeyboard", "disable", "closure"): "raw C pointers",
+    ("parameter", "SoQtMouse", "enable", "handler"): "function pointers",
+    ("parameter", "SoQtMouse", "disable", "handler"): "function pointers",
+    ("parameter", "SoQtMouse", "enable", "closure"): "raw C pointers",
+    ("parameter", "SoQtMouse", "disable", "closure"): "raw C pointers",
+    ("parameter", "SoQtViewer", "getAnaglyphStereoColorMasks", "left"):
+        "unknown output parameters",
+    ("parameter", "SoQtViewer", "getAnaglyphStereoColorMasks", "right"):
+        "unknown output parameters",
 }
 
 

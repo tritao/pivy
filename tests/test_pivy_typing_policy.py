@@ -436,8 +436,8 @@ class FieldTypePolicyTests(unittest.TestCase):
             policy.PYTHON_SHADOW_METHOD_TYPES[("SoDB", "registerHeader")],
             (
                 "headerstring: SbString, isbinary: bool, ivversion: float, "
-                "precallback: Callable[[object, SoInput], None], "
-                "postcallback: Callable[[object, SoInput], None], "
+                "precallback: SoDBHeaderCallback, "
+                "postcallback: SoDBHeaderCallback, "
                 "userdata: object | None = ...",
                 "bool",
             ),
@@ -484,7 +484,7 @@ class FieldTypePolicyTests(unittest.TestCase):
             ],
             (
                 "self, strategy: int, "
-                "cb: Callable[[object, SoGLRenderAction], float] | None = ..., "
+                "cb: SoGLSortedObjectOrderCallback | None = ..., "
                 "closure: object | None = ...",
                 "None",
             ),
@@ -496,7 +496,7 @@ class FieldTypePolicyTests(unittest.TestCase):
                 ("SoGLImage", "setEndFrameCallback")
             ],
             (
-                "self, cb: Callable[[object], None] | None, "
+                "self, cb: SoGLImageEndFrameCallback | None, "
                 "closure: object | None = ...",
                 "None",
             ),
@@ -506,7 +506,7 @@ class FieldTypePolicyTests(unittest.TestCase):
                 ("SoShaderProgram", "setEnableCallback")
             ],
             (
-                "self, cb: Callable[[object, SoState, bool], None] | None, "
+                "self, cb: SoShaderEnableCallback | None, "
                 "closure: object | None = ...",
                 "None",
             ),
@@ -516,15 +516,15 @@ class FieldTypePolicyTests(unittest.TestCase):
                 ("SoProto", "setFetchExternProtoCallback")
             ],
             (
-                "cb: Callable[[object, SoInput, list[SbString], int], "
-                "SoProto | None] | None, closure: object | None = ...",
+                "cb: SoProtoFetchExternProtoCallback | None, "
+                "closure: object | None = ...",
                 "None",
             ),
         )
         self.assertEqual(
             policy.PYTHON_SHADOW_METHOD_TYPES[("SbImage", "addReadImageCB")],
             (
-                "cb: Callable[[object, SbString, SbImage], bool], "
+                "cb: SbImageReadImageCallback, "
                 "closure: object | None = ...",
                 "None",
             ),
@@ -532,7 +532,7 @@ class FieldTypePolicyTests(unittest.TestCase):
         self.assertEqual(
             policy.PYTHON_SHADOW_METHOD_TYPES[("SbImage", "removeReadImageCB")],
             (
-                "cb: Callable[[object, SbString, SbImage], bool], "
+                "cb: SbImageReadImageCallback, "
                 "closure: object | None = ...",
                 "None",
             ),
@@ -540,7 +540,7 @@ class FieldTypePolicyTests(unittest.TestCase):
         self.assertEqual(
             policy.PYTHON_SHADOW_METHOD_TYPES[("SbImage", "scheduleReadFile")],
             (
-                "self, cb: Callable[[object, SbString, SbImage], bool], "
+                "self, cb: SbImageReadImageCallback, "
                 "closure: object | None, filename: SbString, "
                 "searchdirectories: SbString | None = ..., "
                 "numdirectories: int = ...",
@@ -729,6 +729,36 @@ class IncompletePolicyTests(unittest.TestCase):
                 class_name="SbVec3f",
                 method_name="getValue",
                 parameter_name="values",
+            ),
+            "unknown output parameters",
+        )
+
+    def test_soqt_native_boundaries_are_classified(self):
+        for method_name in ("enable", "disable"):
+            self.assertEqual(
+                self.classify(
+                    kind="parameter",
+                    class_name="SoQtDevice",
+                    method_name=method_name,
+                    parameter_name="handler",
+                ),
+                "function pointers",
+            )
+            self.assertEqual(
+                self.classify(
+                    kind="parameter",
+                    class_name="SoQtDevice",
+                    method_name=method_name,
+                    parameter_name="closure",
+                ),
+                "raw C pointers",
+            )
+        self.assertEqual(
+            self.classify(
+                kind="parameter",
+                class_name="SoQtViewer",
+                method_name="getAnaglyphStereoColorMasks",
+                parameter_name="left",
             ),
             "unknown output parameters",
         )
@@ -1183,10 +1213,10 @@ class PolicyBoundaryTests(unittest.TestCase):
 
     def test_verifytypes_summary_parser(self):
         output = """
-Symbols exported by "pivy.coin": 13801
-  With known type: 8416
+Symbols exported by "pivy.coin": 13917
+  With known type: 8519
   With ambiguous type: 0
-  With unknown type: 5385
+  With unknown type: 5398
 
 Other symbols referenced but not exported by "pivy.coin": 0
   With known type: 0
@@ -1201,10 +1231,10 @@ Type completeness score: 61%
             report,
             VerifyTypesReport(
                 module="pivy.coin",
-                exported_symbols=13801,
-                known_symbols=8416,
+                exported_symbols=13917,
+                known_symbols=8519,
                 ambiguous_symbols=0,
-                unknown_symbols=5385,
+                unknown_symbols=5398,
                 completeness_score=61.0,
                 pyright_returncode=1,
             ),

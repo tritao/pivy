@@ -1,6 +1,6 @@
 # pyright: reportMissingModuleSource=false
 
-from typing import Any, Callable
+from typing import Any
 from typing_extensions import assert_type
 
 from pivy import coin
@@ -87,12 +87,15 @@ def check_sensor_callbacks() -> None:
     def changed_callback(data: Any) -> None:
         pass
 
-    coin.SoDB.getSensorManager().setChangedCallback(changed_callback, None)
+    changed_contract: coin.SoSensorManagerChangedCallback = changed_callback
+    coin.SoDB.getSensorManager().setChangedCallback(changed_contract, None)
 
 
 def check_database_callbacks() -> None:
     def header_callback(data: object, input: coin.SoInput) -> None:
         pass
+
+    header_contract: coin.SoDBHeaderCallback = header_callback
 
     def progress_callback(
         data: object,
@@ -107,8 +110,8 @@ def check_database_callbacks() -> None:
             coin.SbString("#PivyTypingHeader"),
             False,
             1.0,
-            header_callback,
-            header_callback,
+            header_contract,
+            header_contract,
         ),
         bool,
     )
@@ -161,8 +164,9 @@ def check_graphics_callback_setters() -> None:
     def end_frame_callback(data: object) -> None:
         pass
 
+    end_frame_contract: coin.SoGLImageEndFrameCallback = end_frame_callback
     image = coin.SoGLImage()
-    image.setEndFrameCallback(end_frame_callback, None)
+    image.setEndFrameCallback(end_frame_contract, None)
     image.setEndFrameCallback(None)
 
     def enable_callback(
@@ -172,8 +176,9 @@ def check_graphics_callback_setters() -> None:
     ) -> None:
         pass
 
+    enable_contract: coin.SoShaderEnableCallback = enable_callback
     shader_program = coin.SoShaderProgram()
-    shader_program.setEnableCallback(enable_callback, None)
+    shader_program.setEnableCallback(enable_contract, None)
     shader_program.setEnableCallback(None)
 
     def fetch_proto_callback(
@@ -184,7 +189,8 @@ def check_graphics_callback_setters() -> None:
     ) -> coin.SoProto | None:
         return None if numurls != len(urls) else None
 
-    coin.SoProto.setFetchExternProtoCallback(fetch_proto_callback, None)
+    fetch_proto_contract: coin.SoProtoFetchExternProtoCallback = fetch_proto_callback
+    coin.SoProto.setFetchExternProtoCallback(fetch_proto_contract, None)
     coin.SoProto.setFetchExternProtoCallback(None)
 
     def image_read_callback(
@@ -194,13 +200,14 @@ def check_graphics_callback_setters() -> None:
     ) -> bool:
         return bool(filename) and isinstance(image, coin.SbImage)
 
-    coin.SbImage.addReadImageCB(image_read_callback, None)
-    coin.SbImage.removeReadImageCB(image_read_callback, None)
+    image_read_contract: coin.SbImageReadImageCallback = image_read_callback
+    coin.SbImage.addReadImageCB(image_read_contract, None)
+    coin.SbImage.removeReadImageCB(image_read_contract, None)
 
     image = coin.SbImage()
     assert_type(
         image.scheduleReadFile(
-            image_read_callback,
+            image_read_contract,
             None,
             coin.SbString("missing-image"),
         ),
@@ -378,9 +385,12 @@ def check_render_and_scene_callbacks() -> None:
     ) -> float:
         return 0.0
 
+    sorted_object_contract: coin.SoGLSortedObjectOrderCallback = (
+        sorted_object_callback
+    )
     gl_action.setSortedObjectOrderStrategy(
         coin.SoGLRenderAction.CUSTOM_CALLBACK,
-        sorted_object_callback,
+        sorted_object_contract,
         None,
     )
     gl_action.setSortedObjectOrderStrategy(coin.SoGLRenderAction.BBOX_CENTER)

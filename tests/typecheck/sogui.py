@@ -7,7 +7,7 @@ from pivy import coin, sogui
 
 
 def check_sogui_wrapper_contract() -> None:
-    wrapper = sogui.SoGui_Quarter_Wrapper(object())
+    wrapper = sogui.SoGui_Quarter_Wrapper(_Widget())
     assert_type(wrapper.getCamera(), coin.SoCamera)
     assert_type(wrapper.getSize(), coin.SbVec2s)
     assert_type(wrapper.getViewportRegion(), coin.SbViewportRegion)
@@ -24,16 +24,19 @@ def check_sogui_wrapper_contract() -> None:
 
 
 def check_sogui_viewer_aliases() -> None:
-    viewer = sogui.SoGuiExaminerViewer(object())
+    viewer = sogui.SoGuiExaminerViewer(_Widget())
     assert_type(viewer, sogui.SoGui_Quarter_Wrapper)
     assert_type(sogui.SoGuiViewer.BROWSER, int)
-    assert_type(sogui.SoGui.init(), Any)
+    widget = sogui.SoGui.init()
+    assert_type(widget, sogui.SoGuiWidget)
+    sogui.SoGui.show(widget)
 
 
 def check_backend_contract() -> None:
     backend: sogui.SoGuiBinding = sogui.SoGui
+    assert_type(backend.init(), sogui.SoGuiWidget)
     backend.mainLoop()
-    backend.show(object())
+    backend.show(_Widget())
 
 
 class _Widget:

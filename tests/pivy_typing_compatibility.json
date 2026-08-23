@@ -178,7 +178,7 @@
             "mainLoop": [{"parameters": [], "return": "None"}],
             "show": [
               {
-                "parameters": [{"name": "mainwindow", "type": "Any"}],
+                "parameters": [{"name": "mainwindow", "type": "SoGuiWidget"}],
                 "return": "None"
               }
             ]

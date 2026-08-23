@@ -233,7 +233,6 @@ def _manual_contract(
 # here makes the contract registry the source for both validation and the
 # manifest while preserving the exact existing expected signatures.
 _MANUAL_CALLBACK_CONTRACTS = (
-    ("SoSensorManager", "setChangedCallback", {"pyfunc": "Callable[[object], None]", "data": "object"}, "None"),
     ("SoCallbackAction", "addPreCallback", {"type": "SoType", "pyfunc": "SoCallbackActionNodeCallback", "userdata": "object"}, "None"),
     ("SoCallbackAction", "addPostCallback", {"type": "SoType", "pyfunc": "SoCallbackActionNodeCallback", "userdata": "object"}, "None"),
     ("SoCallbackAction", "addPreTailCallback", {"pyfunc": "SoCallbackActionNodeCallback", "userdata": "object"}, "None"),

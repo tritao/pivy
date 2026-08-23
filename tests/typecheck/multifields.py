@@ -164,6 +164,75 @@ def check_all_multifield_value_snapshots() -> None:
     assert_type(coin.SoMFVec4d().values, list[Sequence[float]])
 
 
+def check_remaining_multifield_mutators() -> None:
+    """Exercise the inherited three-form setter contract across MF families."""
+
+    doubles = coin.SoMFDouble()
+    doubles.setValues([1.0, 2.0])
+    doubles.setValues(1, [3.0])
+    doubles.setValues(0, 1, [4.0])
+    doubles.set1Value(0, 5.0)
+
+    times = coin.SoMFTime()
+    times.setValues([coin.SbTime(1.0)])
+    times.setValues(1, [coin.SbTime(2.0)])
+    times.setValues(0, 1, [coin.SbTime(3.0)])
+
+    names = coin.SoMFName()
+    names.setValues(["one"])
+    names.setValues(1, ["two"])
+    names.setValues(0, 1, ["three"])
+
+    strings = coin.SoMFString()
+    strings.setValues(["one"])
+    strings.setValues(1, ["two"])
+    strings.setValues(0, 1, ["three"])
+
+    nodes = coin.SoMFNode()
+    nodes.setValues([coin.SoCube()])
+    nodes.setValues(1, [coin.SoSphere()])
+    nodes.setValues(0, 1, [coin.SoCone()])
+
+    paths = coin.SoMFPath()
+    paths.setValues([coin.SoPath()])
+    paths.setValues(1, [coin.SoPath()])
+    paths.setValues(0, 1, [coin.SoPath()])
+
+    engines = coin.SoMFEngine()
+    engines.setValues([coin.SoTimeCounter()])
+    engines.setValues(1, [coin.SoTimeCounter()])
+    engines.setValues(0, 1, [coin.SoTimeCounter()])
+
+    planes = coin.SoMFPlane()
+    planes.setValues([coin.SbPlane()])
+    planes.setValues(1, [coin.SbPlane()])
+    planes.setValues(0, 1, [coin.SbPlane()])
+
+    rotations = coin.SoMFRotation()
+    rotations.set1Value(0, (0.0, 0.0, 1.0, 0.0))
+    rotations.set1Value(0, coin.SbVec3f(0.0, 0.0, 1.0), 0.0)
+
+    matrices = coin.SoMFMatrix()
+    matrices.setValues([coin.SbMatrix()])
+    matrices.setValues(1, [coin.SbMatrix()])
+    matrices.setValues(0, 1, [coin.SbMatrix()])
+    matrices.set1Value(0, coin.SbMatrix())
+    matrices[0] = coin.SbMatrix()
+
+    vec2b = coin.SoMFVec2b()
+    vec2b.set1Value(0, (1, 2))
+    vec3s = coin.SoMFVec3s()
+    vec3s.set1Value(0, (1, 2, 3))
+    vec4i32 = coin.SoMFVec4i32()
+    vec4i32.set1Value(0, (1, 2, 3, 4))
+    vec2d = coin.SoMFVec2d()
+    vec2d.set1Value(0, (1.0, 2.0))
+    vec3d = coin.SoMFVec3d()
+    vec3d.set1Value(0, (1.0, 2.0, 3.0))
+    vec4d = coin.SoMFVec4d()
+    vec4d.set1Value(0, (1.0, 2.0, 3.0, 4.0))
+
+
 def check_numeric_vector_multifield_families() -> None:
     vec2b = coin.SoMFVec2b()
     vec2b.setValues([(1, 2)])
