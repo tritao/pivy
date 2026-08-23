@@ -464,7 +464,7 @@ SEQUENCE_METHOD_RULES = _sequence_method_rules()
 def sequence_method_checks():
     """Return compatibility checks derived from sequence method policy."""
 
-    return tuple(rule.check for rule in SEQUENCE_METHOD_RULES)
+    return method_signature_checks(SEQUENCE_METHOD_RULES)
 
 
 SEQUENCE_PARAMETER_TYPE_OVERRIDES = {
@@ -482,6 +482,128 @@ STRING_POINTER_PARAMETERS = {
     ("SbString", "__nq__", "u"),
 }
 INPLACE_DIVISION_METHODS = {"__idiv__", "__itruediv__"}
+
+
+def method_signature_checks(rules):
+    """Return legacy validator tuples for structured method rules."""
+
+    return tuple(rule.check for rule in rules)
+
+
+def _typedef_and_string_method_rules():
+    rules = []
+    for class_name, method_name, _ in sorted(STRING_POINTER_PARAMETERS):
+        rules.append(
+            _method_signature_rule(
+                class_name,
+                method_name,
+                (("u", "str"),),
+                "bool" if method_name == "__eq__" else "int",
+                "Native string comparison exposed as Python text",
+            )
+        )
+    rules.extend(
+        (
+            _method_signature_rule(
+                "SoNotList",
+                "getTimeStamp",
+                (),
+                "int",
+                "Native timestamp typedef normalized to int",
+            ),
+            _method_signature_rule(
+                "SoNode",
+                "getNodeId",
+                (),
+                "int",
+                "Native identifier typedef normalized to int",
+            ),
+            _method_signature_rule(
+                "SoNode",
+                "getNextNodeId",
+                (),
+                "int",
+                "Native identifier typedef normalized to int",
+            ),
+            _method_signature_rule(
+                "SoColorPacker",
+                "diffuseMatch",
+                (("nodeid", "int"),),
+                "bool",
+                "Native identifier parameter normalized to int",
+            ),
+            _method_signature_rule(
+                "SoColorPacker",
+                "getDiffuseId",
+                (),
+                "int",
+                "Native identifier typedef normalized to int",
+            ),
+        )
+    )
+    return tuple(rules)
+
+
+TYPEDEF_AND_STRING_METHOD_RULES = _typedef_and_string_method_rules()
+
+
+def typedef_and_string_method_checks():
+    return method_signature_checks(TYPEDEF_AND_STRING_METHOD_RULES)
+
+
+def _operator_method_rules():
+    rules = []
+    for class_name in (*VECTOR_TYPE_POLICIES, "SbColor4f"):
+        for method_name in INPLACE_DIVISION_METHODS:
+            rules.append(
+                _method_signature_rule(
+                    class_name,
+                    method_name,
+                    (("d", "float"),),
+                    class_name,
+                    "Binding-generated in-place scalar division operator",
+                )
+            )
+    rules.extend(
+        (
+            _method_signature_rule(
+                "SbTime",
+                "__itruediv__",
+                (("d", "float"),),
+                "SbTime",
+                "Binding-generated in-place time division operator",
+            ),
+            _method_signature_rule(
+                "SbTime",
+                "__truediv__",
+                (("tm", "SbTime"),),
+                "float",
+                "Binding-generated time division overload",
+            ),
+            _method_signature_rule(
+                "SbTime",
+                "__truediv__",
+                (("d", "float"),),
+                "float",
+                "Binding-generated time division overload",
+            ),
+            _method_signature_rule(
+                "SbRotation",
+                "__imul__",
+                (("other", "SbRotation"),),
+                "SbRotation",
+                "Binding-generated rotation multiplication operator",
+            ),
+        )
+    )
+    return tuple(rules)
+
+
+OPERATOR_METHOD_RULES = _operator_method_rules()
+
+
+def operator_method_checks():
+    return method_signature_checks(OPERATOR_METHOD_RULES)
 PYTHON_HELPER_METHOD_POLICIES = {
     ("_SwigNonDynamicMeta", "__setattr__"): PythonMethodPolicy(
         "cls, name: str, value: object",

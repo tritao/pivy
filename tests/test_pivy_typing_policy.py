@@ -128,6 +128,24 @@ class FieldTypePolicyTests(unittest.TestCase):
             policy.sequence_method_checks(),
         )
 
+    def test_operator_and_typedef_rules_are_policy_owned(self):
+        for rules in (
+            policy.OPERATOR_METHOD_RULES,
+            policy.TYPEDEF_AND_STRING_METHOD_RULES,
+        ):
+            self.assertTrue(rules)
+            self.assertTrue(all(rule.reason for rule in rules))
+            self.assertTrue(all(rule.source for rule in rules))
+
+        self.assertIn(
+            ("SbTime", "__truediv__", {"tm": "SbTime"}, "float"),
+            policy.operator_method_checks(),
+        )
+        self.assertIn(
+            ("SbString", "__eq__", {"u": "str"}, "bool"),
+            policy.typedef_and_string_method_checks(),
+        )
+
     def test_coin_typing_policy_registry_is_complete(self):
         self.assertEqual(COIN_TYPING_POLICY.fields, policy.FIELD_TYPE_POLICIES)
         self.assertEqual(

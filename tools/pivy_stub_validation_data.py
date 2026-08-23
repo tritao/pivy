@@ -11,9 +11,11 @@ from tools.pivy_stub_typing_policy import (
     multifield_single_value_types,
     multifield_setvalues_types,
     MULTIFIELD_TYPE_POLICIES,
+    operator_method_checks,
     sequence_method_checks,
     SENSOR_CALLBACK_CLASSES,
     SENSOR_CALLBACK_CONSTRUCTOR_TYPES,
+    typedef_and_string_method_checks,
     vector_iter_element_types,
 )
 from tools.pivy_typing.callbacks import callback_method_checks
@@ -318,62 +320,7 @@ DEFERRED_RAW_ATTRIBUTE_CHECKS = {
     ),
 }
 TYPEDEF_AND_STRING_METHOD_CHECKS = {
-    "coin.pyi": (
-        (
-            "SbString",
-            "__eq__",
-            {"u": "str"},
-            "bool",
-        ),
-        (
-            "SbString",
-            "__nq__",
-            {"u": "str"},
-            "int",
-        ),
-        (
-            "SbName",
-            "__eq__",
-            {"u": "str"},
-            "bool",
-        ),
-        (
-            "SbName",
-            "__nq__",
-            {"u": "str"},
-            "int",
-        ),
-        (
-            "SoNotList",
-            "getTimeStamp",
-            {},
-            "int",
-        ),
-        (
-            "SoNode",
-            "getNodeId",
-            {},
-            "int",
-        ),
-        (
-            "SoNode",
-            "getNextNodeId",
-            {},
-            "int",
-        ),
-        (
-            "SoColorPacker",
-            "diffuseMatch",
-            {"nodeid": "int"},
-            "bool",
-        ),
-        (
-            "SoColorPacker",
-            "getDiffuseId",
-            {},
-            "int",
-        ),
-    ),
+    "coin.pyi": typedef_and_string_method_checks(),
 }
 DOC_TYPED_METHOD_CHECKS = {
     "coin.pyi": (
@@ -757,52 +704,7 @@ UNSUPPORTED_REFERENCE_METHOD_CHECKS = {
         ),
     ),
 }
-OPERATOR_METHOD_CHECKS = {
-    "coin.pyi": (
-        (
-            "SbVec2f",
-            "__itruediv__",
-            {"d": "float"},
-            "SbVec2f",
-        ),
-        (
-            "SbVec3i32",
-            "__idiv__",
-            {"d": "float"},
-            "SbVec3i32",
-        ),
-        (
-            "SbColor4f",
-            "__itruediv__",
-            {"d": "float"},
-            "SbColor4f",
-        ),
-        (
-            "SbTime",
-            "__itruediv__",
-            {"d": "float"},
-            "SbTime",
-        ),
-        (
-            "SbTime",
-            "__truediv__",
-            {"tm": "SbTime"},
-            "float",
-        ),
-        (
-            "SbTime",
-            "__truediv__",
-            {"d": "float"},
-            "float",
-        ),
-        (
-            "SbRotation",
-            "__imul__",
-            {"other": "SbRotation"},
-            "SbRotation",
-        ),
-    ),
-}
+OPERATOR_METHOD_CHECKS = {"coin.pyi": operator_method_checks()}
 def _policy_multifield_method_checks():
     checks = []
     setvalues_types = multifield_setvalues_types()

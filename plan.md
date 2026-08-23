@@ -409,6 +409,14 @@ The first remaining structural validator table has also been removed:
 - the same special sequence parameter rules feed stub generation, so the
   validator no longer owns a second copy of those signatures.
 
+The small typedef/string and operator tables now follow the same path:
+
+- native string comparisons, identifier typedefs and color-packer adapters are
+  policy-owned method contracts;
+- vector/time/rotation operator expectations are derived from vector and
+  operator policy rather than handwritten validator tuples;
+- the legacy validator shapes remain only as compatibility projections.
+
 The next slice is to migrate the remaining duplicated positive structural
 tables—pointer helpers, typedef/string adapters, documented typed methods,
 operators and deferred raw boundaries—into the resolved model or policy
