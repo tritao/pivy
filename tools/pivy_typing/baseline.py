@@ -15,7 +15,7 @@ COIN_MANIFEST_BASELINE = {
     "attributes": 2738,
     "boundaries": 417,
     "callback_contracts": 78,
-    "sha256": "b7a42fed31c1cbd8187f7edd8c94abb15e3b8d1e704e1bb007e2ac255b093048",
+    "sha256": "2829dbd262c06b5027594a08e061cdebfd253e36a3c852eadc28e57740ba0449",
 }
 
 

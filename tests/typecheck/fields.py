@@ -262,6 +262,45 @@ def check_enum_constant_contract() -> None:
         coin.SoMaterialBindingElement.PER_VERTEX,
         coin.SoMaterialBindingValue,
     )
+    assert_type(coin.SoComplexity.OBJECT_SPACE, coin.SoComplexityValue)
+    assert_type(coin.SoLightModel.PHONG, coin.SoLightModelValue)
+    assert_type(coin.SoPickStyle.SHAPE_ON_TOP, coin.SoPickStyleValue)
+    assert_type(
+        coin.SoShapeHints.COUNTERCLOCKWISE,
+        coin.SoShapeHintsOrdering,
+    )
+    assert_type(coin.SoShapeHints.SOLID, coin.SoShapeHintsShapeType)
+    assert_type(coin.SoShapeHints.CONVEX, coin.SoShapeHintsFaceType)
+    assert_type(
+        coin.SoShapeHints.NO_WINDING_TYPE,
+        coin.SoShapeHintsWindingType,
+    )
+    assert_type(coin.SoUnits.MILES, coin.SoUnitsValue)
+    assert_type(coin.SoSearchAction.NAME, coin.SoSearchFind)
+    assert_type(coin.SoSearchAction.ALL, coin.SoSearchInterest)
+
+
+def check_open_enum_field_contract() -> None:
+    """Enum fields accept arbitrary native integers plus declared constants."""
+
+    enum_field = coin.SoSFEnum()
+    enum_field.setValue(coin.SoDrawStyle.FILLED)
+    enum_field.setValue(37)
+    enum_field.setEnums(2, [0, 1], ["ZERO", coin.SbName("ONE")])
+
+    bitmask_field = coin.SoSFBitMask()
+    bitmask_field.setValue(coin.SoPickStyle.SHAPE_ON_TOP)
+    bitmask_field.setValue(1 << 8)
+
+    multifield = coin.SoMFEnum()
+    multifield.setValue(coin.SoMaterialBinding.PER_VERTEX)
+    multifield.setValue(37)
+    multifield.setEnums(2, [0, 1], ["ZERO", coin.SbName("ONE")])
+
+    bitmask_values = coin.SoMFBitMask()
+    bitmask_values.setValue(1 << 4)
+    assert_type(multifield.values, list[int])
+    assert_type(bitmask_values.values, list[int])
 
 
 def check_runtime_registry_field_contracts() -> None:

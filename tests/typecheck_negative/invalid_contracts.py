@@ -38,3 +38,7 @@ def invalid_stable_enum_value() -> None:
     viewer = soqt.SoQtViewer()
     viewer.setDrawStyle(0, 99)
     del style, viewer
+
+
+def invalid_soqt_build_flag() -> None:
+    soqt.SoQtExaminerViewer(flag=4)

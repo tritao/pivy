@@ -101,6 +101,17 @@ def check_matrices() -> None:
     assert_type(scale, coin.SbVec3f)
     assert_type(scale_orientation, coin.SbRotation)
 
+    matrix.setValue(
+        [
+            [1.0, 0.0, 0.0, 0.0],
+            [0.0, 1.0, 0.0, 0.0],
+            [0.0, 0.0, 1.0, 0.0],
+            [0.0, 0.0, 0.0, 1.0],
+        ]
+    )
+    matrix.multRight(coin.SbMatrix.identity())
+    matrix.multLeft(coin.SbMatrix.identity())
+
 
 def check_double_precision_values() -> None:
     rotation = coin.SbDPRotation(coin.SbVec3d(0.0, 1.0, 0.0), 0.5)

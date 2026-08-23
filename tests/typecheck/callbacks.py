@@ -15,7 +15,7 @@ def check_named_callback_protocols() -> None:
     sensor.setFunction(SensorCallbackObject())
     assert_type(
         sensor.getFunction(),
-        coin.SoSensorCallback[coin.SoSensor] | None,
+        coin.SoSensorCallback[coin.SoSensor, object] | None,
     )
 
     class ErrorCallbackObject:
@@ -62,9 +62,15 @@ def check_sensor_callbacks() -> None:
     field = coin.SoFieldSensor(field_callback, None)
     node = coin.SoNodeSensor(node_callback, None)
 
+    def typed_timer_callback(data: str, sensor: coin.SoTimerSensor) -> None:
+        del data, sensor
+
+    typed_timer = coin.SoTimerSensor(typed_timer_callback, "timer")
+
     assert_type(timer, coin.SoTimerSensor)
     assert_type(field, coin.SoFieldSensor)
     assert_type(node, coin.SoNodeSensor)
+    assert_type(typed_timer, coin.SoTimerSensor)
 
     def base_sensor_callback(data: object, sensor: coin.SoSensor) -> None:
         pass
@@ -73,7 +79,7 @@ def check_sensor_callbacks() -> None:
     plain_timer.setData({"source": "typing"})
     assert_type(plain_timer.getData(), object | None)
     plain_timer.setFunction(base_sensor_callback)
-    sensor_callback: coin.SoSensorCallback[coin.SoSensor] | None = (
+    sensor_callback: coin.SoSensorCallback[coin.SoSensor, object] | None = (
         plain_timer.getFunction()
     )
     if sensor_callback is not None:
@@ -320,20 +326,55 @@ def check_event_and_selection_callbacks() -> None:
     ) -> coin.SoPath:
         return coin.SoPath()
 
-    selection_path_contract: coin.SoSelectionPathCallback = selection_callback
-    selection_class_contract: coin.SoSelectionClassCallback = selection_class_callback
-    selection_pick_contract: coin.SoSelectionPickCallback = pick_filter_callback
+    selection_path_contract: coin.SoSelectionPathCallback[object] = (
+        selection_callback
+    )
+    selection_class_contract: coin.SoSelectionClassCallback[object] = (
+        selection_class_callback
+    )
+    selection_pick_contract: coin.SoSelectionPickCallback[object] = (
+        pick_filter_callback
+    )
+
+    def typed_selection_callback(data: str, path: coin.SoPath) -> None:
+        del data, path
+
+    def typed_selection_class_callback(
+        data: int,
+        selection: coin.SoSelection,
+    ) -> None:
+        del data, selection
+
+    def typed_pick_filter_callback(
+        data: bytes,
+        point: coin.SoPickedPoint,
+    ) -> coin.SoPath:
+        del data, point
+        return coin.SoPath()
+
+    typed_selection_contract: coin.SoSelectionPathCallback[str] = (
+        typed_selection_callback
+    )
 
     selection = coin.SoSelection()
     selection.addSelectionCallback(selection_callback, None)
+    selection.addSelectionCallback(typed_selection_callback, "selection")
     selection.removeSelectionCallback(selection_callback, None)
     selection.addDeselectionCallback(selection_callback, None)
     selection.removeDeselectionCallback(selection_callback, None)
     selection.addStartCallback(selection_class_callback, None)
+    selection.addStartCallback(
+        typed_selection_class_callback,
+        1,
+    )
     selection.removeStartCallback(selection_class_callback, None)
     selection.addFinishCallback(selection_class_callback, None)
     selection.removeFinishCallback(selection_class_callback, None)
     selection.setPickFilterCallback(pick_filter_callback, None)
+    selection.setPickFilterCallback(
+        typed_pick_filter_callback,
+        b"pick",
+    )
     selection.addChangeCallback(selection_class_callback, None)
     selection.removeChangeCallback(selection_class_callback, None)
 

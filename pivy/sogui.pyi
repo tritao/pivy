@@ -50,6 +50,31 @@ class SoGuiRenderWidget(SoGuiWidget, Protocol):
     def viewAll(self) -> None: ...
 
 
+class SoGuiCursorProtocol(Protocol):
+    """Small cross-backend cursor surface exposed by SoGui bindings."""
+
+    def getShape(self) -> int: ...
+    def getCustomCursor(self) -> int: ...
+    @staticmethod
+    def getZoomCursor() -> SoGuiCursorProtocol: ...
+    @staticmethod
+    def getPanCursor() -> SoGuiCursorProtocol: ...
+    @staticmethod
+    def getRotateCursor() -> SoGuiCursorProtocol: ...
+
+
+class SoGuiDeviceProtocol(Protocol):
+    """Minimal device surface shared by SoQt and compatible backends."""
+
+    def translateEvent(self, event: object) -> coin.SoEvent: ...
+
+
+class SoGuiOpaqueClass(Protocol):
+    """Backend-specific class with intentionally unknown member methods."""
+
+    def __init__(self, *args: object, **kwargs: object) -> None: ...
+
+
 class SoGui_Proxy:
     debug: bool
 
@@ -123,16 +148,15 @@ class SoGui_Quarter_Wrapper:
     def viewAll(self) -> None: ...
 
 
-SoGuiCursor: type[Any]
-SoGuiComponent: type[Any]
-SoGuiGLWidget: type[Any]
-SoGuiFullViewer: type[Any]
-SoGuiFlyViewer: type[Any]
-SoGuiPlaneViewer: type[Any]
-SoGuiDevice: type[Any]
-SoGuiKeyboard: type[Any]
-SoGuiMouse: type[Any]
-SoGuiConstrainedViewer: type[Any]
+SoGuiCursor: type[SoGuiCursorProtocol]
+SoGuiComponent: type[SoGuiOpaqueClass]
+SoGuiGLWidget: type[SoGuiOpaqueClass]
+SoGuiFullViewer: type[SoGuiOpaqueClass]
+SoGuiFlyViewer: type[SoGuiOpaqueClass]
+SoGuiDevice: type[SoGuiDeviceProtocol]
+SoGuiKeyboard: type[SoGuiDeviceProtocol]
+SoGuiMouse: type[SoGuiDeviceProtocol]
+SoGuiConstrainedViewer: type[SoGuiOpaqueClass]
 
 SoGuiExaminerViewer = SoGui_Quarter_Wrapper
 SoGuiRenderArea = SoGui_Quarter_Wrapper

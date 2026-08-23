@@ -107,6 +107,11 @@ def check_soqt_viewer_family_contract() -> None:
     assert_type(viewer.getCamera(), coin.SoCamera | None)
 
     plane = soqt.SoQtPlaneViewer()
+    plane_with_flags = soqt.SoQtPlaneViewer(
+        flag=soqt.SoQtFullViewer.BUILD_DECORATION,
+        type=soqt.SoQtViewer.BROWSER,
+    )
+    assert_type(soqt.SoQtFullViewer.BUILD_ALL, soqt.SoQtBuildFlag)
     plane.setViewing(True)
     plane.setCamera(coin.SoOrthographicCamera())
 
@@ -117,8 +122,13 @@ def check_soqt_viewer_family_contract() -> None:
     assert_type(examiner.getFeedbackSize(), int)
 
     fly = soqt.SoQtFlyViewer()
+    fly_with_flags = soqt.SoQtFlyViewer(
+        flag=soqt.SoQtFullViewer.BUILD_POPUP,
+        type=soqt.SoQtViewer.EDITOR,
+    )
     fly.setViewing(True)
     fly.setCamera(coin.SoPerspectiveCamera())
+    del plane_with_flags, fly_with_flags
 
 
 def check_soqt_devices_and_utility_contract() -> None:
@@ -168,7 +178,7 @@ def check_soqt_viewer_contract() -> None:
 
     auto_clipping_contract: soqt.SoQtAutoClippingCallback = auto_clipping_callback
 
-    viewer.setAutoClippingStrategy(0, cb=auto_clipping_contract)
+    viewer.setAutoClippingStrategy(soqt.SoQtViewer.VARIABLE_NEAR_PLANE, cb=auto_clipping_contract)
     viewer.setDrawStyle(soqt.SoQtViewer.STILL, soqt.SoQtViewer.VIEW_LINE)
     assert_type(
         viewer.getDrawStyle(soqt.SoQtViewer.INTERACTIVE), soqt.SoQtViewStyle

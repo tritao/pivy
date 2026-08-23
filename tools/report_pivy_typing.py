@@ -13,6 +13,7 @@ from typing import Iterable
 
 from tools.pivy_stub_typing_policy import (
     DYNAMIC_RUNTIME_SUBCATEGORIES,
+    GEOMETRY_PARAMETER_AUDIT,
     INCOMPLETE_CATEGORIES,
     INCOMPLETE_CATEGORY_ACTIONS,
     INCOMPLETE_CATEGORY_POLICIES,
@@ -446,7 +447,7 @@ def report_to_dict(report: TypingReport, stub_path: Path) -> dict[str, object]:
         }
 
     payload = {
-        "schema_version": 5,
+        "schema_version": 6,
         "stub": str(stub_path),
         "classes": report.classes,
         "methods": report.methods,
@@ -472,6 +473,9 @@ def report_to_dict(report: TypingReport, stub_path: Path) -> dict[str, object]:
     if stub_path.name == "coin.pyi":
         payload["opaque_return_audit"] = opaque_return_audit_summary(report)
         payload["raw_pointer_audit"] = raw_pointer_audit_summary(report)
+        payload["geometry_parameter_audit"] = geometry_parameter_audit_summary(
+            report
+        )
     return payload
 
 
@@ -514,6 +518,52 @@ def raw_pointer_sites(report: TypingReport) -> set[tuple[str, str, str, str]]:
         (site.kind, site.class_name, site.method_name or "", site.name)
         for site, category in report.incomplete_sites
         if category == "raw C pointers"
+    }
+
+
+def geometry_parameter_sites(
+    report: TypingReport,
+) -> set[tuple[str, str, str, str]]:
+    """Return the currently observed opaque geometry parameter sites."""
+
+    return {
+        (site.kind, site.class_name, site.method_name or "", site.name)
+        for site, category in report.incomplete_sites
+        if category == "dynamic/runtime API"
+        and classify_opaque_parameter_family(site) == "geometry"
+    }
+
+
+def geometry_parameter_audit_issues(report: TypingReport) -> tuple[str, ...]:
+    """Return missing or stale entries in the geometry boundary audit."""
+
+    observed = geometry_parameter_sites(report)
+    audited = set(GEOMETRY_PARAMETER_AUDIT)
+    issues = []
+    for key in sorted(observed - audited):
+        issues.append(
+            "geometry parameter is not audited: %s" % format_site_key(key)
+        )
+    for key in sorted(audited - observed):
+        issues.append(
+            "geometry parameter audit entry is stale: %s" % format_site_key(key)
+        )
+    return tuple(issues)
+
+
+def geometry_parameter_audit_summary(report: TypingReport) -> dict[str, object]:
+    """Return a compact machine-readable geometry-boundary audit summary."""
+
+    observed = geometry_parameter_sites(report)
+    dispositions = Counter(
+        GEOMETRY_PARAMETER_AUDIT[key].disposition
+        for key in observed
+        if key in GEOMETRY_PARAMETER_AUDIT
+    )
+    return {
+        "observed": len(observed),
+        "audited": len(observed & set(GEOMETRY_PARAMETER_AUDIT)),
+        "dispositions": dict(sorted(dispositions.items())),
     }
 
 
@@ -700,6 +750,11 @@ def main() -> int:
         raw_pointer_issues = raw_pointer_audit_issues(report)
         if raw_pointer_issues:
             for issue in raw_pointer_issues:
+                print("error: typing audit: %s" % issue, file=sys.stderr)
+            return 1
+        geometry_issues = geometry_parameter_audit_issues(report)
+        if geometry_issues:
+            for issue in geometry_issues:
                 print("error: typing audit: %s" % issue, file=sys.stderr)
             return 1
     if args.check_baseline:

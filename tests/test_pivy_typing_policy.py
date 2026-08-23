@@ -24,6 +24,8 @@ from tools.check_pivy_typing_matrix import SUPPORTED_PYTHON_VERSIONS
 from tools.report_pivy_typing import (
     TYPING_QUALITY_BASELINE,
     collect_report,
+    geometry_parameter_audit_issues,
+    geometry_parameter_audit_summary,
     opaque_return_audit_issues,
     opaque_return_audit_summary,
     raw_pointer_audit_issues,
@@ -355,15 +357,15 @@ class FieldTypePolicyTests(unittest.TestCase):
         self.assertEqual(
             policy.PYTHON_SHADOW_METHOD_TYPES[("SoSensor", "setFunction")],
             (
-                "self, callbackfunction: SoSensorCallback[SoSensor]",
+                "self, callbackfunction: SoSensorCallback[SoSensor, _SensorDataT]",
                 "None",
             ),
         )
         self.assertEqual(
             policy.PYTHON_SHADOW_METHOD_TYPES[("SoDataSensor", "setDeleteCallback")],
             (
-                "self, function: SoSensorCallback[SoSensor], "
-                "data: object | None = ...",
+                "self, function: SoSensorCallback[SoSensor, _SensorDataT], "
+                "data: _SensorDataT | None = ...",
                 "None",
             ),
         )
@@ -372,8 +374,8 @@ class FieldTypePolicyTests(unittest.TestCase):
         self.assertEqual(
             policy.SENSOR_CALLBACK_CONSTRUCTOR_TYPES["SoTimerSensor"],
             (
-                "SoSensorCallback[SoTimerSensor]",
-                "object | None",
+                "SoSensorCallback[SoTimerSensor, _SensorDataT]",
+                "_SensorDataT | None",
             ),
         )
 
@@ -924,19 +926,19 @@ class CallbackTypePolicyTests(unittest.TestCase):
             policy.CALLBACK_PARAMETER_TYPE_OVERRIDES[
                 ("SoSensor", "setFunction", "callbackfunction")
             ],
-            "SoSensorCallback[SoSensor]",
+            "SoSensorCallback[SoSensor, _SensorDataT]",
         )
         self.assertEqual(
             policy.CALLBACK_PARAMETER_TYPE_OVERRIDES[
                 ("SoDataSensor", "setDeleteCallback", "function")
             ],
-            "SoSensorCallback[SoSensor]",
+            "SoSensorCallback[SoSensor, _SensorDataT]",
         )
         self.assertEqual(
             policy.CALLBACK_PARAMETER_TYPE_OVERRIDES[
                 ("SoDataSensor", "setDeleteCallback", "data")
             ],
-            "object | None",
+            "_SensorDataT | None",
         )
 
     def test_python_protocols_have_required_bindings(self):
@@ -1103,7 +1105,7 @@ class PolicyBoundaryTests(unittest.TestCase):
         payload = report_to_dict(report, stub_path)
 
         json.dumps(payload)
-        self.assertEqual(payload["schema_version"], 5)
+        self.assertEqual(payload["schema_version"], 6)
         self.assertEqual(payload["annotation_sites"], report.annotation_sites)
         self.assertEqual(
             payload["incomplete_categories"]["uncategorized"]["count"],
@@ -1118,6 +1120,10 @@ class PolicyBoundaryTests(unittest.TestCase):
         )
         self.assertEqual(
             payload["raw_pointer_audit"], raw_pointer_audit_summary(report)
+        )
+        self.assertEqual(
+            payload["geometry_parameter_audit"],
+            geometry_parameter_audit_summary(report),
         )
         self.assertEqual(
             payload["opaque_parameter_families"],
@@ -1157,6 +1163,14 @@ class PolicyBoundaryTests(unittest.TestCase):
         self.assertEqual(raw_pointer_audit_issues(report), ())
         self.assertEqual(len(policy.RAW_POINTER_AUDIT), 96)
         self.assertEqual(raw_pointer_audit_summary(report)["observed"], 96)
+
+    def test_geometry_parameter_audit_is_complete(self):
+        report = collect_report(Path("pivy/coin.pyi"))
+        self.assertEqual(geometry_parameter_audit_issues(report), ())
+        self.assertEqual(len(policy.GEOMETRY_PARAMETER_AUDIT), 18)
+        self.assertEqual(
+            geometry_parameter_audit_summary(report)["observed"], 18
+        )
 
     def test_policy_managed_fields_are_covered(self):
         self.assertEqual(policy_coverage_errors(Path("pivy/coin.pyi")), ())

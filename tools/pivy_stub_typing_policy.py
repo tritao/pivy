@@ -821,9 +821,20 @@ PYTHON_TYPE_ALIAS_DEFINITIONS = {
     "pivy.coin": (
         "SoDrawStyleValue = Literal[0, 1, 2, 3]",
         "SoMaterialBindingValue = Literal[0, 1, 2, 3, 4, 5, 6, 7, 8]",
+        "SoComplexityValue = Literal[0, 1, 2]",
+        "SoLightModelValue = Literal[0, 1]",
+        "SoPickStyleValue = Literal[0, 1, 2, 3, 4, 5]",
+        "SoShapeHintsOrdering = Literal[0, 1, 2]",
+        "SoShapeHintsShapeType = Literal[0, 1]",
+        "SoShapeHintsFaceType = Literal[0, 1]",
+        "SoShapeHintsWindingType = Literal[0]",
+        "SoUnitsValue = Literal[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]",
+        "SoSearchFind = Literal[1, 2, 4]",
+        "SoSearchInterest = Literal[0, 1, 2]",
     ),
     "pivy.gui.soqt": (
         "SoQtViewerType = Literal[0, 1]",
+        "SoQtBuildFlag = Literal[0, 1, 2, 3]",
         "SoQtDrawType = Literal[0, 1]",
         "SoQtViewStyle = Literal[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]",
         "SoQtBufferMode = Literal[0, 1, 2]",
@@ -854,12 +865,83 @@ PYTHON_ENUM_CONSTANT_TYPES = {
                 "NONE",
             )
         },
+        **{
+            (class_name, constant): "SoComplexityValue"
+            for class_name in ("SoComplexity",)
+            for constant in ("OBJECT_SPACE", "SCREEN_SPACE", "BOUNDING_BOX")
+        },
+        **{
+            (class_name, constant): "SoLightModelValue"
+            for class_name in ("SoLightModel",)
+            for constant in ("BASE_COLOR", "PHONG")
+        },
+        **{
+            (class_name, constant): "SoPickStyleValue"
+            for class_name in ("SoPickStyle",)
+            for constant in (
+                "SHAPE",
+                "BOUNDING_BOX",
+                "UNPICKABLE",
+                "SHAPE_ON_TOP",
+                "BOUNDING_BOX_ON_TOP",
+                "SHAPE_FRONTFACES",
+            )
+        },
+        **{
+            ("SoShapeHints", constant): alias
+            for constant, alias in (
+                ("UNKNOWN_ORDERING", "SoShapeHintsOrdering"),
+                ("CLOCKWISE", "SoShapeHintsOrdering"),
+                ("COUNTERCLOCKWISE", "SoShapeHintsOrdering"),
+                ("UNKNOWN_SHAPE_TYPE", "SoShapeHintsShapeType"),
+                ("SOLID", "SoShapeHintsShapeType"),
+                ("UNKNOWN_FACE_TYPE", "SoShapeHintsFaceType"),
+                ("CONVEX", "SoShapeHintsFaceType"),
+                ("NO_WINDING_TYPE", "SoShapeHintsWindingType"),
+            )
+        },
+        **{
+            ("SoUnits", constant): "SoUnitsValue"
+            for constant in (
+                "METERS",
+                "CENTIMETERS",
+                "MILLIMETERS",
+                "MICROMETERS",
+                "MICRONS",
+                "NANOMETERS",
+                "ANGSTROMS",
+                "KILOMETERS",
+                "FEET",
+                "INCHES",
+                "POINTS",
+                "YARDS",
+                "MILES",
+                "NAUTICAL_MILES",
+            )
+        },
+        **{
+            ("SoSearchAction", constant): "SoSearchFind"
+            for constant in ("NODE", "TYPE", "NAME")
+        },
+        **{
+            ("SoSearchAction", constant): "SoSearchInterest"
+            for constant in ("FIRST", "LAST", "ALL")
+        },
     },
     "pivy.gui.soqt": {
         ("SoQtPlaneViewer", "BROWSER"): "SoQtViewerType",
         ("SoQtPlaneViewer", "EDITOR"): "SoQtViewerType",
         ("SoQtViewer", "BROWSER"): "SoQtViewerType",
         ("SoQtViewer", "EDITOR"): "SoQtViewerType",
+        **{
+            ("SoQtFullViewer", constant): "SoQtBuildFlag"
+            for constant in (
+                "BUILD_NONE",
+                "BUILD_DECORATION",
+                "BUILD_POPUP",
+                "BUILD_ALL",
+            )
+        },
         **{
             ("SoQtViewer", constant): "SoQtViewStyle"
             for constant in (
@@ -1242,7 +1324,7 @@ EXTEND_HELPER_METHOD_TYPES = {
     ("SoColorPacker", "getPackedColors", "self"): ("self", "bytes"),
     ("SoSensor", "getFunction", "self"): (
         "self",
-        "SoSensorCallback[SoSensor] | None",
+        "SoSensorCallback[SoSensor, object] | None",
     ),
     ("SoSensor", "getData", "self"): ("self", "object | None"),
     ("SoError", "getHandlerCallback", ""): (
@@ -1431,10 +1513,11 @@ PYTHON_PROTOCOL_DEFINITIONS = (
         "SoSensorCallback",
         ("SoSensor",),
         "_SensorT = TypeVar(\"_SensorT\", bound=SoSensor, contravariant=True)\n"
+        "_SensorDataT = TypeVar(\"_SensorDataT\", contravariant=True)\n"
         "\n"
-        "class SoSensorCallback(Protocol[_SensorT]):\n"
+        "class SoSensorCallback(Protocol[_SensorT, _SensorDataT]):\n"
         "    def __call__(\n"
-        "        self, data: object, sensor: _SensorT, /\n"
+        "        self, data: _SensorDataT, sensor: _SensorT, /\n"
         "    ) -> None: ...",
     ),
     (
@@ -1717,23 +1800,29 @@ PYTHON_PROTOCOL_DEFINITIONS = (
     (
         "SoSelectionClassCallback",
         ("SoSelection",),
-        "class SoSelectionClassCallback(Protocol):\n"
+        "_SelectionClassDataT = TypeVar(\"_SelectionClassDataT\", contravariant=True)\n"
+        "\n"
+        "class SoSelectionClassCallback(Protocol[_SelectionClassDataT]):\n"
         "    def __call__(\n"
-        "        self, data: object, selection: SoSelection, /\n"
+        "        self, data: _SelectionClassDataT, selection: SoSelection, /\n"
         "    ) -> None: ...",
     ),
     (
         "SoSelectionPathCallback",
         ("SoPath",),
-        "class SoSelectionPathCallback(Protocol):\n"
-        "    def __call__(self, data: object, path: SoPath, /) -> None: ...",
+        "_SelectionPathDataT = TypeVar(\"_SelectionPathDataT\", contravariant=True)\n"
+        "\n"
+        "class SoSelectionPathCallback(Protocol[_SelectionPathDataT]):\n"
+        "    def __call__(self, data: _SelectionPathDataT, path: SoPath, /) -> None: ...",
     ),
     (
         "SoSelectionPickCallback",
         ("SoPath", "SoPickedPoint"),
-        "class SoSelectionPickCallback(Protocol):\n"
+        "_SelectionPickDataT = TypeVar(\"_SelectionPickDataT\", contravariant=True)\n"
+        "\n"
+        "class SoSelectionPickCallback(Protocol[_SelectionPickDataT]):\n"
         "    def __call__(\n"
-        "        self, data: object, point: SoPickedPoint, /\n"
+        "        self, data: _SelectionPickDataT, point: SoPickedPoint, /\n"
         "    ) -> SoPath: ...",
     ),
     (
@@ -1834,9 +1923,9 @@ CALLBACK_TYPE_SIGNATURES = {
     "SoPointCB": "SoPointCallback",
     "SoRenderManagerRenderCB": "SoRenderManagerCallback",
     "SoSceneManagerRenderCB": "SoSceneManagerCallback",
-    "SoSelectionClassCB": "SoSelectionClassCallback",
-    "SoSelectionPathCB": "SoSelectionPathCallback",
-    "SoSelectionPickCB": "SoSelectionPickCallback",
+    "SoSelectionClassCB": "SoSelectionClassCallback[object]",
+    "SoSelectionPathCB": "SoSelectionPathCallback[object]",
+    "SoSelectionPickCB": "SoSelectionPickCallback[object]",
     "SoTriangleCB": (
         "SoTriangleCallback"
     ),
@@ -1847,7 +1936,7 @@ CALLBACK_TYPE_SIGNATURES = {
     "SoShaderEnableCB": "SoShaderEnableCallback",
     "SoProtoFetchExternProtoCB": "SoProtoFetchExternProtoCallback",
     "SbImageReadImageCB": "SbImageReadImageCallback",
-    "SoSensorCB": "SoSensorCallback[SoSensor]",
+    "SoSensorCB": "SoSensorCallback[SoSensor, object]",
     "SoErrorCB": "SoErrorCallback",
     "SoQtRenderAreaEventCB": "SoQtRenderAreaCallback",
     "SoQtFatalErrorCB": "SoQtFatalErrorCallback",
@@ -2280,20 +2369,20 @@ CALLBACK_METHOD_POLICIES = {
         ),
     ),
     ("SoSensor", "setFunction"): CallbackMethodPolicy(
-        (("callbackfunction", "SoSensorCallback[SoSensor]"),),
+        (("callbackfunction", "SoSensorCallback[SoSensor, _SensorDataT]"),),
         (
-            "self, callbackfunction: SoSensorCallback[SoSensor]",
+            "self, callbackfunction: SoSensorCallback[SoSensor, _SensorDataT]",
             "None",
         ),
     ),
     ("SoDataSensor", "setDeleteCallback"): CallbackMethodPolicy(
         (
-            ("function", "SoSensorCallback[SoSensor]"),
-            ("data", "object | None"),
+            ("function", "SoSensorCallback[SoSensor, _SensorDataT]"),
+            ("data", "_SensorDataT | None"),
         ),
         (
-            "self, function: SoSensorCallback[SoSensor], "
-            "data: object | None = ...",
+            "self, function: SoSensorCallback[SoSensor, _SensorDataT], "
+            "data: _SensorDataT | None = ...",
             "None",
         ),
     ),
@@ -2336,12 +2425,12 @@ for _selection_callback_name in (
     CALLBACK_METHOD_POLICIES[("SoSelection", _selection_callback_name)] = (
         CallbackMethodPolicy(
             (
-                ("pyfunc", "SoSelectionPathCallback"),
-                ("userdata", "object | None"),
+                ("pyfunc", "SoSelectionPathCallback[_SelectionPathDataT]"),
+                ("userdata", "_SelectionPathDataT | None"),
             ),
             (
-                "self, pyfunc: SoSelectionPathCallback, "
-                "userdata: object | None = ...",
+                "self, pyfunc: SoSelectionPathCallback[_SelectionPathDataT], "
+                "userdata: _SelectionPathDataT | None = ...",
                 "None",
             ),
         )
@@ -2358,12 +2447,12 @@ for _selection_callback_name in (
     CALLBACK_METHOD_POLICIES[("SoSelection", _selection_callback_name)] = (
         CallbackMethodPolicy(
             (
-                ("pyfunc", "SoSelectionClassCallback"),
-                ("userdata", "object | None"),
+                ("pyfunc", "SoSelectionClassCallback[_SelectionClassDataT]"),
+                ("userdata", "_SelectionClassDataT | None"),
             ),
             (
-                "self, pyfunc: SoSelectionClassCallback, "
-                "userdata: object | None = ...",
+                "self, pyfunc: SoSelectionClassCallback[_SelectionClassDataT], "
+                "userdata: _SelectionClassDataT | None = ...",
                 "None",
             ),
         )
@@ -2372,17 +2461,18 @@ for _selection_callback_name in (
 CALLBACK_METHOD_POLICIES[("SoSelection", "setPickFilterCallback")] = (
     CallbackMethodPolicy(
         (
-            ("pyfunc", "SoSelectionPickCallback"),
-            ("userdata", "object | None"),
+            ("pyfunc", "SoSelectionPickCallback[_SelectionPickDataT]"),
+            ("userdata", "_SelectionPickDataT | None"),
         ),
         (
-            "self, pyfunc: SoSelectionPickCallback, "
-            "userdata: object | None = ..., callOnlyIfSelectable: int = ...",
+            "self, pyfunc: SoSelectionPickCallback[_SelectionPickDataT], "
+            "userdata: _SelectionPickDataT | None = ..., "
+            "callOnlyIfSelectable: int = ...",
             "None",
         ),
         (
-            ("pyfunc", "SoSelectionPickCallback"),
-            ("userdata", "object | None"),
+            ("pyfunc", "SoSelectionPickCallback[_SelectionPickDataT]"),
+            ("userdata", "_SelectionPickDataT | None"),
             ("callOnlyIfSelectable", "int"),
         ),
     )
@@ -2560,6 +2650,46 @@ PYTHON_SHADOW_METHOD_TYPES[("SoQtViewer", "setAutoClippingStrategy")] = (
     "cbuserdata: object | None = ...",
     "None",
 )
+for _soqt_constructor_class in (
+    "SoQtPlaneViewer",
+    "SoQtExaminerViewer",
+    "SoQtFlyViewer",
+):
+    PYTHON_SHADOW_METHOD_TYPES[(_soqt_constructor_class, "__init__")] = (
+        "self, parent: QWidget | None = ..., name: str | None = ..., "
+        "embed: bool = ..., flag: SoQtBuildFlag = ..., "
+        "type: SoQtViewerType = ...",
+        "None",
+    )
+PYTHON_SHADOW_METHOD_TYPES[("SoSearchAction", "setFind")] = (
+    "self, what: SoSearchFind",
+    "None",
+)
+PYTHON_SHADOW_METHOD_TYPES[("SoSearchAction", "getFind")] = (
+    "self",
+    "SoSearchFind",
+)
+PYTHON_SHADOW_METHOD_TYPES[("SoSearchAction", "setInterest")] = (
+    "self, interest: SoSearchInterest",
+    "None",
+)
+PYTHON_SHADOW_METHOD_TYPES[("SoSearchAction", "getInterest")] = (
+    "self",
+    "SoSearchInterest",
+)
+for _callback_action_method, _callback_action_type in (
+    ("getComplexityType", "SoComplexityValue"),
+    ("getLightModel", "SoLightModelValue"),
+    ("getVertexOrdering", "SoShapeHintsOrdering"),
+    ("getShapeType", "SoShapeHintsShapeType"),
+    ("getFaceType", "SoShapeHintsFaceType"),
+    ("getUnits", "SoUnitsValue"),
+    ("getPickStyle", "SoPickStyleValue"),
+):
+    PYTHON_SHADOW_METHOD_TYPES[("SoCallbackAction", _callback_action_method)] = (
+        "self",
+        _callback_action_type,
+    )
 CALLBACK_PARAMETER_TYPE_OVERRIDES = {
     (class_name, method_name, parameter_name): annotation
     for (class_name, method_name), method_policy in CALLBACK_METHOD_POLICIES.items()
@@ -2595,8 +2725,8 @@ SENSOR_CALLBACK_CLASSES = {
 }
 SENSOR_CALLBACK_CONSTRUCTOR_TYPES = {
     class_name: (
-        "SoSensorCallback[%s]" % class_name,
-        "object | None",
+        "SoSensorCallback[%s, _SensorDataT]" % class_name,
+        "_SensorDataT | None",
     )
     for class_name in SENSOR_CALLBACK_CLASSES
 }
@@ -2725,6 +2855,54 @@ OPAQUE_PARAMETER_FAMILY_ACTIONS = {
     "array/output": "use typed pointer helpers or tuple outputs",
     "callback/handle": "move userdata into a named callback contract",
     "other": "require symbol-level review before typing",
+}
+
+
+@dataclass(frozen=True)
+class GeometryParameterAudit:
+    """Review record for one opaque geometry parameter."""
+
+    disposition: str
+    rationale: str
+    next_action: str
+
+
+# These are the complete, currently observed geometry-family boundaries.
+# They are kept explicit so a future sequence/copy adapter can reduce this
+# list one proven symbol at a time without silently widening the API.
+GEOMETRY_PARAMETER_AUDIT = {
+    key: GeometryParameterAudit(
+        disposition="intentional native boundary",
+        rationale=(
+            "The parameter is a legacy native pointer/reference or "
+            "cross-width geometry value; the generated Python surface does "
+            "not yet prove a safe copy or sequence conversion."
+        ),
+        next_action=(
+            "Add a runtime-backed copy/sequence overload only after testing "
+            "the exact native layout and ownership behavior."
+        ),
+    )
+    for key in (
+        ("parameter", "SbVec2s", "setValue", "v"),
+        ("parameter", "SbVec2s", "__init__", "v"),
+        ("parameter", "SbVec3s", "setValue", "v"),
+        ("parameter", "SbVec3s", "__init__", "v"),
+        ("parameter", "SbMatrix", "__init__", "matrix"),
+        ("parameter", "SbMatrix", "setValue", "pMat"),
+        ("parameter", "SbMatrix", "getValue", "m"),
+        ("parameter", "SbMatrix", "LUDecomposition", "index"),
+        ("parameter", "SbMatrix", "LUBackSubstitution", "index"),
+        ("parameter", "SbPlane", "intersect", "SbPlane"),
+        ("parameter", "SbVec2i32", "setValue", "v"),
+        ("parameter", "SbVec2i32", "__init__", "v"),
+        ("parameter", "SbVec3i32", "setValue", "v"),
+        ("parameter", "SbVec3i32", "__init__", "v"),
+        ("parameter", "SbVec2b", "setValue", "v"),
+        ("parameter", "SbVec2b", "__init__", "v"),
+        ("parameter", "SbVec3b", "setValue", "v"),
+        ("parameter", "SbVec3b", "__init__", "v"),
+    )
 }
 
 

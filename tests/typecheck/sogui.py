@@ -1,6 +1,6 @@
 # pyright: reportMissingModuleSource=false
 
-from typing import Literal, Sequence
+from typing import Literal, Sequence, cast
 from typing_extensions import assert_type
 
 from pivy import coin, sogui
@@ -119,3 +119,12 @@ def check_enum_contract() -> None:
     assert_type(sogui.SoGuiViewer.VIEW_LINE, Literal[4])
     assert_type(sogui.SoGuiViewer.BUFFER_DOUBLE, Literal[1])
     assert_type(sogui.SoGuiViewer.VARIABLE_NEAR_PLANE, Literal[0])
+
+
+def check_backend_protocol_contracts() -> None:
+    cursor = cast(sogui.SoGuiCursorProtocol, object())
+    device = cast(sogui.SoGuiDeviceProtocol, object())
+    assert_type(cursor.getShape(), int)
+    assert_type(cursor.getCustomCursor(), int)
+    assert_type(cursor.getZoomCursor(), sogui.SoGuiCursorProtocol)
+    assert_type(device.translateEvent(object()), coin.SoEvent)
