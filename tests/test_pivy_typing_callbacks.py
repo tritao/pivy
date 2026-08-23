@@ -46,8 +46,8 @@ class CallbackContractTests(unittest.TestCase):
                 "addPreCallback",
                 {
                     "type": "SoType",
-                    "pyfunc": "SoCallbackActionNodeCallback",
-                    "userdata": "object",
+                    "pyfunc": "SoCallbackActionNodeCallback[_CallbackActionDataT]",
+                    "userdata": "_CallbackActionDataT",
                 },
                 "None",
             ),
@@ -58,10 +58,8 @@ class CallbackContractTests(unittest.TestCase):
                 "SoQtViewer",
                 "setAutoClippingStrategy",
                 {
-                    "strategy": "SoQtNearPlaneMode",
-                    "value": "float",
-                    "cb": "SoQtAutoClippingCallback | None",
-                    "cbuserdata": "object | None",
+                    "cb": "SoQtAutoClippingCallback[_SoQtAutoClippingDataT] | None",
+                    "cbuserdata": "_SoQtAutoClippingDataT | None",
                 },
                 "None",
             ),

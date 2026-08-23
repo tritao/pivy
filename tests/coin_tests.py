@@ -1876,14 +1876,30 @@ class ZZCallbackActionTextureTests(unittest.TestCase):
             self.assertIsNone(pixels3)
             self.assertEqual(tuple(size3), (0, 0, 0))
             self.assertEqual(components3, 0)
-            seen.append(type(node).__name__)
+            seen.append((data, type(node).__name__))
             return current.CONTINUE
 
-        action.addPreCallback(SoType.fromName("SoTexture2"), callback, None)
+        action.addPreCallback(
+            SoType.fromName("SoTexture2"), callback, "texture-payload"
+        )
         root = SoSeparator()
         root.addChild(SoTexture2())
         action.apply(root)
-        self.assertEqual(seen, ["SoTexture2"])
+        self.assertEqual(seen, [("texture-payload", "SoTexture2")])
+
+    def testActionCallbackPayload(self):
+        events = []
+        callback_node = SoCallback()
+
+        def callback(data, action):
+            events.append((data, type(action).__name__))
+
+        callback_node.setCallback(callback, "action-payload")
+        root = SoSeparator()
+        root.addChild(callback_node)
+        SoCallbackAction().apply(root)
+
+        self.assertEqual(events, [("action-payload", "SoAction")])
 
 
 class ZZSoDBCallbackTests(unittest.TestCase):
@@ -2171,6 +2187,23 @@ class ZZGLCallbackTests(unittest.TestCase):
                 42,
                 "sort-data",
             )
+
+
+class ZZActionAndIntersectionCallbackTests(unittest.TestCase):
+    def testIntersectionVisitationPayload(self):
+        events = []
+        action = SoIntersectionDetectionAction()
+
+        def callback(data, path):
+            events.append((data, type(path).__name__))
+            return 0
+
+        action.addVisitationCallback(
+            SoSeparator.getClassTypeId(), callback, "visit-payload"
+        )
+        action.apply(SoSeparator())
+
+        self.assertEqual(events, [("visit-payload", "SoPath")])
 
 
 class SbVecTests(unittest.TestCase):

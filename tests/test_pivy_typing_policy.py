@@ -385,10 +385,13 @@ class FieldTypePolicyTests(unittest.TestCase):
             "SoQtRenderAreaCallback",
         )
         self.assertEqual(
-            policy.PYTHON_PARAMETER_TYPE_OVERRIDES[
-                ("SoQtRenderArea", "setEventCallback", "user")
-            ],
-            "object",
+            policy.CALLBACK_METHOD_POLICIES[
+                ("SoQtRenderArea", "setEventCallback")
+            ].parameter_types,
+            (
+                ("pyfunc", "SoQtRenderAreaCallback[_SoQtRenderAreaDataT]"),
+                ("user", "_SoQtRenderAreaDataT | None"),
+            ),
         )
 
     def test_soqt_callback_adapters_use_named_protocols(self):
@@ -405,7 +408,7 @@ class FieldTypePolicyTests(unittest.TestCase):
             policy.CALLBACK_METHOD_POLICIES[
                 ("SoQtViewer", "setAutoClippingStrategy")
             ].parameter_types[0],
-            ("cb", "SoQtAutoClippingCallback | None"),
+            ("cb", "SoQtAutoClippingCallback[_SoQtAutoClippingDataT] | None"),
         )
         for method_name in (
             "addMenuSelectionCallback",
@@ -416,7 +419,7 @@ class FieldTypePolicyTests(unittest.TestCase):
                     policy.CALLBACK_METHOD_POLICIES[
                         ("SoQtPopupMenu", method_name)
                     ].parameter_types[0],
-                    ("callback", "SoQtMenuSelectionCallback"),
+                    ("callback", "SoQtMenuSelectionCallback[_SoQtMenuDataT]"),
                 )
 
     def test_single_enum_sequence_policy(self):
@@ -521,8 +524,8 @@ class FieldTypePolicyTests(unittest.TestCase):
             ],
             (
                 "self, strategy: int, "
-                "cb: SoGLSortedObjectOrderCallback | None = ..., "
-                "closure: object | None = ...",
+                "cb: SoGLSortedObjectOrderCallback[_SoGLSortedObjectDataT] | None = ..., "
+                "closure: _SoGLSortedObjectDataT | None = ...",
                 "None",
             ),
         )
@@ -1077,8 +1080,8 @@ class CallbackTypePolicyTests(unittest.TestCase):
         self.assertNotIn("class SoErrorCallback(Protocol):", soqt_stub)
         self.assertNotIn("class SoEvent:", soqt_stub)
         self.assertNotIn("class SbVec2s:", soqt_stub)
-        self.assertIn("class SoQtComponentCallback(Protocol):", soqt_stub)
-        self.assertIn("class SoQtViewerCallback(Protocol):", soqt_stub)
+        self.assertIn("class SoQtComponentCallback(Protocol[", soqt_stub)
+        self.assertIn("class SoQtViewerCallback(Protocol[", soqt_stub)
         for name in (
             "SoQtRenderAreaCallback",
             "SoQtFatalErrorCallback",

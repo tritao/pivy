@@ -131,6 +131,20 @@
             ]
           }
         },
+        "SoCallback": {
+          "bases": ["SoNode"],
+          "methods": {
+            "setCallback": [
+              {
+                "parameters": [
+                  {"name": "pyfunc", "type": "SoActionCallback[_SoActionDataT]"},
+                  {"name": "userdata", "type": "_SoActionDataT | None"}
+                ],
+                "return": "None"
+              }
+            ]
+          }
+        },
         "SoSensor": {
           "bases": [],
           "methods": {
@@ -160,8 +174,8 @@
             "setEventCallback": [
               {
                 "parameters": [
-                  {"name": "pyfunc", "type": "SoQtRenderAreaCallback"},
-                  {"name": "user", "type": "object | None"}
+                  {"name": "pyfunc", "type": "SoQtRenderAreaCallback[_SoQtRenderAreaDataT]"},
+                  {"name": "user", "type": "_SoQtRenderAreaDataT | None"}
                 ],
                 "return": "None"
               }

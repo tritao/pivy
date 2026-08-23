@@ -1122,7 +1122,6 @@ _PYTHON_PARAMETER_TYPE_OVERRIDES = {
     ("SoSFImage3", "setValue", "pixels"): "str | bytes",
     ("SoSFEnum", "setEnums", "vals"): "Sequence[int]",
     ("SoSFEnum", "setEnums", "names"): "SbName | Sequence[SbName | str]",
-    ("SoQtRenderArea", "setEventCallback", "user"): "object",
     # SoSensor stores and returns an arbitrary Python callback payload.  The
     # getter is already object-valued; keep the setter symmetric.
     ("SoSensor", "setData", "callbackdata"): "object",
@@ -1602,9 +1601,11 @@ PYTHON_PROTOCOL_DEFINITIONS = (
     (
         "SoGLSortedObjectOrderCallback",
         ("SoGLRenderAction",),
-        "class SoGLSortedObjectOrderCallback(Protocol):\n"
+        "_SoGLSortedObjectDataT = TypeVar(\"_SoGLSortedObjectDataT\", contravariant=True)\n"
+        "\n"
+        "class SoGLSortedObjectOrderCallback(Protocol[_SoGLSortedObjectDataT]):\n"
         "    def __call__(\n"
-        "        self, data: object, action: SoGLRenderAction, /\n"
+        "        self, data: _SoGLSortedObjectDataT, action: SoGLRenderAction, /\n"
         "    ) -> float: ...",
     ),
     (
@@ -1663,17 +1664,21 @@ PYTHON_PROTOCOL_DEFINITIONS = (
     (
         "SoQtComponentCallback",
         ("SoQtComponent",),
-        "class SoQtComponentCallback(Protocol):\n"
+        "_SoQtComponentDataT = TypeVar(\"_SoQtComponentDataT\", contravariant=True)\n"
+        "\n"
+        "class SoQtComponentCallback(Protocol[_SoQtComponentDataT]):\n"
         "    def __call__(\n"
-        "        self, user: object, component: SoQtComponent, /\n"
+        "        self, user: _SoQtComponentDataT, component: SoQtComponent, /\n"
         "    ) -> None: ...",
     ),
     (
         "SoQtViewerCallback",
         ("SoQtViewer",),
-        "class SoQtViewerCallback(Protocol):\n"
+        "_SoQtViewerDataT = TypeVar(\"_SoQtViewerDataT\", contravariant=True)\n"
+        "\n"
+        "class SoQtViewerCallback(Protocol[_SoQtViewerDataT]):\n"
         "    def __call__(\n"
-        "        self, data: object, viewer: SoQtViewer, /\n"
+        "        self, data: _SoQtViewerDataT, viewer: SoQtViewer, /\n"
         "    ) -> None: ...",
     ),
     (
@@ -1754,16 +1759,20 @@ PYTHON_PROTOCOL_DEFINITIONS = (
     (
         "SoCallbackActionNodeCallback",
         ("SoCallbackAction", "SoNode"),
-        "class SoCallbackActionNodeCallback(Protocol):\n"
+        "_CallbackActionDataT = TypeVar(\"_CallbackActionDataT\", contravariant=True)\n"
+        "\n"
+        "class SoCallbackActionNodeCallback(Protocol[_CallbackActionDataT]):\n"
         "    def __call__(\n"
-        "        self, data: object, action: SoCallbackAction, node: SoNode, /\n"
+        "        self, data: _CallbackActionDataT, action: SoCallbackAction, node: SoNode, /\n"
         "    ) -> int: ...",
     ),
     (
         "SoActionCallback",
         ("SoAction",),
-        "class SoActionCallback(Protocol):\n"
-        "    def __call__(self, data: object, action: SoAction, /) -> None: ...",
+        "_SoActionDataT = TypeVar(\"_SoActionDataT\", contravariant=True)\n"
+        "\n"
+        "class SoActionCallback(Protocol[_SoActionDataT]):\n"
+        "    def __call__(self, data: _SoActionDataT, action: SoAction, /) -> None: ...",
     ),
     (
         "SoDraggerCallback",
@@ -1786,61 +1795,77 @@ PYTHON_PROTOCOL_DEFINITIONS = (
     (
         "SoGLPreRenderCallback",
         ("SoGLRenderAction",),
-        "class SoGLPreRenderCallback(Protocol):\n"
+        "_SoGLPreRenderDataT = TypeVar(\"_SoGLPreRenderDataT\", contravariant=True)\n"
+        "\n"
+        "class SoGLPreRenderCallback(Protocol[_SoGLPreRenderDataT]):\n"
         "    def __call__(\n"
-        "        self, data: object, action: SoGLRenderAction, /\n"
+        "        self, data: _SoGLPreRenderDataT, action: SoGLRenderAction, /\n"
         "    ) -> None: ...",
     ),
     (
         "SoGLRenderAbortCallback",
         (),
-        "class SoGLRenderAbortCallback(Protocol):\n"
-        "    def __call__(self, data: object, /) -> int: ...",
+        "_SoGLRenderAbortDataT = TypeVar(\"_SoGLRenderAbortDataT\", contravariant=True)\n"
+        "\n"
+        "class SoGLRenderAbortCallback(Protocol[_SoGLRenderAbortDataT]):\n"
+        "    def __call__(self, data: _SoGLRenderAbortDataT, /) -> int: ...",
     ),
     (
         "SoGLRenderPassCallback",
         (),
-        "class SoGLRenderPassCallback(Protocol):\n"
-        "    def __call__(self, data: object, /) -> None: ...",
+        "_SoGLRenderPassDataT = TypeVar(\"_SoGLRenderPassDataT\", contravariant=True)\n"
+        "\n"
+        "class SoGLRenderPassCallback(Protocol[_SoGLRenderPassDataT]):\n"
+        "    def __call__(self, data: _SoGLRenderPassDataT, /) -> None: ...",
     ),
     (
         "SoIntersectionCallback",
         ("SoIntersectingPrimitive",),
-        "class SoIntersectionCallback(Protocol):\n"
+        "_SoIntersectionDataT = TypeVar(\"_SoIntersectionDataT\", contravariant=True)\n"
+        "\n"
+        "class SoIntersectionCallback(Protocol[_SoIntersectionDataT]):\n"
         "    def __call__(\n"
-        "        self, data: object, first: SoIntersectingPrimitive,\n"
+        "        self, data: _SoIntersectionDataT, first: SoIntersectingPrimitive,\n"
         "        second: SoIntersectingPrimitive, /\n"
         "    ) -> int: ...",
     ),
     (
         "SoIntersectionFilterCallback",
         ("SoPath",),
-        "class SoIntersectionFilterCallback(Protocol):\n"
+        "_SoIntersectionFilterDataT = TypeVar(\"_SoIntersectionFilterDataT\", contravariant=True)\n"
+        "\n"
+        "class SoIntersectionFilterCallback(Protocol[_SoIntersectionFilterDataT]):\n"
         "    def __call__(\n"
-        "        self, data: object, first: SoPath, second: SoPath, /\n"
+        "        self, data: _SoIntersectionFilterDataT, first: SoPath, second: SoPath, /\n"
         "    ) -> bool: ...",
     ),
     (
         "SoIntersectionVisitationCallback",
         ("SoPath",),
-        "class SoIntersectionVisitationCallback(Protocol):\n"
-        "    def __call__(self, data: object, path: SoPath, /) -> int: ...",
+        "_SoIntersectionVisitationDataT = TypeVar(\"_SoIntersectionVisitationDataT\", contravariant=True)\n"
+        "\n"
+        "class SoIntersectionVisitationCallback(Protocol[_SoIntersectionVisitationDataT]):\n"
+        "    def __call__(self, data: _SoIntersectionVisitationDataT, path: SoPath, /) -> int: ...",
     ),
     (
         "SoLineSegmentCallback",
         ("SoCallbackAction", "SoPrimitiveVertex"),
-        "class SoLineSegmentCallback(Protocol):\n"
+        "_SoLineSegmentDataT = TypeVar(\"_SoLineSegmentDataT\", contravariant=True)\n"
+        "\n"
+        "class SoLineSegmentCallback(Protocol[_SoLineSegmentDataT]):\n"
         "    def __call__(\n"
-        "        self, data: object, action: SoCallbackAction,\n"
+        "        self, data: _SoLineSegmentDataT, action: SoCallbackAction,\n"
         "        first: SoPrimitiveVertex, second: SoPrimitiveVertex, /\n"
         "    ) -> None: ...",
     ),
     (
         "SoPointCallback",
         ("SoCallbackAction", "SoPrimitiveVertex"),
-        "class SoPointCallback(Protocol):\n"
+        "_SoPointDataT = TypeVar(\"_SoPointDataT\", contravariant=True)\n"
+        "\n"
+        "class SoPointCallback(Protocol[_SoPointDataT]):\n"
         "    def __call__(\n"
-        "        self, data: object, action: SoCallbackAction,\n"
+        "        self, data: _SoPointDataT, action: SoCallbackAction,\n"
         "        vertex: SoPrimitiveVertex, /\n"
         "    ) -> None: ...",
     ),
@@ -1891,9 +1916,11 @@ PYTHON_PROTOCOL_DEFINITIONS = (
     (
         "SoTriangleCallback",
         ("SoCallbackAction", "SoPrimitiveVertex"),
-        "class SoTriangleCallback(Protocol):\n"
+        "_SoTriangleDataT = TypeVar(\"_SoTriangleDataT\", contravariant=True)\n"
+        "\n"
+        "class SoTriangleCallback(Protocol[_SoTriangleDataT]):\n"
         "    def __call__(\n"
-        "        self, data: object, action: SoCallbackAction,\n"
+        "        self, data: _SoTriangleDataT, action: SoCallbackAction,\n"
         "        first: SoPrimitiveVertex, second: SoPrimitiveVertex,\n"
         "        third: SoPrimitiveVertex, /\n"
         "    ) -> None: ...",
@@ -1937,8 +1964,10 @@ PYTHON_PROTOCOL_DEFINITIONS = (
     (
         "SoQtRenderAreaCallback",
         ("QEvent",),
-        "class SoQtRenderAreaCallback(Protocol):\n"
-        "    def __call__(self, data: object, event: QEvent, /) -> object: ...",
+        "_SoQtRenderAreaDataT = TypeVar(\"_SoQtRenderAreaDataT\", contravariant=True)\n"
+        "\n"
+        "class SoQtRenderAreaCallback(Protocol[_SoQtRenderAreaDataT]):\n"
+        "    def __call__(self, data: _SoQtRenderAreaDataT, event: QEvent, /) -> object: ...",
     ),
     (
         "SoQtFatalErrorCallback",
@@ -1951,16 +1980,20 @@ PYTHON_PROTOCOL_DEFINITIONS = (
     (
         "SoQtAutoClippingCallback",
         ("SbVec2f",),
-        "class SoQtAutoClippingCallback(Protocol):\n"
+        "_SoQtAutoClippingDataT = TypeVar(\"_SoQtAutoClippingDataT\", contravariant=True)\n"
+        "\n"
+        "class SoQtAutoClippingCallback(Protocol[_SoQtAutoClippingDataT]):\n"
         "    def __call__(\n"
-        "        self, data: object, value: SbVec2f, /\n"
+        "        self, data: _SoQtAutoClippingDataT, value: SbVec2f, /\n"
         "    ) -> SbVec2f: ...",
     ),
     (
         "SoQtMenuSelectionCallback",
         (),
-        "class SoQtMenuSelectionCallback(Protocol):\n"
-        "    def __call__(self, menu_id: int, data: object, /) -> None: ...",
+        "_SoQtMenuDataT = TypeVar(\"_SoQtMenuDataT\", contravariant=True)\n"
+        "\n"
+        "class SoQtMenuSelectionCallback(Protocol[_SoQtMenuDataT]):\n"
+        "    def __call__(self, menu_id: int, data: _SoQtMenuDataT, /) -> None: ...",
     ),
 )
 # Protocols belong to the module that owns the binding surface, even when
@@ -2139,6 +2172,146 @@ class CallbackMethodPolicy:
 
 
 CALLBACK_METHOD_POLICIES = {
+    ("SoCallbackAction", "addPreCallback"): CallbackMethodPolicy(
+        (
+            ("type", "SoType"),
+            ("pyfunc", "SoCallbackActionNodeCallback[_CallbackActionDataT]"),
+            ("userdata", "_CallbackActionDataT"),
+        ),
+        (
+            "self, type: SoType, "
+            "pyfunc: SoCallbackActionNodeCallback[_CallbackActionDataT], "
+            "userdata: _CallbackActionDataT",
+            "None",
+        ),
+    ),
+    ("SoCallbackAction", "addPostCallback"): CallbackMethodPolicy(
+        (
+            ("type", "SoType"),
+            ("pyfunc", "SoCallbackActionNodeCallback[_CallbackActionDataT]"),
+            ("userdata", "_CallbackActionDataT"),
+        ),
+        (
+            "self, type: SoType, "
+            "pyfunc: SoCallbackActionNodeCallback[_CallbackActionDataT], "
+            "userdata: _CallbackActionDataT",
+            "None",
+        ),
+    ),
+    ("SoCallbackAction", "addPreTailCallback"): CallbackMethodPolicy(
+        (
+            ("pyfunc", "SoCallbackActionNodeCallback[_CallbackActionDataT]"),
+            ("userdata", "_CallbackActionDataT"),
+        ),
+        (
+            "self, pyfunc: SoCallbackActionNodeCallback[_CallbackActionDataT], "
+            "userdata: _CallbackActionDataT",
+            "None",
+        ),
+    ),
+    ("SoCallbackAction", "addPostTailCallback"): CallbackMethodPolicy(
+        (
+            ("pyfunc", "SoCallbackActionNodeCallback[_CallbackActionDataT]"),
+            ("userdata", "_CallbackActionDataT"),
+        ),
+        (
+            "self, pyfunc: SoCallbackActionNodeCallback[_CallbackActionDataT], "
+            "userdata: _CallbackActionDataT",
+            "None",
+        ),
+    ),
+    ("SoCallbackAction", "addTriangleCallback"): CallbackMethodPolicy(
+        (
+            ("type", "SoType"),
+            ("pyfunc", "SoTriangleCallback[_SoTriangleDataT]"),
+            ("userdata", "_SoTriangleDataT"),
+        ),
+        (
+            "self, type: SoType, pyfunc: SoTriangleCallback[_SoTriangleDataT], "
+            "userdata: _SoTriangleDataT",
+            "None",
+        ),
+    ),
+    ("SoCallbackAction", "addLineSegmentCallback"): CallbackMethodPolicy(
+        (
+            ("type", "SoType"),
+            ("pyfunc", "SoLineSegmentCallback[_SoLineSegmentDataT]"),
+            ("userdata", "_SoLineSegmentDataT"),
+        ),
+        (
+            "self, type: SoType, "
+            "pyfunc: SoLineSegmentCallback[_SoLineSegmentDataT], "
+            "userdata: _SoLineSegmentDataT",
+            "None",
+        ),
+    ),
+    ("SoCallbackAction", "addPointCallback"): CallbackMethodPolicy(
+        (
+            ("type", "SoType"),
+            ("pyfunc", "SoPointCallback[_SoPointDataT]"),
+            ("userdata", "_SoPointDataT"),
+        ),
+        (
+            "self, type: SoType, pyfunc: SoPointCallback[_SoPointDataT], "
+            "userdata: _SoPointDataT",
+            "None",
+        ),
+    ),
+    ("SoCallback", "setCallback"): CallbackMethodPolicy(
+        (
+            ("pyfunc", "SoActionCallback[_SoActionDataT]"),
+            ("userdata", "_SoActionDataT | None"),
+        ),
+        (
+            "self, pyfunc: SoActionCallback[_SoActionDataT], "
+            "userdata: _SoActionDataT | None = ...",
+            "None",
+        ),
+    ),
+    ("SoGLRenderAction", "setPassCallback"): CallbackMethodPolicy(
+        (
+            ("pyfunc", "SoGLRenderPassCallback[_SoGLRenderPassDataT]"),
+            ("userdata", "_SoGLRenderPassDataT"),
+        ),
+        (
+            "self, pyfunc: SoGLRenderPassCallback[_SoGLRenderPassDataT], "
+            "userdata: _SoGLRenderPassDataT",
+            "None",
+        ),
+    ),
+    ("SoGLRenderAction", "setAbortCallback"): CallbackMethodPolicy(
+        (
+            ("pyfunc", "SoGLRenderAbortCallback[_SoGLRenderAbortDataT]"),
+            ("userdata", "_SoGLRenderAbortDataT"),
+        ),
+        (
+            "self, pyfunc: SoGLRenderAbortCallback[_SoGLRenderAbortDataT], "
+            "userdata: _SoGLRenderAbortDataT",
+            "None",
+        ),
+    ),
+    ("SoGLRenderAction", "addPreRenderCallback"): CallbackMethodPolicy(
+        (
+            ("pyfunc", "SoGLPreRenderCallback[_SoGLPreRenderDataT]"),
+            ("userdata", "_SoGLPreRenderDataT"),
+        ),
+        (
+            "self, pyfunc: SoGLPreRenderCallback[_SoGLPreRenderDataT], "
+            "userdata: _SoGLPreRenderDataT",
+            "None",
+        ),
+    ),
+    ("SoGLRenderAction", "removePreRenderCallback"): CallbackMethodPolicy(
+        (
+            ("pyfunc", "SoGLPreRenderCallback[_SoGLPreRenderDataT]"),
+            ("userdata", "_SoGLPreRenderDataT"),
+        ),
+        (
+            "self, pyfunc: SoGLPreRenderCallback[_SoGLPreRenderDataT], "
+            "userdata: _SoGLPreRenderDataT",
+            "None",
+        ),
+    ),
     ("SoSensorManager", "setChangedCallback"): CallbackMethodPolicy(
         (
             ("pyfunc", "SoSensorManagerChangedCallback"),
@@ -2176,43 +2349,57 @@ CALLBACK_METHOD_POLICIES = {
     ),
     ("SoQtComponent", "setWindowCloseCallback"): CallbackMethodPolicy(
         (
-            ("func", "SoQtComponentCallback"),
-            ("user", "object | None"),
+            ("func", "SoQtComponentCallback[_SoQtComponentDataT]"),
+            ("user", "_SoQtComponentDataT | None"),
         ),
         (
-            "self, func: SoQtComponentCallback, user: object | None = ...",
+            "self, func: SoQtComponentCallback[_SoQtComponentDataT], "
+            "user: _SoQtComponentDataT | None = ...",
+            "None",
+        ),
+    ),
+    ("SoQtRenderArea", "setEventCallback"): CallbackMethodPolicy(
+        (
+            ("pyfunc", "SoQtRenderAreaCallback[_SoQtRenderAreaDataT]"),
+            ("user", "_SoQtRenderAreaDataT | None"),
+        ),
+        (
+            "self, pyfunc: SoQtRenderAreaCallback[_SoQtRenderAreaDataT], "
+            "user: _SoQtRenderAreaDataT | None = ...",
             "None",
         ),
     ),
     ("SoQtViewer", "setAutoClippingStrategy"): CallbackMethodPolicy(
         (
-            ("cb", "SoQtAutoClippingCallback | None"),
-            ("cbuserdata", "object | None"),
+            ("cb", "SoQtAutoClippingCallback[_SoQtAutoClippingDataT] | None"),
+            ("cbuserdata", "_SoQtAutoClippingDataT | None"),
         ),
         (
             "self, strategy: SoQtNearPlaneMode, value: float = ..., "
-            "cb: SoQtAutoClippingCallback | None = ..., "
-            "cbuserdata: object | None = ...",
+            "cb: SoQtAutoClippingCallback[_SoQtAutoClippingDataT] | None = ..., "
+            "cbuserdata: _SoQtAutoClippingDataT | None = ...",
             "None",
         ),
     ),
     ("SoQtPopupMenu", "addMenuSelectionCallback"): CallbackMethodPolicy(
         (
-            ("callback", "SoQtMenuSelectionCallback"),
-            ("data", "object"),
+            ("callback", "SoQtMenuSelectionCallback[_SoQtMenuDataT]"),
+            ("data", "_SoQtMenuDataT"),
         ),
         (
-            "self, callback: SoQtMenuSelectionCallback, data: object",
+            "self, callback: SoQtMenuSelectionCallback[_SoQtMenuDataT], "
+            "data: _SoQtMenuDataT",
             "None",
         ),
     ),
     ("SoQtPopupMenu", "removeMenuSelectionCallback"): CallbackMethodPolicy(
         (
-            ("callback", "SoQtMenuSelectionCallback"),
-            ("data", "object"),
+            ("callback", "SoQtMenuSelectionCallback[_SoQtMenuDataT]"),
+            ("data", "_SoQtMenuDataT"),
         ),
         (
-            "self, callback: SoQtMenuSelectionCallback, data: object",
+            "self, callback: SoQtMenuSelectionCallback[_SoQtMenuDataT], "
+            "data: _SoQtMenuDataT",
             "None",
         ),
     ),
@@ -2307,19 +2494,93 @@ CALLBACK_METHOD_POLICIES = {
     ),
     ("SoGLRenderAction", "setSortedObjectOrderStrategy"): CallbackMethodPolicy(
         (
-            ("cb", "SoGLSortedObjectOrderCallback | None"),
-            ("closure", "object | None"),
+            ("cb", "SoGLSortedObjectOrderCallback[_SoGLSortedObjectDataT] | None"),
+            ("closure", "_SoGLSortedObjectDataT | None"),
         ),
         (
             "self, strategy: int, "
-            "cb: SoGLSortedObjectOrderCallback | None = ..., "
-            "closure: object | None = ...",
+            "cb: SoGLSortedObjectOrderCallback[_SoGLSortedObjectDataT] | None = ..., "
+            "closure: _SoGLSortedObjectDataT | None = ...",
             "None",
         ),
         (
             ("strategy", "int"),
-            ("cb", "SoGLSortedObjectOrderCallback | None"),
-            ("closure", "object | None"),
+            ("cb", "SoGLSortedObjectOrderCallback[_SoGLSortedObjectDataT] | None"),
+            ("closure", "_SoGLSortedObjectDataT | None"),
+        ),
+    ),
+    ("SoIntersectionDetectionAction", "addVisitationCallback"): CallbackMethodPolicy(
+        (
+            ("type", "SoType"),
+            (
+                "pyfunc",
+                "SoIntersectionVisitationCallback[_SoIntersectionVisitationDataT]",
+            ),
+            ("closure", "_SoIntersectionVisitationDataT"),
+        ),
+        (
+            "self, type: SoType, "
+            "pyfunc: SoIntersectionVisitationCallback[_SoIntersectionVisitationDataT], "
+            "closure: _SoIntersectionVisitationDataT",
+            "None",
+        ),
+    ),
+    ("SoIntersectionDetectionAction", "removeVisitationCallback"): CallbackMethodPolicy(
+        (
+            ("type", "SoType"),
+            (
+                "pyfunc",
+                "SoIntersectionVisitationCallback[_SoIntersectionVisitationDataT]",
+            ),
+            ("closure", "_SoIntersectionVisitationDataT"),
+        ),
+        (
+            "self, type: SoType, "
+            "pyfunc: SoIntersectionVisitationCallback[_SoIntersectionVisitationDataT], "
+            "closure: _SoIntersectionVisitationDataT",
+            "None",
+        ),
+    ),
+    ("SoIntersectionDetectionAction", "setFilterCallback"): CallbackMethodPolicy(
+        (
+            (
+                "pyfunc",
+                "SoIntersectionFilterCallback[_SoIntersectionFilterDataT]",
+            ),
+            ("closure", "_SoIntersectionFilterDataT | None"),
+        ),
+        (
+            "self, pyfunc: SoIntersectionFilterCallback[_SoIntersectionFilterDataT], "
+            "closure: _SoIntersectionFilterDataT | None = ...",
+            "None",
+        ),
+    ),
+    ("SoIntersectionDetectionAction", "addIntersectionCallback"): CallbackMethodPolicy(
+        (
+            (
+                "pyfunc",
+                "SoIntersectionCallback[_SoIntersectionDataT]",
+            ),
+            ("closure", "_SoIntersectionDataT | None"),
+        ),
+        (
+            "self, pyfunc: SoIntersectionCallback[_SoIntersectionDataT], "
+            "closure: _SoIntersectionDataT | None = ...",
+            "None",
+        ),
+    ),
+    ("SoIntersectionDetectionAction", "removeIntersectionCallback"): CallbackMethodPolicy(
+        (
+            (
+                "pyfunc",
+                "SoIntersectionCallback[_SoIntersectionDataT]",
+            ),
+            ("closure", "_SoIntersectionDataT | None"),
+        ),
+        (
+            "self, pyfunc: SoIntersectionCallback[_SoIntersectionDataT], "
+            "closure: _SoIntersectionDataT | None = ...",
+            "None",
         ),
     ),
     ("SoGLCacheContextElement", "scheduleDeleteCallback"): CallbackMethodPolicy(
@@ -2619,11 +2880,12 @@ for _soqt_viewer_callback_name in (
     CALLBACK_METHOD_POLICIES[("SoQtViewer", _soqt_viewer_callback_name)] = (
         CallbackMethodPolicy(
             (
-                ("func", "SoQtViewerCallback"),
-                ("data", "object | None"),
+                ("func", "SoQtViewerCallback[_SoQtViewerDataT]"),
+                ("data", "_SoQtViewerDataT | None"),
             ),
             (
-                "self, func: SoQtViewerCallback, data: object | None = ...",
+                "self, func: SoQtViewerCallback[_SoQtViewerDataT], "
+                "data: _SoQtViewerDataT | None = ...",
                 "None",
             ),
         )
@@ -2709,8 +2971,8 @@ PYTHON_SHADOW_METHOD_TYPES[("SoQtViewer", "getStereoType")] = (
 )
 PYTHON_SHADOW_METHOD_TYPES[("SoQtViewer", "setAutoClippingStrategy")] = (
     "self, strategy: SoQtNearPlaneMode, value: float = ..., "
-    "cb: SoQtAutoClippingCallback | None = ..., "
-    "cbuserdata: object | None = ...",
+    "cb: SoQtAutoClippingCallback[_SoQtAutoClippingDataT] | None = ..., "
+    "cbuserdata: _SoQtAutoClippingDataT | None = ...",
     "None",
 )
 for _soqt_constructor_class in (

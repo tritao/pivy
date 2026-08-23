@@ -44,10 +44,11 @@ def check_soqt_lifecycle_contract() -> None:
 def check_soqt_render_area_contract() -> None:
     area = soqt.SoQtRenderArea()
 
-    def event_callback(data: object, event: soqt.QEvent) -> object:
+    def event_callback(data: str, event: soqt.QEvent) -> object:
         return event
 
-    area.setEventCallback(event_callback, {"source": "typing"})
+    event_contract: soqt.SoQtRenderAreaCallback[str] = event_callback
+    area.setEventCallback(event_contract, "event")
     area.setEventCallback(event_callback)
 
     assert_type(area.getSceneGraph(), coin.SoNode | None)
@@ -72,10 +73,11 @@ def check_soqt_render_area_contract() -> None:
 def check_soqt_component_and_gl_widget_contract() -> None:
     component = soqt.SoQtComponent()
 
-    def window_close_callback(user: object, closed: soqt.SoQtComponent) -> None:
+    def window_close_callback(user: int, closed: soqt.SoQtComponent) -> None:
         del user, closed
 
-    component.setWindowCloseCallback(window_close_callback)
+    window_close_contract: soqt.SoQtComponentCallback[int] = window_close_callback
+    component.setWindowCloseCallback(window_close_contract, 1)
     assert_type(component.getWidget(), soqt.QWidget)
     assert_type(component.getBaseWidget(), soqt.QWidget)
     assert_type(component.getShellWidget(), soqt.QWidget)
@@ -144,13 +146,13 @@ def check_soqt_devices_and_utility_contract() -> None:
 
     popup = soqt.SoQtPopupMenu()
 
-    def menu_callback(item_id: int, data: object) -> None:
+    def menu_callback(item_id: int, data: bytes) -> None:
         del item_id, data
 
-    menu_callback_contract: soqt.SoQtMenuSelectionCallback = menu_callback
+    menu_callback_contract: soqt.SoQtMenuSelectionCallback[bytes] = menu_callback
 
-    popup.addMenuSelectionCallback(menu_callback_contract, None)
-    popup.removeMenuSelectionCallback(menu_callback_contract, None)
+    popup.addMenuSelectionCallback(menu_callback_contract, b"menu")
+    popup.removeMenuSelectionCallback(menu_callback_contract, b"menu")
     assert_type(popup.newMenu("File"), int)
     assert_type(popup.getMenuTitle(1), str)
     assert_type(popup.getMenuItemEnabled(1), bool)
@@ -167,18 +169,22 @@ def check_soqt_devices_and_utility_contract() -> None:
 def check_soqt_viewer_contract() -> None:
     viewer = soqt.SoQtExaminerViewer()
 
-    def viewer_callback(data: object, callback_viewer: soqt.SoQtViewer) -> None:
+    def viewer_callback(data: str, callback_viewer: soqt.SoQtViewer) -> None:
         del data, callback_viewer
 
     def auto_clipping_callback(
-        data: object, nearfar: coin.SbVec2f
+        data: int, nearfar: coin.SbVec2f
     ) -> coin.SbVec2f:
         del data
         return nearfar
 
-    auto_clipping_contract: soqt.SoQtAutoClippingCallback = auto_clipping_callback
+    auto_clipping_contract: soqt.SoQtAutoClippingCallback[int] = auto_clipping_callback
 
-    viewer.setAutoClippingStrategy(soqt.SoQtViewer.VARIABLE_NEAR_PLANE, cb=auto_clipping_contract)
+    viewer.setAutoClippingStrategy(
+        soqt.SoQtViewer.VARIABLE_NEAR_PLANE,
+        cb=auto_clipping_contract,
+        cbuserdata=1,
+    )
     viewer.setDrawStyle(soqt.SoQtViewer.STILL, soqt.SoQtViewer.VIEW_LINE)
     assert_type(
         viewer.getDrawStyle(soqt.SoQtViewer.INTERACTIVE), soqt.SoQtViewStyle
@@ -189,10 +195,11 @@ def check_soqt_viewer_contract() -> None:
         viewer.setStereoType(soqt.SoQtViewer.STEREO_NONE), bool
     )
     assert_type(viewer.getStereoType(), soqt.SoQtStereoType)
-    viewer.addStartCallback(viewer_callback)
-    viewer.addFinishCallback(viewer_callback)
-    viewer.removeStartCallback(viewer_callback)
-    viewer.removeFinishCallback(viewer_callback)
+    viewer_contract: soqt.SoQtViewerCallback[str] = viewer_callback
+    viewer.addStartCallback(viewer_contract, "viewer")
+    viewer.addFinishCallback(viewer_contract, "viewer")
+    viewer.removeStartCallback(viewer_contract, "viewer")
+    viewer.removeFinishCallback(viewer_contract, "viewer")
 
     assert_type(viewer.getCamera(), coin.SoCamera | None)
     assert_type(viewer.getHeadlight(), coin.SoDirectionalLight)

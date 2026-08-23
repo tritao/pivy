@@ -269,14 +269,14 @@ def check_graphics_callback_setters() -> None:
 
 def check_callback_action_callbacks() -> None:
     def node_callback(
-        data: Any,
+        data: str,
         action: coin.SoCallbackAction,
         node: coin.SoNode,
     ) -> int:
         return action.CONTINUE
 
     def triangle_callback(
-        data: Any,
+        data: bytes,
         action: coin.SoCallbackAction,
         v1: coin.SoPrimitiveVertex,
         v2: coin.SoPrimitiveVertex,
@@ -285,7 +285,7 @@ def check_callback_action_callbacks() -> None:
         pass
 
     def line_callback(
-        data: Any,
+        data: int,
         action: coin.SoCallbackAction,
         v1: coin.SoPrimitiveVertex,
         v2: coin.SoPrimitiveVertex,
@@ -293,7 +293,7 @@ def check_callback_action_callbacks() -> None:
         pass
 
     def point_callback(
-        data: Any,
+        data: float,
         action: coin.SoCallbackAction,
         vertex: coin.SoPrimitiveVertex,
     ) -> None:
@@ -301,13 +301,25 @@ def check_callback_action_callbacks() -> None:
 
     action = coin.SoCallbackAction()
     type_id = coin.SoType.badType()
-    action.addPreCallback(type_id, node_callback, None)
-    action.addPostCallback(type_id, node_callback, None)
-    action.addPreTailCallback(node_callback, None)
-    action.addPostTailCallback(node_callback, None)
-    action.addTriangleCallback(type_id, triangle_callback, None)
-    action.addLineSegmentCallback(type_id, line_callback, None)
-    action.addPointCallback(type_id, point_callback, None)
+    node_contract: coin.SoCallbackActionNodeCallback[str] = node_callback
+    triangle_contract: coin.SoTriangleCallback[bytes] = triangle_callback
+    line_contract: coin.SoLineSegmentCallback[int] = line_callback
+    point_contract: coin.SoPointCallback[float] = point_callback
+    action.addPreCallback(type_id, node_contract, "node")
+    action.addPostCallback(type_id, node_contract, "node")
+    action.addPreTailCallback(node_contract, "node")
+    action.addPostTailCallback(node_contract, "node")
+    action.addTriangleCallback(type_id, triangle_contract, b"triangle")
+    action.addLineSegmentCallback(type_id, line_contract, 1)
+    action.addPointCallback(type_id, point_contract, 1.0)
+
+    callback_node = coin.SoCallback()
+
+    def action_callback(data: str, action: coin.SoAction) -> None:
+        del data, action
+
+    action_contract: coin.SoActionCallback[str] = action_callback
+    callback_node.setCallback(action_contract, "action")
 
 
 def check_event_and_selection_callbacks() -> None:
@@ -448,37 +460,40 @@ def check_event_and_selection_callbacks() -> None:
 
 
 def check_render_and_scene_callbacks() -> None:
-    def pass_callback(data: Any) -> None:
+    def pass_callback(data: str) -> None:
         pass
 
-    def abort_callback(data: Any) -> int:
+    def abort_callback(data: bytes) -> int:
         return coin.SoGLRenderAction.CONTINUE
 
     def gl_callback(
-        data: Any,
+        data: int,
         action: coin.SoGLRenderAction,
     ) -> None:
         pass
 
     gl_action = coin.SoGLRenderAction(coin.SbViewportRegion())
-    gl_action.setPassCallback(pass_callback, None)
-    gl_action.setAbortCallback(abort_callback, None)
-    gl_action.addPreRenderCallback(gl_callback, None)
-    gl_action.removePreRenderCallback(gl_callback, None)
+    pass_contract: coin.SoGLRenderPassCallback[str] = pass_callback
+    abort_contract: coin.SoGLRenderAbortCallback[bytes] = abort_callback
+    gl_contract: coin.SoGLPreRenderCallback[int] = gl_callback
+    gl_action.setPassCallback(pass_contract, "pass")
+    gl_action.setAbortCallback(abort_contract, b"abort")
+    gl_action.addPreRenderCallback(gl_contract, 1)
+    gl_action.removePreRenderCallback(gl_contract, 1)
 
     def sorted_object_callback(
-        data: object,
+        data: str,
         action: coin.SoGLRenderAction,
     ) -> float:
         return 0.0
 
-    sorted_object_contract: coin.SoGLSortedObjectOrderCallback = (
+    sorted_object_contract: coin.SoGLSortedObjectOrderCallback[str] = (
         sorted_object_callback
     )
     gl_action.setSortedObjectOrderStrategy(
         coin.SoGLRenderAction.CUSTOM_CALLBACK,
         sorted_object_contract,
-        None,
+        "sorted",
     )
     gl_action.setSortedObjectOrderStrategy(coin.SoGLRenderAction.BBOX_CENTER)
 
@@ -518,18 +533,18 @@ def check_other_callback_domains() -> None:
     dragger.addValueChangedCallback(typed_dragger_contract, "dragger-owner")
     dragger.removeValueChangedCallback(typed_dragger_contract, "dragger-owner")
 
-    def visitation_callback(data: Any, path: coin.SoPath) -> int:
+    def visitation_callback(data: str, path: coin.SoPath) -> int:
         return 0
 
     def filter_callback(
-        data: Any,
+        data: bytes,
         left: coin.SoPath,
         right: coin.SoPath,
     ) -> bool:
         return True
 
     def intersection_callback(
-        data: Any,
+        data: int,
         left: coin.SoIntersectingPrimitive,
         right: coin.SoIntersectingPrimitive,
     ) -> int:
@@ -537,15 +552,20 @@ def check_other_callback_domains() -> None:
 
     intersection_action = coin.SoIntersectionDetectionAction()
     type_id = coin.SoType.badType()
+    visitation_contract: coin.SoIntersectionVisitationCallback[str] = (
+        visitation_callback
+    )
+    filter_contract: coin.SoIntersectionFilterCallback[bytes] = filter_callback
+    intersection_contract: coin.SoIntersectionCallback[int] = intersection_callback
     intersection_action.addVisitationCallback(
-        type_id, visitation_callback, None
+        type_id, visitation_contract, "visit"
     )
     intersection_action.removeVisitationCallback(
-        type_id, visitation_callback, None
+        type_id, visitation_contract, "visit"
     )
-    intersection_action.setFilterCallback(filter_callback)
-    intersection_action.addIntersectionCallback(intersection_callback)
-    intersection_action.removeIntersectionCallback(intersection_callback)
+    intersection_action.setFilterCallback(filter_contract, b"filter")
+    intersection_action.addIntersectionCallback(intersection_contract, 1)
+    intersection_action.removeIntersectionCallback(intersection_contract, 1)
 
 
 def check_error_callbacks() -> None:

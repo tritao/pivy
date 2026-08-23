@@ -233,25 +233,8 @@ def _manual_contract(
 # here makes the contract registry the source for both validation and the
 # manifest while preserving the exact existing expected signatures.
 _MANUAL_CALLBACK_CONTRACTS = (
-    ("SoCallbackAction", "addPreCallback", {"type": "SoType", "pyfunc": "SoCallbackActionNodeCallback", "userdata": "object"}, "None"),
-    ("SoCallbackAction", "addPostCallback", {"type": "SoType", "pyfunc": "SoCallbackActionNodeCallback", "userdata": "object"}, "None"),
-    ("SoCallbackAction", "addPreTailCallback", {"pyfunc": "SoCallbackActionNodeCallback", "userdata": "object"}, "None"),
-    ("SoCallbackAction", "addPostTailCallback", {"pyfunc": "SoCallbackActionNodeCallback", "userdata": "object"}, "None"),
-    ("SoCallbackAction", "addTriangleCallback", {"type": "SoType", "pyfunc": "SoTriangleCallback", "userdata": "object"}, "None"),
-    ("SoCallbackAction", "addLineSegmentCallback", {"type": "SoType", "pyfunc": "SoLineSegmentCallback", "userdata": "object"}, "None"),
-    ("SoCallbackAction", "addPointCallback", {"type": "SoType", "pyfunc": "SoPointCallback", "userdata": "object"}, "None"),
-    ("SoCallback", "setCallback", {"pyfunc": "SoActionCallback", "userdata": "object | None"}, "None"),
     ("SoEventCallback", "addEventCallback", {"pyfunc": "SoEventCallbackHandler", "userdata": "object | None"}, "tuple[SoEventCallbackHandler, object]"),
     ("SoEventCallback", "removeEventCallback", {"tuple": "tuple[SoEventCallbackHandler, object]"}, "None"),
-    ("SoGLRenderAction", "setPassCallback", {"pyfunc": "SoGLRenderPassCallback", "userdata": "object"}, "None"),
-    ("SoGLRenderAction", "setAbortCallback", {"pyfunc": "SoGLRenderAbortCallback", "userdata": "object"}, "None"),
-    ("SoGLRenderAction", "addPreRenderCallback", {"pyfunc": "SoGLPreRenderCallback", "userdata": "object"}, "None"),
-    ("SoGLRenderAction", "removePreRenderCallback", {"pyfunc": "SoGLPreRenderCallback", "userdata": "object"}, "None"),
-    ("SoIntersectionDetectionAction", "addVisitationCallback", {"type": "SoType", "pyfunc": "SoIntersectionVisitationCallback", "closure": "object"}, "None"),
-    ("SoIntersectionDetectionAction", "removeVisitationCallback", {"type": "SoType", "pyfunc": "SoIntersectionVisitationCallback", "closure": "object"}, "None"),
-    ("SoIntersectionDetectionAction", "setFilterCallback", {"pyfunc": "SoIntersectionFilterCallback", "closure": "object | None"}, "None"),
-    ("SoIntersectionDetectionAction", "addIntersectionCallback", {"pyfunc": "SoIntersectionCallback", "closure": "object | None"}, "None"),
-    ("SoIntersectionDetectionAction", "removeIntersectionCallback", {"pyfunc": "SoIntersectionCallback", "closure": "object | None"}, "None"),
     ("SoSceneManager", "setRenderCallback", {"pyfunc": "SoSceneManagerCallback", "userData": "object | None"}, "None"),
     ("SoRenderManager", "setRenderCallback", {"pyfunc": "SoRenderManagerCallback", "userData": "object | None"}, "None"),
     ("SoRenderManager", "addPreRenderCallback", {"pyfunc": "SoRenderManagerCallback", "data": "object"}, "None"),
@@ -262,15 +245,6 @@ _MANUAL_CALLBACK_CONTRACTS = (
     ("ScXMLStateMachine", "removeDeleteCallback", {"pyfunc": "ScXMLStateMachineDeleteCallback", "userdata": "object"}, "None"),
     ("ScXMLStateMachine", "addStateChangeCallback", {"pyfunc": "ScXMLStateChangeCallback", "userdata": "object"}, "None"),
     ("ScXMLStateMachine", "removeStateChangeCallback", {"pyfunc": "ScXMLStateChangeCallback", "userdata": "object"}, "None"),
-    ("SoQtRenderArea", "setEventCallback", {"pyfunc": "SoQtRenderAreaCallback", "user": "object | None"}, "None"),
-    ("SoQtComponent", "setWindowCloseCallback", {"func": "SoQtComponentCallback", "user": "object | None"}, "None"),
-    ("SoQtViewer", "addStartCallback", {"func": "SoQtViewerCallback", "data": "object | None"}, "None"),
-    ("SoQtViewer", "addFinishCallback", {"func": "SoQtViewerCallback", "data": "object | None"}, "None"),
-    ("SoQtViewer", "removeStartCallback", {"func": "SoQtViewerCallback", "data": "object | None"}, "None"),
-    ("SoQtViewer", "removeFinishCallback", {"func": "SoQtViewerCallback", "data": "object | None"}, "None"),
-    ("SoQtViewer", "setAutoClippingStrategy", {"strategy": "SoQtNearPlaneMode", "value": "float", "cb": "SoQtAutoClippingCallback | None", "cbuserdata": "object | None"}, "None"),
-    ("SoQtPopupMenu", "addMenuSelectionCallback", {"callback": "SoQtMenuSelectionCallback", "data": "object"}, "None"),
-    ("SoQtPopupMenu", "removeMenuSelectionCallback", {"callback": "SoQtMenuSelectionCallback", "data": "object"}, "None"),
 )
 
 
