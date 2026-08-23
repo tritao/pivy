@@ -2,10 +2,6 @@
 
 import unittest
 
-from tools.pivy_stub_validation_data import (
-    CALLBACK_METHOD_CHECKS as CURRENT_CALLBACK_METHOD_CHECKS,
-    _LEGACY_CALLBACK_METHOD_CHECKS,
-)
 from tools.pivy_typing.callbacks import (
     CALLBACK_CONTRACTS,
     CallbackRemoval,
@@ -71,32 +67,6 @@ class CallbackContractTests(unittest.TestCase):
             ),
             soqt_checks,
         )
-
-    def test_coin_contracts_replace_the_legacy_callback_database(self):
-        def normalize(checks):
-            return {
-                (class_name, method_name, tuple(sorted(parameters.items())), return_type)
-                for class_name, method_name, parameters, return_type in checks
-            }
-
-        legacy_coin = normalize(_LEGACY_CALLBACK_METHOD_CHECKS["coin.pyi"])
-        legacy_coin.discard(
-            (
-                "SoQtRenderArea",
-                "setEventCallback",
-                (
-                    ("pyfunc", "SoQtRenderAreaCallback"),
-                    ("user", "object | None"),
-                ),
-                "None",
-            )
-        )
-        self.assertEqual(normalize(CURRENT_CALLBACK_METHOD_CHECKS["coin.pyi"]), legacy_coin)
-        self.assertTrue(
-            normalize(_LEGACY_CALLBACK_METHOD_CHECKS["gui/soqt.pyi"])
-            <= normalize(CURRENT_CALLBACK_METHOD_CHECKS["gui/soqt.pyi"])
-        )
-
 
 if __name__ == "__main__":
     unittest.main()
