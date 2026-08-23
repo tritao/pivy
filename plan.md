@@ -363,3 +363,21 @@ resolved from the semantic model into category-bearing records, and the
 quality report consumes those records while retaining its existing fallback
 for compatibility. The baseline remains exactly 436 sites, with zero
 uncategorized entries.
+
+Phase 8 has now started with the first backend-neutral API artifact:
+
+- `tools/pivy_typing/manifest.py` projects the semantic model into a
+  deterministic JSON-compatible manifest, excluding source locations and
+  formatting-only differences.
+- `tools/generate_pivy_typing_manifest.py` emits a manifest or compares two
+  stub inputs structurally, providing the future SWIG-producer comparison
+  seam.
+- `pixi run typecheck_manifest` writes the Coin manifest to
+  `build/typing/pivy-api.json`; it is included in `typecheck_quality`.
+- Manifest tests cover deterministic output, normalized annotation spelling,
+  structural self-comparison and the real Coin API surface.
+
+The next slice is callback contracts and independent runtime validation. The
+remaining later work is to derive more validator expectations from the model,
+reduce legacy policy tables, declare the backend-neutral baseline, and only
+then compare an experimental SWIG 4.5 producer against the manifest.
