@@ -73,3 +73,15 @@ def check_reflection_contract() -> None:
     assert_type(cube_type.isBad(), bool)
     assert_type(cube_type.isDerivedFrom(coin.SoType.fromName("SoNode")), bool)
     assert_type(cube_type.createInstance(), coin.SoBase | coin.SoField | coin.SoPath | None)
+
+
+def check_scxml_factory_contract() -> None:
+    assert_type(
+        coin.ScXMLInExprDataObj.createInstance(),
+        coin.ScXMLInExprDataObj,
+    )
+    assert_type(
+        coin.ScXMLAppendOpExprDataObj.createInstance(),
+        coin.ScXMLAppendOpExprDataObj,
+    )
+    assert_type(coin.ScXMLScriptElt.createInstance(), coin.ScXMLScriptElt)

@@ -1750,6 +1750,19 @@ PYTHON_SHADOW_METHOD_TYPES[("SoMFDouble", "getValuesSnapshot")] = (
     "self",
     "list[float]",
 )
+PYTHON_SHADOW_METHOD_TYPES[("SoMFDouble", "__setitem__")] = (
+    "self, index: int, value: float",
+    "None",
+)
+for _scxml_factory_class in (
+    "ScXMLInExprDataObj",
+    "ScXMLAppendOpExprDataObj",
+    "ScXMLScriptElt",
+):
+    PYTHON_SHADOW_METHOD_TYPES[(_scxml_factory_class, "createInstance")] = (
+        "",
+        _scxml_factory_class,
+    )
 for _box_class, _bounds_type, _origin_type in (
     ("SbBox2s", "tuple[int, int, int, int]", "tuple[int, int]"),
     ("SbBox3s", "tuple[int, int, int, int, int, int]", "tuple[int, int, int]"),

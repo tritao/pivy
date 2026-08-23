@@ -65,13 +65,13 @@ class TypingQualityBaseline:
 TYPING_QUALITY_BASELINE = TypingQualityBaseline(
     min_concrete_annotations=21576,
     max_any_annotations=0,
-    max_incomplete_annotations=443,
+    max_incomplete_annotations=436,
     max_incomplete_by_category=(
-        ("raw C pointers", 105),
+        ("raw C pointers", 103),
         ("callbacks", 30),
         ("unknown output parameters", 0),
         ("function pointers", 36),
-        ("dynamic/runtime API", 272),
+        ("dynamic/runtime API", 267),
         ("uncategorized", 0),
     ),
 )
@@ -220,7 +220,11 @@ def collect_report(stub_path: Path) -> TypingReport:
     incomplete_sites: list[tuple[AnnotationSite, str]] = []
     status_counts = Counter()
     category_counts = Counter()
-    dynamic_subcategory_counts = Counter()
+    # Keep the JSON/report shape stable even when a reviewed subcategory
+    # reaches zero after an adapter lands.
+    dynamic_subcategory_counts = Counter(
+        {subcategory: 0 for subcategory in DYNAMIC_RUNTIME_SUBCATEGORIES}
+    )
     for site in annotation_sites:
         if has_annotation_name(site.annotation, "Incomplete"):
             category = classify_incomplete(

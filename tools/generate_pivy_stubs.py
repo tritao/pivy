@@ -1048,13 +1048,6 @@ def normalize_property_attributes(text, property_types):
     return "\n".join(updated) + "\n"
 
 
-def normalize_module_cleanup_locals(text):
-    # stubgen infers the temporary variable in the wrapper's module-level
-    # property cleanup loop from its last observed value. Keep its annotation
-    # stable across runtime introspection results.
-    return text.replace("\nname: str\nthing: tuple\n", "\nname: str\nthing: property\n")
-
-
 def normalize_field_attribute_policies(text):
     """Add reviewed runtime fields omitted by stubgen."""
 
@@ -2141,7 +2134,6 @@ def postprocess_stub(path, module, output_dir):
         ),
     )
     processed = normalize_field_attribute_policies(processed)
-    processed = normalize_module_cleanup_locals(processed)
     processed = add_overload_import(processed)
     processed = add_missing_imports(processed)
     processed = add_type_imports(processed, used_external_types, external_class_modules)

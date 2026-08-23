@@ -368,6 +368,34 @@ SbByteBuffer.data = lambda self: self._pivy_data_bytes()
 
 %include "Inventor/nodes/SoExtSelection.i"
 
+/* Coin 4.0.7 leaves these ScXML factories as void * even though the
+   concrete Python proxy is available.  The runtime type IDs for these
+   classes are incomplete, so use the explicit SWIG cast and transfer the
+   factory's ownership to the typed proxy. */
+%pythoncode %{
+def _pivy_scxml_factory(native_factory, class_name):
+  object_ = cast(native_factory(), class_name)
+  object_.thisown = True
+  return object_
+
+ScXMLInExprDataObj.createInstance = staticmethod(
+    lambda: _pivy_scxml_factory(
+        _coin.ScXMLInExprDataObj_createInstance, "ScXMLInExprDataObj"
+    )
+)
+ScXMLAppendOpExprDataObj.createInstance = staticmethod(
+    lambda: _pivy_scxml_factory(
+        _coin.ScXMLAppendOpExprDataObj_createInstance,
+        "ScXMLAppendOpExprDataObj",
+    )
+)
+ScXMLScriptElt.createInstance = staticmethod(
+    lambda: _pivy_scxml_factory(
+        _coin.ScXMLScriptElt_createInstance, "ScXMLScriptElt"
+    )
+)
+%}
+
 /* Coin's enum reference is represented by its underlying integer in the
    Python binding, just like the other scalar output references. */
 %rename(get) SoDepthBufferElement::getInt;
@@ -406,4 +434,5 @@ for key in list(locals()):
       thing = x.__dict__[name]
       if isinstance(thing, property):
         delattr(x, name)
+del key, x, name, thing
 %}

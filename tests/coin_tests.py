@@ -36,16 +36,17 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from tools.pivy_factory_registry import ENGINE_FACTORY_CLASS_NAMES
+from tools.pivy_factory_registry import (
+    ENGINE_FACTORY_CLASS_NAMES,
+    SCXML_FACTORY_CLASS_NAMES,
+)
 
 ENGINE_FACTORY_TYPES = tuple(
     globals()[class_name] for class_name in ENGINE_FACTORY_CLASS_NAMES
 )
 
-SCXML_FACTORY_TEST_TYPES = (
-    ScXMLDocument,
-    ScXMLStringDataObj,
-    SoScXMLEvent,
+SCXML_FACTORY_TEST_TYPES = tuple(
+    globals()[class_name] for class_name in SCXML_FACTORY_CLASS_NAMES
 )
 
 class Autocasting(unittest.TestCase):
@@ -128,12 +129,19 @@ class EngineFactoryTests(unittest.TestCase):
 
 class ScXMLFactoryTests(unittest.TestCase):
     def testScXMLFactoryAutocastAndOwnership(self):
+        self.assertEqual(len(SCXML_FACTORY_TEST_TYPES), 66)
         for factory_type in SCXML_FACTORY_TEST_TYPES:
             with self.subTest(factory_type=factory_type.__name__):
                 object_ = factory_type.createInstance()
                 self.assertIsInstance(object_, factory_type)
                 self.assertIsInstance(object_, ScXMLObject)
                 self.assertTrue(object_.thisown)
+
+    def testBindingCleanupDoesNotLeakTemporaryNames(self):
+        module = sys.modules["pivy.coin"]
+        for name in ("key", "x", "name", "thing"):
+            with self.subTest(name=name):
+                self.assertFalse(hasattr(module, name))
 
 
 class EngineOutputTests(unittest.TestCase):

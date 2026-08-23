@@ -69,8 +69,10 @@ SCXML_FACTORY_CLASS_NAMES = (
     "ScXMLAndOpExprDataObj",
     "ScXMLOrOpExprDataObj",
     "ScXMLNotOpExprDataObj",
+    "ScXMLInExprDataObj",
     "ScXMLEqualsOpExprDataObj",
     "ScXMLAddOpExprDataObj",
+    "ScXMLAppendOpExprDataObj",
     "ScXMLSubtractOpExprDataObj",
     "ScXMLMultiplyOpExprDataObj",
     "ScXMLDivideOpExprDataObj",
@@ -105,6 +107,7 @@ SCXML_FACTORY_CLASS_NAMES = (
     "ScXMLParamElt",
     "ScXMLScxmlElt",
     "ScXMLSendElt",
+    "ScXMLScriptElt",
     "ScXMLStateElt",
     "ScXMLStateMachine",
     "ScXMLTransitionElt",
@@ -116,12 +119,11 @@ SCXML_FACTORY_CLASS_NAMES = (
 
 SCXML_FACTORY_CLASSES = frozenset(SCXML_FACTORY_CLASS_NAMES)
 
-# Coin 4.0.7 exposes these factories, but their runtime type IDs are not
-# initialized consistently, so autocasting them would return ScXMLObject (or
-# emit registration errors). Keep them explicitly outside the adapted set
-# until the upstream runtime contract is fixed.
-SCXML_UNSUPPORTED_FACTORY_CLASS_NAMES = (
+# These factories need a Python shadow adapter because Coin's runtime type
+# IDs are incomplete, so the generic ScXML autocast cannot identify them.
+SCXML_PYTHON_FACTORY_CLASS_NAMES = (
     "ScXMLInExprDataObj",
     "ScXMLAppendOpExprDataObj",
     "ScXMLScriptElt",
 )
+SCXML_PYTHON_FACTORY_CLASSES = frozenset(SCXML_PYTHON_FACTORY_CLASS_NAMES)

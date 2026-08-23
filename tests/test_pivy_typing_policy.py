@@ -9,7 +9,7 @@ from tools.pivy_factory_registry import (
     ENGINE_FACTORY_CLASS_NAMES,
     SCXML_FACTORY_CLASSES,
     SCXML_FACTORY_CLASS_NAMES,
-    SCXML_UNSUPPORTED_FACTORY_CLASS_NAMES,
+    SCXML_PYTHON_FACTORY_CLASSES,
 )
 import tools.pivy_stub_typing_policy as policy
 from tools.check_pivy_typing_matrix import SUPPORTED_PYTHON_VERSIONS
@@ -896,11 +896,9 @@ class PolicyBoundaryTests(unittest.TestCase):
                 if class_name != "_class_"
             )
 
+        interface_classes.update(SCXML_PYTHON_FACTORY_CLASSES)
         self.assertEqual(interface_classes, FACTORY_CLASSES)
         self.assertEqual(set(SCXML_FACTORY_CLASS_NAMES), SCXML_FACTORY_CLASSES)
-        self.assertTrue(
-            set(SCXML_UNSUPPORTED_FACTORY_CLASS_NAMES).isdisjoint(interface_classes)
-        )
         for class_name in interface_classes:
             self.assertEqual(
                 factory_method_return_type(class_name, "createInstance"),
@@ -1010,7 +1008,7 @@ class PolicyBoundaryTests(unittest.TestCase):
         baseline = replace(
             TYPING_QUALITY_BASELINE,
             max_incomplete_by_category=(
-                ("dynamic/runtime API", 270),
+                ("dynamic/runtime API", 266),
             ),
         )
         violations = quality_regressions(report, baseline)
@@ -1029,7 +1027,7 @@ class PolicyBoundaryTests(unittest.TestCase):
         self.assertEqual(
             dict(report.dynamic_runtime_subcategories),
             {
-                "runtime factory returns": 4,
+                "runtime factory returns": 0,
                 "opaque pointer/object returns": 40,
                 "opaque parameter boundaries": 226,
                 "opaque field storage": 1,
