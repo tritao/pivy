@@ -11,6 +11,7 @@ from .model import (
     parse_stub,
     render_stub,
 )
+from .boundaries import IncompleteBoundary, resolve_incomplete_boundaries
 from .pipeline import PipelineResult, Stage, run_pipeline
 
 __all__ = [
@@ -26,4 +27,6 @@ __all__ = [
     "PipelineResult",
     "Stage",
     "run_pipeline",
+    "IncompleteBoundary",
+    "resolve_incomplete_boundaries",
 ]

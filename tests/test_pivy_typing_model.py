@@ -2,7 +2,9 @@
 
 from pathlib import Path
 import unittest
+from collections import Counter
 
+from tools.pivy_typing.boundaries import resolve_incomplete_boundaries
 from tools.pivy_typing.model import parse_stub, render_stub
 
 
@@ -61,6 +63,18 @@ class Example:
         invoke = methods["invoke"].overloads[0].parameters
         self.assertEqual(invoke[1].kind, "var_positional")
         self.assertEqual(invoke[2].kind, "var_keyword")
+
+    def test_incomplete_boundaries_resolve_to_the_quality_baseline(self):
+        source = (PROJECT_ROOT / "pivy" / "coin.pyi").read_text(encoding="utf-8")
+        boundaries = resolve_incomplete_boundaries(
+            parse_stub(source, name="pivy.coin")
+        )
+        categories = Counter(boundary.category for boundary in boundaries)
+
+        self.assertEqual(len(boundaries), 436)
+        self.assertEqual(categories["uncategorized"], 0)
+        self.assertEqual(categories["raw C pointers"], 103)
+        self.assertEqual(categories["dynamic/runtime API"], 267)
 
 
 if __name__ == "__main__":

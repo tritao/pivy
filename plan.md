@@ -357,3 +357,9 @@ are now generated from `METHOD_RETURN_TYPE_OVERRIDES` and validated against the
 semantic model; the validation-data table retains only legacy exceptions that
 are not yet represented by policy. The existing AST-based checks remain for
 those independent behavioral/legacy expectations.
+
+Phase 6 now has an explicit boundary-resolution layer. `Incomplete` sites are
+resolved from the semantic model into category-bearing records, and the
+quality report consumes those records while retaining its existing fallback
+for compatibility. The baseline remains exactly 436 sites, with zero
+uncategorized entries.

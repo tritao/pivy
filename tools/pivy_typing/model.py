@@ -63,6 +63,7 @@ class Parameter:
     type: TypeExpr | None
     default: str | None
     kind: str
+    line: int = 0
 
 
 @dataclass(frozen=True)
@@ -71,6 +72,7 @@ class Overload:
 
     parameters: tuple[Parameter, ...]
     return_type: TypeExpr | None
+    line: int = 0
 
 
 @dataclass(frozen=True)
@@ -174,12 +176,14 @@ def _parse_overload(
                 else keyword_defaults.get(name)
             ),
             kind=kind,
+            line=arg.lineno,
         )
         for name, arg, kind in parameters
     )
     return Overload(
         parameters=parsed_parameters,
         return_type=_type_expr(source, node.returns),
+        line=node.lineno,
     )
 
 

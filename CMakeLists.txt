@@ -156,6 +156,7 @@ if(PIVY_GENERATE_PYI)
             DEPENDS
                 ${CMAKE_SOURCE_DIR}/tools/generate_pivy_stubs.py
                 ${CMAKE_SOURCE_DIR}/tools/pivy_typing/__init__.py
+                ${CMAKE_SOURCE_DIR}/tools/pivy_typing/boundaries.py
                 ${CMAKE_SOURCE_DIR}/tools/pivy_typing/model.py
                 ${CMAKE_SOURCE_DIR}/tools/pivy_typing/normalize.py
                 ${CMAKE_SOURCE_DIR}/tools/pivy_typing/parse_stubgen.py
