@@ -1,6 +1,6 @@
 # pyright: reportMissingModuleSource=false
 
-from typing import Any, Sequence
+from typing import Literal, Sequence
 from typing_extensions import assert_type
 
 from pivy import coin, sogui
@@ -22,11 +22,19 @@ def check_sogui_wrapper_contract() -> None:
     wrapper.setSize(size)
     wrapper.setTitle("Pivy")
 
+    render_widget: sogui.SoGuiRenderWidget = _Widget()
+    assert_type(render_widget.getSoRenderManager(), coin.SoRenderManager)
+    assert_type(render_widget.size().width, int)
+    render_widget.setBackgroundColor(coin.SbColor())
+    render_widget.enableHeadlight(True)
+    render_widget.setSceneGraph(coin.SoSeparator())
+    render_widget.viewAll()
+
 
 def check_sogui_viewer_aliases() -> None:
     viewer = sogui.SoGuiExaminerViewer(_Widget())
     assert_type(viewer, sogui.SoGui_Quarter_Wrapper)
-    assert_type(sogui.SoGuiViewer.BROWSER, int)
+    assert_type(sogui.SoGuiViewer.BROWSER, Literal[0])
     widget = sogui.SoGui.init()
     assert_type(widget, sogui.SoGuiWidget)
     sogui.SoGui.show(widget)
@@ -39,6 +47,11 @@ def check_backend_contract() -> None:
     backend.show(_Widget())
 
 
+class _Size:
+    width: int = 640
+    height: int = 480
+
+
 class _Widget:
     def show(self) -> None:
         pass
@@ -49,9 +62,36 @@ class _Widget:
     def resize(self, width: int, height: int) -> None:
         pass
 
+    def getSoRenderManager(self) -> coin.SoRenderManager:
+        return coin.SoRenderManager()
+
+    def size(self) -> _Size:
+        return _Size()
+
+    def setBackgroundColor(
+        self, color: coin.SbColor | coin.SbColor4f
+    ) -> None:
+        del color
+
+    def enableHeadlight(self, onoff: bool) -> None:
+        del onoff
+
+    def setSceneGraph(self, root: coin.SoNode) -> None:
+        del root
+
+    def viewAll(self) -> None:
+        pass
+
 
 def check_widget_contract() -> None:
     widget: sogui.SoGuiWidget = _Widget()
     widget.setWindowTitle("Pivy")
     widget.resize(640, 480)
     widget.show()
+
+
+def check_enum_contract() -> None:
+    assert_type(sogui.SoGuiViewer.STILL, Literal[0])
+    assert_type(sogui.SoGuiViewer.VIEW_LINE, Literal[4])
+    assert_type(sogui.SoGuiViewer.BUFFER_DOUBLE, Literal[1])
+    assert_type(sogui.SoGuiViewer.VARIABLE_NEAR_PLANE, Literal[0])

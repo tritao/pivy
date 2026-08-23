@@ -783,6 +783,21 @@ PYTHON_HELPER_METHOD_POLICIES = {
         "name: SbName | str", "SoType"
     ),
 }
+
+# Some toolkit classes are intentionally only lightly represented by SWIG.
+# Keep their Python-level methods in the policy rather than editing generated
+# stubs by hand.  These methods are part of the stable widget contract used by
+# SoQt and SoGui, even though stubgen does not discover them from the proxy
+# class declaration.
+PYTHON_CLASS_METHOD_POLICIES = {
+    "QWidget": {
+        "show": PythonMethodPolicy("self", "None"),
+        "setWindowTitle": PythonMethodPolicy("self, title: str", "None"),
+        "resize": PythonMethodPolicy(
+            "self, width: int, height: int", "None"
+        ),
+    },
+}
 _METHOD_RETURN_TYPE_OVERRIDES = {
     # The Python-level SbImage adapter snapshots the native pixel buffer, so
     # callers never receive a borrowed C pointer.  ``None`` represents an

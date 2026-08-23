@@ -1103,7 +1103,7 @@ class PolicyBoundaryTests(unittest.TestCase):
         payload = report_to_dict(report, stub_path)
 
         json.dumps(payload)
-        self.assertEqual(payload["schema_version"], 3)
+        self.assertEqual(payload["schema_version"], 4)
         self.assertEqual(payload["annotation_sites"], report.annotation_sites)
         self.assertEqual(
             payload["incomplete_categories"]["uncategorized"]["count"],
@@ -1118,6 +1118,10 @@ class PolicyBoundaryTests(unittest.TestCase):
         )
         self.assertEqual(
             payload["raw_pointer_audit"], raw_pointer_audit_summary(report)
+        )
+        self.assertEqual(
+            payload["opaque_parameter_families"],
+            dict(report.opaque_parameter_families),
         )
 
     def test_opaque_pointer_return_audit_is_complete(self):
@@ -1208,6 +1212,17 @@ class PolicyBoundaryTests(unittest.TestCase):
                 "opaque pointer/object returns": 40,
                 "opaque parameter boundaries": 209,
                 "opaque field storage": 0,
+            },
+        )
+        self.assertEqual(
+            dict(report.opaque_parameter_families),
+            {
+                "geometry": 18,
+                "image/buffer": 20,
+                "action": 4,
+                "array/output": 11,
+                "callback/handle": 35,
+                "other": 121,
             },
         )
 

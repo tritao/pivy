@@ -79,6 +79,7 @@ try:
         POINTER_HELPER_TYPES,
         PYTHON_PARAMETER_TYPE_OVERRIDES,
         PRIVATE_EXTENSION_STUB,
+        PYTHON_CLASS_METHOD_POLICIES,
         PYTHON_HELPER_METHOD_POLICIES,
         PYTHON_SHADOW_METHOD_TYPES,
         RUNTIME_UNSUPPORTED_METHOD_NOTES,
@@ -132,6 +133,7 @@ except ImportError:
         POINTER_HELPER_TYPES,
         PYTHON_PARAMETER_TYPE_OVERRIDES,
         PRIVATE_EXTENSION_STUB,
+        PYTHON_CLASS_METHOD_POLICIES,
         PYTHON_HELPER_METHOD_POLICIES,
         PYTHON_SHADOW_METHOD_TYPES,
         RUNTIME_UNSUPPORTED_METHOD_NOTES,
@@ -2001,6 +2003,63 @@ def normalize_python_helpers(text):
     return "\n".join(updated) + "\n"
 
 
+def normalize_python_class_methods(text):
+    """Append policy-owned methods missing from a SWIG proxy class."""
+
+    lines = text.splitlines()
+    updated = []
+    current_class = None
+    current_lines = []
+
+    def flush_class():
+        if current_class is None:
+            updated.extend(current_lines)
+            return
+
+        policies = PYTHON_CLASS_METHOD_POLICIES.get(current_class)
+        if not policies:
+            updated.extend(current_lines)
+            return
+
+        existing = {
+            match.group("name")
+            for line in current_lines
+            if (match := DEF_RE.match(line)) is not None
+        }
+        normalized = list(current_lines)
+        while normalized and normalized[-1] == "":
+            normalized.pop()
+        for method_name, method_policy in policies.items():
+            if method_name in existing:
+                continue
+            normalized.append(
+                "    def %s(%s) -> %s: ..."
+                % (method_name, method_policy.parameters, method_policy.return_type)
+            )
+        updated.extend(normalized)
+        if current_lines and current_lines[-1] == "":
+            updated.append("")
+
+    for line in lines:
+        class_match = re.match(r"^class\s+([A-Za-z_]\w*)", line)
+        if class_match:
+            flush_class()
+            current_class = class_match.group(1)
+            current_lines = [line]
+            continue
+        if current_class and is_top_level_statement(line):
+            flush_class()
+            current_class = None
+            current_lines = []
+        if current_class is not None:
+            current_lines.append(line)
+        else:
+            updated.append(line)
+
+    flush_class()
+    return "\n".join(updated) + "\n"
+
+
 def normalize_extend_helpers(text):
     lines = text.splitlines()
     updated = []
@@ -2314,6 +2373,10 @@ def postprocess_stub(path, module, output_dir):
             Stage("normalize SWIG helpers", normalize_swig_helpers),
             Stage("normalize container helpers", normalize_container_helpers),
             Stage("normalize callback helpers", normalize_callback_helpers),
+            Stage(
+                "normalize Python class methods",
+                normalize_python_class_methods,
+            ),
             Stage("normalize shadow methods", normalize_shadow_methods),
             Stage("normalize method return overrides", normalize_method_return_overrides),
             Stage("remove SWIG metaclass methods", remove_swig_meta_classmethod),

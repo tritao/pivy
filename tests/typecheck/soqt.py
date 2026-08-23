@@ -2,7 +2,7 @@
 
 from typing_extensions import assert_type
 
-from pivy import coin
+from pivy import coin, sogui
 from pivy.gui import soqt
 
 
@@ -18,6 +18,11 @@ def check_soqt_lifecycle_contract() -> None:
     assert_type(soqt.SoQt.getTopLevelWidget(), soqt.QWidget)
     assert_type(soqt.SoQt.getShellWidget(widget), soqt.QWidget)
     assert_type(soqt.SoQt.getWidgetSize(widget), coin.SbVec2s)
+    widget.show()
+    widget.setWindowTitle("Pivy")
+    widget.resize(640, 480)
+    gui_widget: sogui.SoGuiWidget = widget
+    gui_widget.show()
 
     def fatal_error_callback(
         message: coin.SbString, code: int, data: object

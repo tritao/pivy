@@ -24,6 +24,16 @@ from tools.pivy_stub_typing_policy import (
 from tools.pivy_typing.resolved import resolve_stub
 
 
+OPAQUE_PARAMETER_FAMILIES = (
+    "geometry",
+    "image/buffer",
+    "action",
+    "array/output",
+    "callback/handle",
+    "other",
+)
+
+
 @dataclass(frozen=True)
 class AnnotationSite:
     """One parameter, return value, or class attribute annotation."""
@@ -47,6 +57,7 @@ class TypingReport:
     incomplete_annotations: int
     incomplete_categories: Counter[str]
     dynamic_runtime_subcategories: Counter[str]
+    opaque_parameter_families: Counter[str]
     incomplete_sites: tuple[tuple[AnnotationSite, str], ...]
 
 
@@ -237,6 +248,9 @@ def collect_report(stub_path: Path) -> TypingReport:
     dynamic_subcategory_counts = Counter(
         {subcategory: 0 for subcategory in DYNAMIC_RUNTIME_SUBCATEGORIES}
     )
+    opaque_parameter_family_counts = Counter(
+        {family: 0 for family in OPAQUE_PARAMETER_FAMILIES}
+    )
     for site in annotation_sites:
         if has_annotation_name(site.annotation, "Incomplete"):
             category = semantic_boundaries.get(
@@ -259,12 +273,15 @@ def collect_report(stub_path: Path) -> TypingReport:
             incomplete_sites.append((site, category))
             category_counts[category] += 1
             if category == "dynamic/runtime API":
-                dynamic_subcategory_counts[
-                    classify_dynamic_runtime_site(
-                        kind=site.kind,
-                        method_name=site.method_name,
-                    )
-                ] += 1
+                subcategory = classify_dynamic_runtime_site(
+                    kind=site.kind,
+                    method_name=site.method_name,
+                )
+                dynamic_subcategory_counts[subcategory] += 1
+                if subcategory == "opaque parameter boundaries":
+                    opaque_parameter_family_counts[
+                        classify_opaque_parameter_family(site)
+                    ] += 1
             status_counts["incomplete"] += 1
         elif has_annotation_name(site.annotation, "Any"):
             status_counts["any"] += 1
@@ -281,8 +298,44 @@ def collect_report(stub_path: Path) -> TypingReport:
         incomplete_annotations=status_counts["incomplete"],
         incomplete_categories=category_counts,
         dynamic_runtime_subcategories=dynamic_subcategory_counts,
+        opaque_parameter_families=opaque_parameter_family_counts,
         incomplete_sites=tuple(incomplete_sites),
     )
+
+
+def classify_opaque_parameter_family(site: AnnotationSite) -> str:
+    """Assign a conservative review bucket to an opaque parameter.
+
+    These buckets are triage metadata, not typing decisions.  The classifier
+    deliberately favors ``other`` when the native declaration does not make
+    a safe Python representation obvious.
+    """
+
+    class_name = site.class_name.lower()
+    method_name = (site.method_name or "").lower()
+    parameter_name = site.name.lower()
+    combined = " ".join((class_name, method_name, parameter_name))
+
+    if any(token in combined for token in ("image", "pixel", "texture", "bitmap")):
+        return "image/buffer"
+    if "callback" in combined or parameter_name in {
+        "cb",
+        "callback",
+        "closure",
+        "data",
+        "userdata",
+    }:
+        return "callback/handle"
+    if "action" in class_name or "action" in method_name:
+        return "action"
+    if class_name.startswith(("sbvec", "sbmatrix", "sbplane", "sbsphere")):
+        return "geometry"
+    if any(
+        token in parameter_name
+        for token in ("array", "indices", "values", "out", "fp")
+    ):
+        return "array/output"
+    return "other"
 
 
 def percentage(value: int, total: int) -> str:
@@ -354,6 +407,18 @@ def format_report(report: TypingReport, stub_path: Path) -> str:
                 }[subcategory],
             )
         )
+    lines.extend(
+        [
+            "",
+            "Opaque parameter triage",
+            "-----------------------",
+            "Family                          Count",
+        ]
+    )
+    for family in OPAQUE_PARAMETER_FAMILIES:
+        lines.append(
+            "%-30s %6d" % (family, report.opaque_parameter_families[family])
+        )
     return "\n".join(lines)
 
 
@@ -375,7 +440,7 @@ def report_to_dict(report: TypingReport, stub_path: Path) -> dict[str, object]:
         }
 
     payload = {
-        "schema_version": 3,
+        "schema_version": 4,
         "stub": str(stub_path),
         "classes": report.classes,
         "methods": report.methods,
@@ -388,6 +453,10 @@ def report_to_dict(report: TypingReport, stub_path: Path) -> dict[str, object]:
         "dynamic_runtime_subcategories": {
             subcategory: report.dynamic_runtime_subcategories[subcategory]
             for subcategory in DYNAMIC_RUNTIME_SUBCATEGORIES
+        },
+        "opaque_parameter_families": {
+            family: report.opaque_parameter_families[family]
+            for family in OPAQUE_PARAMETER_FAMILIES
         },
     }
     if stub_path.name == "coin.pyi":

@@ -16,6 +16,9 @@ class SoQtContractTests(unittest.TestCase):
 
     def test_lifecycle_and_metadata(self):
         self.assertIsNotNone(self.top_level_widget)
+        self.assertIsNone(self.top_level_widget.setWindowTitle("Pivy"))
+        self.assertIsNone(self.top_level_widget.resize(640, 480))
+        self.assertIsNone(self.top_level_widget.show())
         self.assertIsNotNone(soqt.SoQt.getTopLevelWidget())
         self.assertTrue(soqt.SoQt.getVersionString())
         self.assertTrue(soqt.SoQt.isCompatible(1, 0))

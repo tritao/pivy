@@ -1315,6 +1315,26 @@ class SoFieldMethods(unittest.TestCase):
         strings = SoMFString()
         strings.values = ["one", "two"]
         self.assertEqual(strings.values, ["one", "two"])
+
+    def testOpaqueMultifieldEditBuffers(self):
+        """Keep native edit-session pointers explicitly outside the stub API."""
+        fields = (
+            (SoMFBool, True),
+            (SoMFEnum, 1),
+            (SoMFFloat, 1.0),
+            (SoMFDouble, 1.0),
+            (SoMFInt32, 1),
+            (SoMFShort, 1),
+            (SoMFUInt32, 1),
+            (SoMFUShort, 1),
+        )
+        for field_type, value in fields:
+            with self.subTest(field_type=field_type.__name__):
+                field = field_type()
+                field.setValues([value])
+                native_buffer = field.startEditing()
+                self.assertEqual(type(native_buffer).__name__, "SwigPyObject")
+                field.finishEditing()
         
 class SbTimeMethods(unittest.TestCase):
     """test SbTime methods"""
