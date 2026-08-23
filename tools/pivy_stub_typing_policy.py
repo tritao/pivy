@@ -366,6 +366,9 @@ PYTHON_PARAMETER_TYPE_OVERRIDES = {
     ("SoSFEnum", "setEnums", "vals"): "Sequence[int]",
     ("SoSFEnum", "setEnums", "names"): "SbName | Sequence[SbName | str]",
     ("SoQtRenderArea", "setEventCallback", "user"): "object",
+    # SoSensor stores and returns an arbitrary Python callback payload.  The
+    # getter is already object-valued; keep the setter symmetric.
+    ("SoSensor", "setData", "callbackdata"): "object",
 }
 
 # Coin's element, engine, and field header macros expose these class-specific
@@ -2694,7 +2697,6 @@ TRIAGED_INCOMPLETE_SITES = frozenset(
         ('parameter', 'SoSFVec4ub', 'setValue', 'xyzw'),
         ('parameter', 'SoSFVec4ui32', 'setValue', 'xyzw'),
         ('parameter', 'SoSFVec4us', 'setValue', 'xyzw'),
-        ('parameter', 'SoSensor', 'setData', 'callbackdata'),
         ('parameter', 'SoSensorManager', 'doSelect', 'exceptfds'),
         ('parameter', 'SoSensorManager', 'doSelect', 'readfds'),
         ('parameter', 'SoSensorManager', 'doSelect', 'writefds'),

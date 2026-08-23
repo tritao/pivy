@@ -1680,6 +1680,8 @@ class ZZSensorCallbackTests(unittest.TestCase):
         sensor_with_data.setFunction(callback)
         sensor_with_data.trigger()
         self.assertEqual(events[-1], ("sensor-data", "SoTimerSensor"))
+        sensor_with_data.setData({"source": "setData"})
+        self.assertEqual(sensor_with_data.getData(), {"source": "setData"})
 
         data_sensor = SoFieldSensor()
         data_sensor.setDeleteCallback(callback, "delete-data")

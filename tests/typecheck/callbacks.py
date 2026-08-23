@@ -70,6 +70,8 @@ def check_sensor_callbacks() -> None:
         pass
 
     plain_timer = coin.SoTimerSensor()
+    plain_timer.setData({"source": "typing"})
+    assert_type(plain_timer.getData(), object | None)
     plain_timer.setFunction(base_sensor_callback)
     sensor_callback: coin.SoSensorCallback[coin.SoSensor] | None = (
         plain_timer.getFunction()
