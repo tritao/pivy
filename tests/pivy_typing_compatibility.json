@@ -1,0 +1,189 @@
+{
+  "schema_version": 1,
+  "modules": {
+    "pivy.coin": {
+      "classes": {
+        "SoGroup": {
+          "bases": ["SoNode"],
+          "methods": {
+            "addChild": [
+              {
+                "parameters": [{"name": "node", "type": "SoNode"}],
+                "return": "None"
+              }
+            ],
+            "getChild": [
+              {
+                "parameters": [{"name": "index", "type": "int"}],
+                "return": "SoNode"
+              }
+            ],
+            "getNumChildren": [
+              {"parameters": [], "return": "int"}
+            ]
+          }
+        },
+        "SoCone": {
+          "bases": ["SoShape"],
+          "attributes": {
+            "bottomRadius": "SoSFFloat",
+            "height": "SoSFFloat"
+          },
+          "methods": {
+            "hasPart": [
+              {
+                "parameters": [{"name": "part", "type": "int"}],
+                "return": "bool"
+              }
+            ]
+          }
+        },
+        "SoSFFloat": {
+          "bases": ["SoSField"],
+          "methods": {
+            "getValue": [{"parameters": [], "return": "float"}],
+            "setValue": [
+              {
+                "parameters": [{"name": "newvalue", "type": "float"}],
+                "return": "None"
+              },
+              {
+                "parameters": [{"name": "other", "type": "SoSFFloat"}],
+                "return": "None"
+              }
+            ]
+          }
+        },
+        "SbVec3f": {
+          "bases": [],
+          "methods": {
+            "normalize": [{"parameters": [], "return": "float"}],
+            "dot": [
+              {
+                "parameters": [{"name": "v", "type": "SbVec3f"}],
+                "return": "float"
+              }
+            ]
+          }
+        },
+        "SoMFVec3f": {
+          "bases": ["SoMField"],
+          "methods": {
+            "set1Value": [
+              {
+                "parameters": [
+                  {"name": "idx", "type": "int"},
+                  {"name": "value", "type": "SbVec3f"}
+                ],
+                "return": "None"
+              },
+              {
+                "parameters": [
+                  {"name": "idx", "type": "int"},
+                  {"name": "x", "type": "float"},
+                  {"name": "y", "type": "float"},
+                  {"name": "z", "type": "float"}
+                ],
+                "return": "None"
+              },
+              {
+                "parameters": [
+                  {"name": "idx", "type": "int"},
+                  {"name": "xyz", "type": "Sequence[float]"}
+                ],
+                "return": "None"
+              }
+            ],
+            "getValuesSnapshot": [
+              {"parameters": [], "return": "list[SbVec3f]"}
+            ]
+          }
+        },
+        "SoCallbackList": {
+          "bases": [],
+          "methods": {
+            "addCallback": [
+              {
+                "parameters": [
+                  {"name": "f", "type": "SoCallbackListCallback"},
+                  {"name": "userData", "type": "object | None"}
+                ],
+                "return": "None"
+              }
+            ],
+            "invokeCallbacks": [
+              {
+                "parameters": [{"name": "callbackdata", "type": "object"}],
+                "return": "None"
+              }
+            ]
+          }
+        },
+        "SoSensor": {
+          "bases": [],
+          "methods": {
+            "setData": [
+              {
+                "parameters": [{"name": "callbackdata", "type": "object"}],
+                "return": "None"
+              }
+            ],
+            "getData": [{"parameters": [], "return": "object | None"}]
+          }
+        }
+      }
+    },
+    "pivy.gui.soqt": {
+      "classes": {
+        "SoQtRenderArea": {
+          "bases": ["SoQtGLWidget"],
+          "methods": {
+            "getSceneGraph": [{"parameters": [], "return": "SoNode | None"}],
+            "setSceneGraph": [
+              {
+                "parameters": [{"name": "scene", "type": "SoNode"}],
+                "return": "None"
+              }
+            ],
+            "setEventCallback": [
+              {
+                "parameters": [
+                  {"name": "pyfunc", "type": "SoQtRenderAreaCallback"},
+                  {"name": "user", "type": "object | None"}
+                ],
+                "return": "None"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "pivy.sogui": {
+      "classes": {
+        "SoGui_Quarter_Wrapper": {
+          "bases": [],
+          "attributes": {"_root": "coin.SoNode | None"},
+          "methods": {
+            "getCamera": [{"parameters": [], "return": "coin.SoCamera"}],
+            "setSceneGraph": [
+              {
+                "parameters": [{"name": "root", "type": "coin.SoNode"}],
+                "return": "None"
+              }
+            ],
+            "setSize": [
+              {
+                "parameters": [{"name": "size", "type": "Sequence[int]"}],
+                "return": "None"
+              }
+            ]
+          }
+        }
+      },
+      "aliases": {
+        "SoGuiExaminerViewer": "SoGui_Quarter_Wrapper",
+        "SoGuiRenderArea": "SoGui_Quarter_Wrapper"
+      }
+    }
+  }
+}
