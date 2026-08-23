@@ -422,8 +422,16 @@ SoQt module views are derived from the same contracts, including enum values,
 SoQt initialization and stereo-mask sequences; their parameter overrides also
 feed the generator.
 
-The next slice is to migrate the remaining duplicated positive structural
-tables—pointer helpers, typedef/string adapters, documented typed methods,
-operators and deferred raw boundaries—into the resolved model or policy
-registries. After that, declare the backend-neutral baseline and only then
-compare an experimental SWIG 4.5 producer against the manifest.
+The remaining validator contracts are now registry-backed too:
+
+- pointer-helper signatures live in `tools/pivy_typing/contracts.py` with
+  Coin/SoQt projections for compatibility;
+- deferred raw methods and attributes remain explicit boundary contracts with
+  rationale and provenance;
+- multifield, Python-helper and extension-helper expectations are derived from
+  the existing binding policy rather than maintained in validator-only tables.
+
+The remaining roadmap work is now the final architecture seam: check and
+document a backend-neutral manifest baseline, expose a producer comparison
+command for future SWIG 4.5 output, and remove any compatibility projections
+that no longer have independent consumers.

@@ -13,7 +13,11 @@ from tools.pivy_factory_registry import (
 )
 import tools.pivy_stub_typing_policy as policy
 from tools.pivy_typing.contracts import (
+    EXTEND_HELPER_METHOD_RULES,
+    MULTIFIELD_METHOD_RULES,
     POINTER_HELPER_METHOD_RULES,
+    PYTHON_HELPER_METHOD_RULES,
+    RAW_BOUNDARY_METHOD_RULES,
     pointer_helper_method_checks,
 )
 from tools.check_pivy_typing_matrix import SUPPORTED_PYTHON_VERSIONS
@@ -178,6 +182,17 @@ class FieldTypePolicyTests(unittest.TestCase):
         soqt_checks = pointer_helper_method_checks("gui/soqt.pyi")
         self.assertTrue(all(not check[0].startswith("SoQt") for check in coin_checks))
         self.assertTrue(all(check[0].startswith("SoQt") for check in soqt_checks))
+
+    def test_remaining_contract_registries_have_provenance(self):
+        for rules in (
+            RAW_BOUNDARY_METHOD_RULES,
+            MULTIFIELD_METHOD_RULES,
+            PYTHON_HELPER_METHOD_RULES,
+            EXTEND_HELPER_METHOD_RULES,
+        ):
+            self.assertTrue(rules)
+            self.assertTrue(all(rule.reason for rule in rules))
+            self.assertTrue(all(rule.source for rule in rules))
 
     def test_coin_typing_policy_registry_is_complete(self):
         self.assertEqual(COIN_TYPING_POLICY.fields, policy.FIELD_TYPE_POLICIES)
