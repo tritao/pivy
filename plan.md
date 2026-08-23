@@ -341,5 +341,8 @@ Phase 3 has started with the highest-impact exceptional signature maps:
   generator consumers;
 - tests assert the structured rules and compatibility views cannot drift.
 
-The remaining Phase 3 work is to migrate the other exceptional parameter and
-factory/callback maps onto the same rule representation.
+The scalar-pointer, scalar-reference, sequence, fixed-width boolean-array and
+matrix parameter maps now use the same rule representation as well. The
+remaining Phase 3 work is to migrate the other exceptional factory/callback
+maps where doing so clarifies ownership rather than just wrapping generic
+type tables.

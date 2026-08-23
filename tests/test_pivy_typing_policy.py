@@ -75,6 +75,19 @@ class FieldTypePolicyTests(unittest.TestCase):
         self.assertTrue(all(rule.reason for rule in policy.METHOD_RETURN_RULES))
         self.assertTrue(all(rule.source for rule in policy.PYTHON_PARAMETER_RULES))
 
+        for rule_name, mapping_name in (
+            ("SCALAR_POINTER_HELPER_RULES", "SCALAR_POINTER_HELPER_PARAMETERS"),
+            ("SCALAR_REFERENCE_HELPER_RULES", "SCALAR_REFERENCE_HELPER_PARAMETERS"),
+            ("SEQUENCE_POINTER_RULES", "SEQUENCE_POINTER_PARAMETERS"),
+            ("BOOL_SEQUENCE_ARRAY_RULES", "BOOL_SEQUENCE_ARRAY_PARAMETERS"),
+            ("MATRIX_SEQUENCE_RULES", "MATRIX_SEQUENCE_PARAMETERS"),
+        ):
+            rules = getattr(policy, rule_name)
+            self.assertEqual(
+                {rule.target.key: rule.python_type for rule in rules},
+                getattr(policy, mapping_name),
+            )
+
     def test_coin_typing_policy_registry_is_complete(self):
         self.assertEqual(COIN_TYPING_POLICY.fields, policy.FIELD_TYPE_POLICIES)
         self.assertEqual(

@@ -64,6 +64,21 @@ class OverrideRule:
     source: str = "tools/pivy_stub_typing_policy.py"
 
 
+def _rules_from_mapping(mapping, reason):
+    return tuple(
+        OverrideRule(
+            target=PolicyTarget(*target),
+            python_type=python_type,
+            reason=reason,
+        )
+        for target, python_type in mapping.items()
+    )
+
+
+def _mapping_from_rules(rules):
+    return {rule.target.key: rule.python_type for rule in rules}
+
+
 VECTOR_TYPE_POLICIES = {
     "SbVec2b": VectorTypePolicy("int8_t", "int", 2),
     "SbVec2s": VectorTypePolicy("short", "int", 2),
@@ -186,12 +201,12 @@ POINTER_HELPER_TYPES = {
     "floatp": "float",
     "doublep": "float",
 }
-SCALAR_POINTER_HELPER_PARAMETERS = {
+_SCALAR_POINTER_HELPER_PARAMETERS = {
     ("SoQt", "getVersionInfo", "major"): "intp",
     ("SoQt", "getVersionInfo", "minor"): "intp",
     ("SoQt", "getVersionInfo", "micro"): "intp",
 }
-SCALAR_REFERENCE_HELPER_PARAMETERS = {
+_SCALAR_REFERENCE_HELPER_PARAMETERS = {
     ("SoDepthBufferElement", "get", "function_out"): "intp",
     ("SoOutput", "getAvailableCompressionMethods", "num"): "uintp",
 }
@@ -204,7 +219,7 @@ SCALAR_REFERENCE_HELPER_TYPES = {
     "int32_t": "intp",
     "long": "longp",
 }
-SEQUENCE_POINTER_PARAMETERS = {
+_SEQUENCE_POINTER_PARAMETERS = {
     ("SbColor", "__init__", "rgb"): "Sequence[float]",
     ("SbColor4f", "__init__", "rgba"): "Sequence[float]",
     ("SoGLColorIndexElement", "set", "indices"): "Sequence[int]",
@@ -219,7 +234,7 @@ SEQUENCE_POINTER_PARAMETERS = {
 SEQUENCE_ARRAY_PARAMETERS = {
     **vector_sequence_array_parameters(),
 }
-BOOL_SEQUENCE_ARRAY_PARAMETERS = {
+_BOOL_SEQUENCE_ARRAY_PARAMETERS = {
     ("SoQtViewer", "setAnaglyphStereoColorMasks", "left"): (
         "Sequence[bool]",
         "3",
@@ -229,12 +244,39 @@ BOOL_SEQUENCE_ARRAY_PARAMETERS = {
         "3",
     ),
 }
-MATRIX_SEQUENCE_PARAMETERS = {
+_MATRIX_SEQUENCE_PARAMETERS = {
     ("SbDPMatrix", "__init__", "matrix"): "Sequence[Sequence[float]]",
     ("SbDPMatrix", "setValue", "m"): "Sequence[Sequence[float]]",
     ("SbMatrix", "__init__", "matrix"): "Sequence[Sequence[float]]",
     ("SbMatrix", "setValue", "m"): "Sequence[Sequence[float]]",
 }
+SCALAR_POINTER_HELPER_RULES = _rules_from_mapping(
+    _SCALAR_POINTER_HELPER_PARAMETERS,
+    "Native scalar output helper represented by a Python pointer value",
+)
+SCALAR_POINTER_HELPER_PARAMETERS = _mapping_from_rules(SCALAR_POINTER_HELPER_RULES)
+SCALAR_REFERENCE_HELPER_RULES = _rules_from_mapping(
+    _SCALAR_REFERENCE_HELPER_PARAMETERS,
+    "Native scalar reference output helper represented by a Python pointer value",
+)
+SCALAR_REFERENCE_HELPER_PARAMETERS = _mapping_from_rules(
+    SCALAR_REFERENCE_HELPER_RULES
+)
+SEQUENCE_POINTER_RULES = _rules_from_mapping(
+    _SEQUENCE_POINTER_PARAMETERS,
+    "Native array input exposed as a Python sequence",
+)
+SEQUENCE_POINTER_PARAMETERS = _mapping_from_rules(SEQUENCE_POINTER_RULES)
+BOOL_SEQUENCE_ARRAY_RULES = _rules_from_mapping(
+    _BOOL_SEQUENCE_ARRAY_PARAMETERS,
+    "Fixed-width native boolean array exposed as a Python sequence",
+)
+BOOL_SEQUENCE_ARRAY_PARAMETERS = _mapping_from_rules(BOOL_SEQUENCE_ARRAY_RULES)
+MATRIX_SEQUENCE_RULES = _rules_from_mapping(
+    _MATRIX_SEQUENCE_PARAMETERS,
+    "Native matrix input exposed as nested Python sequences",
+)
+MATRIX_SEQUENCE_PARAMETERS = _mapping_from_rules(MATRIX_SEQUENCE_RULES)
 MATRIX_CPP_TYPES = {"SbDPMat", "SbMat"}
 SEQUENCE_VALUE_RETURN_TYPES = {
     "SbColor": "Sequence[float]",
