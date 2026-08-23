@@ -290,6 +290,13 @@ _SEQUENCE_POINTER_PARAMETERS = {
     ("SoConvexDataCache", "generate", "matindices"): "Sequence[int]",
     ("SoConvexDataCache", "generate", "normindices"): "Sequence[int]",
     ("SoConvexDataCache", "generate", "texindices"): "Sequence[int]",
+    # Coin's const pointer inputs are copied by the shared numeric-sequence
+    # typemap; these cache/list methods should expose that same Python shape.
+    ("SoChildList", "traverseInPath", "indices"): "Sequence[int]",
+    ("SoNormalCache", "generatePerVertex", "coordindices"): "Sequence[int]",
+    ("SoNormalCache", "generatePerFace", "coordindices"): "Sequence[int]",
+    ("SoNormalCache", "generatePerFaceStrip", "coordindices"): "Sequence[int]",
+    ("SoNormalCache", "generatePerStrip", "coordindices"): "Sequence[int]",
 }
 SEQUENCE_ARRAY_PARAMETERS = {
     **vector_sequence_array_parameters(),
@@ -852,6 +859,11 @@ PYTHON_TYPE_ALIAS_DEFINITIONS = {
         "SoExtSelectionLassoType = Literal[0, 1, 2]",
         "SoExtSelectionLassoPolicy = Literal[0, 1, 2, 3]",
         "SoExtSelectionLassoMode = Literal[0, 1]",
+        "SoDepthBufferFunction = Literal[0, 1, 2, 3, 4, 5, 6, 7]",
+        "SoSelectionPolicy = Literal[0, 1, 2, 3]",
+        "SoRotationXYZAxis = Literal[0, 1, 2]",
+        "SoSeparatorCacheEnabled = Literal[0, 1, 2]",
+        "SoTransparencyTypeValue = Literal[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]",
     ),
     "pivy.gui.soqt": (
         "SoQtViewerType = Literal[0, 1]",
@@ -959,6 +971,48 @@ PYTHON_ENUM_CONSTANT_TYPES = {
         **{
             ("SoExtSelection", constant): "SoExtSelectionLassoMode"
             for constant in ("ALL_SHAPES", "VISIBLE_SHAPES")
+        },
+        **{
+            (class_name, constant): "SoDepthBufferFunction"
+            for class_name in ("SoDepthBuffer", "SoDepthBufferElement")
+            for constant in (
+                "NEVER",
+                "ALWAYS",
+                "LESS",
+                "LEQUAL",
+                "EQUAL",
+                "GEQUAL",
+                "GREATER",
+                "NOTEQUAL",
+            )
+        },
+        **{
+            ("SoSelection", constant): "SoSelectionPolicy"
+            for constant in ("SINGLE", "TOGGLE", "SHIFT", "DISABLE")
+        },
+        **{
+            ("SoRotationXYZ", constant): "SoRotationXYZAxis"
+            for constant in ("X", "Y", "Z")
+        },
+        **{
+            (class_name, constant): "SoSeparatorCacheEnabled"
+            for class_name in ("SoSeparator", "SoSeparatorKit")
+            for constant in ("OFF", "ON", "AUTO")
+        },
+        **{
+            ("SoTransparencyType", constant): "SoTransparencyTypeValue"
+            for constant in (
+                "SCREEN_DOOR",
+                "ADD",
+                "DELAYED_ADD",
+                "SORTED_OBJECT_ADD",
+                "BLEND",
+                "DELAYED_BLEND",
+                "SORTED_OBJECT_BLEND",
+                "SORTED_OBJECT_SORTED_TRIANGLE_ADD",
+                "SORTED_OBJECT_SORTED_TRIANGLE_BLEND",
+                "NONE",
+            )
         },
         **{
             (class_name, constant): "SoTextureModel"
@@ -1178,6 +1232,11 @@ _PYTHON_PARAMETER_TYPE_OVERRIDES = {
     ("SoGLImage", "setData", "wraps"): "SoGLImageWrap",
     ("SoGLImage", "setData", "wrapt"): "SoGLImageWrap",
     ("SoGLImage", "setData", "wrapr"): "SoGLImageWrap",
+    **{
+        ("SoSF%s" % vector_name[2:], "setValue", "xyzw"[: vector_policy.width]):
+        "Sequence[%s]" % vector_policy.component_type
+        for vector_name, vector_policy in VECTOR_TYPE_POLICIES.items()
+    },
     **SEQUENCE_PARAMETER_TYPE_OVERRIDES,
     **DOCUMENTED_PARAMETER_TYPE_OVERRIDES,
 }
@@ -1560,24 +1619,24 @@ PYTHON_PROTOCOL_DEFINITIONS = (
     (
         "SoCallbackListCallback",
         ("SoCallbackList",),
-        "_CallbackDataT = TypeVar(\"_CallbackDataT\", contravariant=True)\n"
+        "_CallbackListDataT = TypeVar(\"_CallbackListDataT\", contravariant=True)\n"
         "\n"
-        "class SoCallbackListCallback(Protocol[_CallbackDataT]):\n"
+        "class SoCallbackListCallback(Protocol[_CallbackListDataT]):\n"
         "    def __call__(\n"
-        "        self, data: _CallbackDataT, callbackdata: object, /\n"
+        "        self, data: _CallbackListDataT, callbackdata: object, /\n"
         "    ) -> None: ...",
     ),
     (
         "SoCallbackListAPI",
         ("SoCallbackList",),
-        "class SoCallbackListAPI(Protocol[_CallbackDataT]):\n"
+        "class SoCallbackListAPI(Protocol[_CallbackListDataT]):\n"
         "    def addCallback(\n"
-        "        self, f: SoCallbackListCallback[_CallbackDataT], "
-        "userData: _CallbackDataT | None = ..., /\n"
+        "        self, f: SoCallbackListCallback[_CallbackListDataT], "
+        "userData: _CallbackListDataT | None = ..., /\n"
         "    ) -> None: ...\n"
         "    def removeCallback(\n"
-        "        self, f: SoCallbackListCallback[_CallbackDataT], "
-        "userdata: _CallbackDataT | None = ..., /\n"
+        "        self, f: SoCallbackListCallback[_CallbackListDataT], "
+        "userdata: _CallbackListDataT | None = ..., /\n"
         "    ) -> None: ...\n"
         "    def clearCallbacks(self) -> None: ...\n"
         "    def getNumCallbacks(self) -> int: ...\n"
@@ -1586,9 +1645,11 @@ PYTHON_PROTOCOL_DEFINITIONS = (
     (
         "SoContextDestructionCallback",
         ("SoContextHandler",),
-        "class SoContextDestructionCallback(Protocol):\n"
+        "_ContextDestructionDataT = TypeVar(\"_ContextDestructionDataT\", contravariant=True)\n"
+        "\n"
+        "class SoContextDestructionCallback(Protocol[_ContextDestructionDataT]):\n"
         "    def __call__(\n"
-        "        self, data: object, contextid: int, /\n"
+        "        self, data: _ContextDestructionDataT, contextid: int, /\n"
         "    ) -> None: ...",
     ),
     (
@@ -1616,22 +1677,28 @@ PYTHON_PROTOCOL_DEFINITIONS = (
     (
         "SoErrorCallback",
         ("SoError",),
-        "class SoErrorCallback(Protocol):\n"
+        "_SoErrorDataT = TypeVar(\"_SoErrorDataT\", contravariant=True)\n"
+        "\n"
+        "class SoErrorCallback(Protocol[_SoErrorDataT]):\n"
         "    def __call__(\n"
-        "        self, data: object, error: SoError, /\n"
+        "        self, data: _SoErrorDataT, error: SoError, /\n"
         "    ) -> None: ...",
     ),
     (
         "SoSensorManagerChangedCallback",
         (),
-        "class SoSensorManagerChangedCallback(Protocol):\n"
-        "    def __call__(self, data: object, /) -> None: ...",
+        "_SoSensorManagerDataT = TypeVar(\"_SoSensorManagerDataT\", contravariant=True)\n"
+        "\n"
+        "class SoSensorManagerChangedCallback(Protocol[_SoSensorManagerDataT]):\n"
+        "    def __call__(self, data: _SoSensorManagerDataT, /) -> None: ...",
     ),
     (
         "SoDBHeaderCallback",
         ("SoInput",),
-        "class SoDBHeaderCallback(Protocol):\n"
-        "    def __call__(self, data: object, input: SoInput, /) -> None: ...",
+        "_SoDBHeaderDataT = TypeVar(\"_SoDBHeaderDataT\", contravariant=True)\n"
+        "\n"
+        "class SoDBHeaderCallback(Protocol[_SoDBHeaderDataT]):\n"
+        "    def __call__(self, data: _SoDBHeaderDataT, input: SoInput, /) -> None: ...",
     ),
     (
         "SoGLSortedObjectOrderCallback",
@@ -1646,32 +1713,40 @@ PYTHON_PROTOCOL_DEFINITIONS = (
     (
         "SoGLImageEndFrameCallback",
         (),
-        "class SoGLImageEndFrameCallback(Protocol):\n"
-        "    def __call__(self, data: object, /) -> None: ...",
+        "_SoGLImageDataT = TypeVar(\"_SoGLImageDataT\", contravariant=True)\n"
+        "\n"
+        "class SoGLImageEndFrameCallback(Protocol[_SoGLImageDataT]):\n"
+        "    def __call__(self, data: _SoGLImageDataT, /) -> None: ...",
     ),
     (
         "SoShaderEnableCallback",
         ("SoState",),
-        "class SoShaderEnableCallback(Protocol):\n"
+        "_SoShaderEnableDataT = TypeVar(\"_SoShaderEnableDataT\", contravariant=True)\n"
+        "\n"
+        "class SoShaderEnableCallback(Protocol[_SoShaderEnableDataT]):\n"
         "    def __call__(\n"
-        "        self, data: object, state: SoState, enable: bool, /\n"
+        "        self, data: _SoShaderEnableDataT, state: SoState, enable: bool, /\n"
         "    ) -> None: ...",
     ),
     (
         "SoProtoFetchExternProtoCallback",
         ("SoInput", "SoProto", "SbString"),
-        "class SoProtoFetchExternProtoCallback(Protocol):\n"
+        "_SoProtoFetchDataT = TypeVar(\"_SoProtoFetchDataT\", contravariant=True)\n"
+        "\n"
+        "class SoProtoFetchExternProtoCallback(Protocol[_SoProtoFetchDataT]):\n"
         "    def __call__(\n"
-        "        self, data: object, input: SoInput, urls: list[SbString],\n"
+        "        self, data: _SoProtoFetchDataT, input: SoInput, urls: list[SbString],\n"
         "        numurls: int, /\n"
         "    ) -> SoProto | None: ...",
     ),
     (
         "SbImageReadImageCallback",
         ("SbImage", "SbString"),
-        "class SbImageReadImageCallback(Protocol):\n"
+        "_SbImageReadDataT = TypeVar(\"_SbImageReadDataT\", contravariant=True)\n"
+        "\n"
+        "class SbImageReadImageCallback(Protocol[_SbImageReadDataT]):\n"
         "    def __call__(\n"
-        "        self, data: object, filename: SbString, image: SbImage, /\n"
+        "        self, data: _SbImageReadDataT, filename: SbString, image: SbImage, /\n"
         "    ) -> bool: ...",
     ),
     (
@@ -2017,9 +2092,11 @@ PYTHON_PROTOCOL_DEFINITIONS = (
     (
         "SoQtFatalErrorCallback",
         ("SbString",),
-        "class SoQtFatalErrorCallback(Protocol):\n"
+        "_SoQtFatalErrorDataT = TypeVar(\"_SoQtFatalErrorDataT\", contravariant=True)\n"
+        "\n"
+        "class SoQtFatalErrorCallback(Protocol[_SoQtFatalErrorDataT]):\n"
         "    def __call__(\n"
-        "        self, message: SbString, line: int, data: object, /\n"
+        "        self, message: SbString, line: int, data: _SoQtFatalErrorDataT, /\n"
         "    ) -> None: ...",
     ),
     (
@@ -2499,37 +2576,38 @@ CALLBACK_METHOD_POLICIES = {
     ),
     ("SoSensorManager", "setChangedCallback"): CallbackMethodPolicy(
         (
-            ("pyfunc", "SoSensorManagerChangedCallback"),
-            ("data", "object"),
+            ("pyfunc", "SoSensorManagerChangedCallback[_SoSensorManagerDataT]"),
+            ("data", "_SoSensorManagerDataT"),
         ),
         (
-            "self, pyfunc: SoSensorManagerChangedCallback, data: object",
+            "self, pyfunc: SoSensorManagerChangedCallback[_SoSensorManagerDataT], "
+            "data: _SoSensorManagerDataT",
             "None",
         ),
     ),
     ("SoDB", "registerHeader"): CallbackMethodPolicy(
         (
-            ("precallback", "SoDBHeaderCallback"),
-            ("postcallback", "SoDBHeaderCallback"),
-            ("userdata", "object | None"),
+            ("precallback", "SoDBHeaderCallback[_SoDBHeaderDataT]"),
+            ("postcallback", "SoDBHeaderCallback[_SoDBHeaderDataT]"),
+            ("userdata", "_SoDBHeaderDataT | None"),
         ),
         (
             "headerstring: SbString, isbinary: bool, ivversion: float, "
-            "precallback: SoDBHeaderCallback, "
-            "postcallback: SoDBHeaderCallback, "
-            "userdata: object | None = ...",
+            "precallback: SoDBHeaderCallback[_SoDBHeaderDataT], "
+            "postcallback: SoDBHeaderCallback[_SoDBHeaderDataT], "
+            "userdata: _SoDBHeaderDataT | None = ...",
             "bool",
         ),
     ),
     ("SoQt", "setFatalErrorHandler"): CallbackMethodPolicy(
         (
-            ("cb", "SoQtFatalErrorCallback"),
-            ("userdata", "object"),
+            ("cb", "SoQtFatalErrorCallback[_SoQtFatalErrorDataT]"),
+            ("userdata", "_SoQtFatalErrorDataT"),
         ),
         (
-            "cb: SoQtFatalErrorCallback, "
-            "userdata: object",
-            "SoQtFatalErrorCallback | None",
+            "cb: SoQtFatalErrorCallback[_SoQtFatalErrorDataT], "
+            "userdata: _SoQtFatalErrorDataT",
+            "SoQtFatalErrorCallback[object] | None",
         ),
     ),
     ("SoQtComponent", "setWindowCloseCallback"): CallbackMethodPolicy(
@@ -2590,63 +2668,63 @@ CALLBACK_METHOD_POLICIES = {
     ),
     ("SoError", "setHandlerCallback"): CallbackMethodPolicy(
         (
-            ("pyfunc", "SoErrorCallback"),
-            ("data", "object"),
+            ("pyfunc", "SoErrorCallback[_SoErrorDataT]"),
+            ("data", "_SoErrorDataT"),
         ),
         (
-            "pyfunc: SoErrorCallback, data: object",
+            "pyfunc: SoErrorCallback[_SoErrorDataT], data: _SoErrorDataT",
             "None",
         ),
     ),
     ("SoDebugError", "setHandlerCallback"): CallbackMethodPolicy(
         (
-            ("pyfunc", "SoErrorCallback"),
-            ("data", "object"),
+            ("pyfunc", "SoErrorCallback[_SoErrorDataT]"),
+            ("data", "_SoErrorDataT"),
         ),
         (
-            "pyfunc: SoErrorCallback, data: object",
+            "pyfunc: SoErrorCallback[_SoErrorDataT], data: _SoErrorDataT",
             "None",
         ),
     ),
     ("SoMemoryError", "setHandlerCallback"): CallbackMethodPolicy(
         (
-            ("pyfunc", "SoErrorCallback"),
-            ("data", "object"),
+            ("pyfunc", "SoErrorCallback[_SoErrorDataT]"),
+            ("data", "_SoErrorDataT"),
         ),
         (
-            "pyfunc: SoErrorCallback, data: object",
+            "pyfunc: SoErrorCallback[_SoErrorDataT], data: _SoErrorDataT",
             "None",
         ),
     ),
     ("SoReadError", "setHandlerCallback"): CallbackMethodPolicy(
         (
-            ("pyfunc", "SoErrorCallback"),
-            ("data", "object"),
+            ("pyfunc", "SoErrorCallback[_SoErrorDataT]"),
+            ("data", "_SoErrorDataT"),
         ),
         (
-            "pyfunc: SoErrorCallback, data: object",
+            "pyfunc: SoErrorCallback[_SoErrorDataT], data: _SoErrorDataT",
             "None",
         ),
     ),
     ("SoCallbackList", "addCallback"): CallbackMethodPolicy(
         (
-            ("f", "SoCallbackListCallback[object]"),
-            ("userData", "object | None"),
+            ("f", "SoCallbackListCallback[_CallbackListDataT]"),
+            ("userData", "_CallbackListDataT | None"),
         ),
         (
-            "self, f: SoCallbackListCallback[object], "
-            "userData: object | None = ...",
+            "self, f: SoCallbackListCallback[_CallbackListDataT], "
+            "userData: _CallbackListDataT | None = ...",
             "None",
         ),
     ),
     ("SoCallbackList", "removeCallback"): CallbackMethodPolicy(
         (
-            ("f", "SoCallbackListCallback[object]"),
-            ("userdata", "object | None"),
+            ("f", "SoCallbackListCallback[_CallbackListDataT]"),
+            ("userdata", "_CallbackListDataT | None"),
         ),
         (
-            "self, f: SoCallbackListCallback[object], "
-            "userdata: object | None = ...",
+            "self, f: SoCallbackListCallback[_CallbackListDataT], "
+            "userdata: _CallbackListDataT | None = ...",
             "None",
         ),
     ),
@@ -2659,21 +2737,23 @@ CALLBACK_METHOD_POLICIES = {
     ),
     ("SoContextHandler", "addContextDestructionCallback"): CallbackMethodPolicy(
         (
-            ("func", "SoContextDestructionCallback"),
-            ("userdata", "object | None"),
+            ("func", "SoContextDestructionCallback[_ContextDestructionDataT]"),
+            ("userdata", "_ContextDestructionDataT | None"),
         ),
         (
-            "func: SoContextDestructionCallback, userdata: object | None = ...",
+            "func: SoContextDestructionCallback[_ContextDestructionDataT], "
+            "userdata: _ContextDestructionDataT | None = ...",
             "None",
         ),
     ),
     ("SoContextHandler", "removeContextDestructionCallback"): CallbackMethodPolicy(
         (
-            ("func", "SoContextDestructionCallback"),
-            ("userdata", "object | None"),
+            ("func", "SoContextDestructionCallback[_ContextDestructionDataT]"),
+            ("userdata", "_ContextDestructionDataT | None"),
         ),
         (
-            "func: SoContextDestructionCallback, userdata: object | None = ...",
+            "func: SoContextDestructionCallback[_ContextDestructionDataT], "
+            "userdata: _ContextDestructionDataT | None = ...",
             "None",
         ),
     ),
@@ -2770,86 +2850,86 @@ CALLBACK_METHOD_POLICIES = {
     ),
     ("SoGLCacheContextElement", "scheduleDeleteCallback"): CallbackMethodPolicy(
         (
-            ("cb", "SoContextDestructionCallback"),
-            ("closure", "object | None"),
+            ("cb", "SoContextDestructionCallback[_ContextDestructionDataT]"),
+            ("closure", "_ContextDestructionDataT | None"),
         ),
         (
             "contextid: int, "
-            "cb: SoContextDestructionCallback, "
-            "closure: object | None = ...",
+            "cb: SoContextDestructionCallback[_ContextDestructionDataT], "
+            "closure: _ContextDestructionDataT | None = ...",
             "None",
         ),
     ),
     ("SoGLImage", "setEndFrameCallback"): CallbackMethodPolicy(
         (
-            ("cb", "SoGLImageEndFrameCallback | None"),
-            ("closure", "object | None"),
+            ("cb", "SoGLImageEndFrameCallback[_SoGLImageDataT] | None"),
+            ("closure", "_SoGLImageDataT | None"),
         ),
         (
-            "self, cb: SoGLImageEndFrameCallback | None, "
-            "closure: object | None = ...",
+            "self, cb: SoGLImageEndFrameCallback[_SoGLImageDataT] | None, "
+            "closure: _SoGLImageDataT | None = ...",
             "None",
         ),
     ),
     ("SoShaderProgram", "setEnableCallback"): CallbackMethodPolicy(
         (
-            ("cb", "SoShaderEnableCallback | None"),
-            ("closure", "object | None"),
+            ("cb", "SoShaderEnableCallback[_SoShaderEnableDataT] | None"),
+            ("closure", "_SoShaderEnableDataT | None"),
         ),
         (
-            "self, cb: SoShaderEnableCallback | None, "
-            "closure: object | None = ...",
+            "self, cb: SoShaderEnableCallback[_SoShaderEnableDataT] | None, "
+            "closure: _SoShaderEnableDataT | None = ...",
             "None",
         ),
     ),
     ("SoProto", "setFetchExternProtoCallback"): CallbackMethodPolicy(
         (
-            ("cb", "SoProtoFetchExternProtoCallback | None"),
-            ("closure", "object | None"),
+            ("cb", "SoProtoFetchExternProtoCallback[_SoProtoFetchDataT] | None"),
+            ("closure", "_SoProtoFetchDataT | None"),
         ),
         (
-            "cb: SoProtoFetchExternProtoCallback | None, "
-            "closure: object | None = ...",
+            "cb: SoProtoFetchExternProtoCallback[_SoProtoFetchDataT] | None, "
+            "closure: _SoProtoFetchDataT | None = ...",
             "None",
         ),
     ),
     ("SbImage", "addReadImageCB"): CallbackMethodPolicy(
         (
-            ("cb", "SbImageReadImageCallback"),
-            ("closure", "object | None"),
+            ("cb", "SbImageReadImageCallback[_SbImageReadDataT]"),
+            ("closure", "_SbImageReadDataT | None"),
         ),
         (
-            "cb: SbImageReadImageCallback, "
-            "closure: object | None = ...",
+            "cb: SbImageReadImageCallback[_SbImageReadDataT], "
+            "closure: _SbImageReadDataT | None = ...",
             "None",
         ),
     ),
     ("SbImage", "removeReadImageCB"): CallbackMethodPolicy(
         (
-            ("cb", "SbImageReadImageCallback"),
-            ("closure", "object | None"),
+            ("cb", "SbImageReadImageCallback[_SbImageReadDataT]"),
+            ("closure", "_SbImageReadDataT | None"),
         ),
         (
-            "cb: SbImageReadImageCallback, "
-            "closure: object | None = ...",
+            "cb: SbImageReadImageCallback[_SbImageReadDataT], "
+            "closure: _SbImageReadDataT | None = ...",
             "None",
         ),
     ),
     ("SbImage", "scheduleReadFile"): CallbackMethodPolicy(
         (
-            ("cb", "SbImageReadImageCallback"),
-            ("closure", "object | None"),
+            ("cb", "SbImageReadImageCallback[_SbImageReadDataT]"),
+            ("closure", "_SbImageReadDataT | None"),
         ),
         (
-            "self, cb: SbImageReadImageCallback, "
-            "closure: object | None, filename: SbString, "
+            "self, cb: SbImageReadImageCallback[_SbImageReadDataT], "
+            "closure: _SbImageReadDataT | None, filename: SbString, "
             "searchdirectories: SbString | None = ..., "
             "numdirectories: int = ...",
             "bool",
         ),
         (
-            ("cb", "SbImageReadImageCallback"),
-            ("closure", "object | None"),
+            ("cb", "SbImageReadImageCallback[_SbImageReadDataT]"),
+            ("closure", "_SbImageReadDataT | None"),
             ("filename", "SbString"),
             ("searchdirectories", "SbString | None"),
             ("numdirectories", "int"),

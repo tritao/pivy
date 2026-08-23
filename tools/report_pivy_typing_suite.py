@@ -24,13 +24,13 @@ COVERAGE_BASELINES = {
     "pivy/coin.pyi": {
         "min_concrete_annotations": 21883,
         "max_any_annotations": 0,
-        "max_incomplete_annotations": 417,
+        "max_incomplete_annotations": 400,
         "max_incomplete_categories": {
             "raw C pointers": 102,
             "callbacks": 30,
             "unknown output parameters": 0,
             "function pointers": 36,
-            "dynamic/runtime API": 249,
+            "dynamic/runtime API": 232,
             "uncategorized": 0,
         },
     },

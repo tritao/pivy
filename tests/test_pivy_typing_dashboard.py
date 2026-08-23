@@ -29,9 +29,9 @@ class TypingDashboardTests(unittest.TestCase):
                 "geometry": 18,
                 "image/buffer": 20,
                 "action": 4,
-                "array/output": 11,
+                "array/output": 6,
                 "callback/handle": 35,
-                "other": 121,
+                "other": 109,
             },
         )
         self.assertEqual(

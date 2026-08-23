@@ -313,6 +313,8 @@ class FieldSetValue(unittest.TestCase):
                         'setValue on SoSFNode failed')
         self.assertTrue(isinstance(t.getValue(), SoCone), 
                         'autocast on SoSFNode.getValue failed')
+        t.setValue(None)
+        self.assertIsNone(t.getValue())
         
     def testSFRotation(self):
         """check setValue for SoSFRotation"""
@@ -445,6 +447,8 @@ class FieldSetValue(unittest.TestCase):
                         'setValue on SoSFPath failed')
         self.assertTrue(isinstance(t.getValue(), SoPath), 
                         'autocast on SoSFPath.getValue failed')
+        t.setValue(None)
+        self.assertIsNone(t.getValue())
 
     def testSFPlane(self):
         """check setValue for SoSFPlane"""
@@ -1376,6 +1380,34 @@ class SbTimeMethods(unittest.TestCase):
         self.assertEqual(seconds.value(), 12)
         self.assertEqual(microseconds.value(), 5000)
 
+
+class TypingSequenceAdapterTests(unittest.TestCase):
+    """Runtime proofs for fixed-width and native index sequence adapters."""
+
+    def testSingleFieldIntegerVectorSequences(self):
+        vec2 = SoSFVec2s()
+        vec2.setValue([1, 2])
+        self.assertEqual(tuple(vec2.getValue()), (1, 2))
+
+        short_vec3 = SoSFVec3s()
+        short_vec3.setValue([2, 3, 4])
+        self.assertEqual(tuple(short_vec3.getValue()), (2, 3, 4))
+
+        vec3 = SoSFVec3i32()
+        vec3.setValue([1, 2, 3])
+        self.assertEqual(tuple(vec3.getValue()), (1, 2, 3))
+
+        vec4 = SoSFVec4ub()
+        vec4.setValue([4, 5, 6, 7])
+        self.assertEqual(tuple(vec4.getValue()), (4, 5, 6, 7))
+
+    def testCacheAndChildIndexSequences(self):
+        cache = SoNormalCache(SoState(SoCallbackAction(), SoTypeList()))
+        cache.generatePerFace(SbVec3f(), 1, [0], 1, True)
+
+        children = SoGroup().getChildren()
+        children.traverseInPath(SoCallbackAction(), 0, [])
+
 class OperatorTests(unittest.TestCase):
     """checks various operator overloaded methods"""
     def testEqNone(self):
@@ -1408,6 +1440,7 @@ class NodeKitTests(unittest.TestCase):
         self.assertTrue(isinstance(s.__getattr__("shape"), SoNode))
         self.assertTrue(isinstance(s.__getattr__("appearance"), SoAppearanceKit))
         self.assertTrue(isinstance(s.getPart("shape", False), SoNode))
+        self.assertEqual(s.getPartString(s.shape), SbString("shape"))
         self.assertIsNone(s.getPart("missing", False))
         self.assertRaises(AttributeError, s.__getattr__, "missing")
 

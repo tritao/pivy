@@ -106,6 +106,38 @@ def check_extended_single_value_fields() -> None:
     rgba.setValue([0.2, 0.4, 0.8, 1.0])
 
 
+def check_remaining_single_value_field_families() -> None:
+    name = coin.SoSFName()
+    assert_type(name.getValue(), coin.SbName)
+    name.setValue("node-name")
+
+    string = coin.SoSFString()
+    assert_type(string.getValue(), coin.SbString)
+    string.setValue("node-string")
+
+    node = coin.SoSFNode()
+    assert_type(node.getValue(), coin.SoNode | None)
+    node.setValue(coin.SoCube())
+    node.setValue(None)
+
+    path = coin.SoSFPath()
+    assert_type(path.getValue(), coin.SoPath | None)
+    path.setValue(coin.SoPath())
+    path.setValue(None)
+
+    engine = coin.SoSFEngine()
+    assert_type(engine.getValue(), coin.SoEngine)
+    engine.setValue(coin.SoTimeCounter())
+
+    integer_vector = coin.SoSFVec3i32()
+    assert_type(integer_vector.getValue(), coin.SbVec3i32)
+    integer_vector.setValue([1, 2, 3])
+
+    byte_vector = coin.SoSFVec4ub()
+    assert_type(byte_vector.getValue(), coin.SbVec4ub)
+    byte_vector.setValue([1, 2, 3, 4])
+
+
 def check_field_attribute_inventory() -> None:
     material = coin.SoMaterial()
     assert_type(material.ambientColor, coin.SoMFColor)

@@ -104,8 +104,6 @@ UNSUPPORTED_ARRAY_METHOD_CHECKS = {
     "coin.pyi": (
         ("SbMatrix", "LUDecomposition", "index", "Sequence[int]"),
         ("SbDPMatrix", "LUDecomposition", "index", "Sequence[int]"),
-        ("SoSFVec2s", "setValue", "xy", "Sequence[int]"),
-        ("SoSFVec3s", "setValue", "xyz", "Sequence[int]"),
     ),
 }
 RUNTIME_UNSUPPORTED_METHOD_CHECKS = {}

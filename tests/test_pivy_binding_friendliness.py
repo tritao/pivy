@@ -16,7 +16,7 @@ class BindingFriendlinessTests(unittest.TestCase):
         cls.report = build_report(PROJECT_ROOT / "pivy" / "coin.pyi")
 
     def test_all_boundaries_and_special_contracts_are_classified(self):
-        self.assertEqual(self.report["summary"]["boundaries"], 417)
+        self.assertEqual(self.report["summary"]["boundaries"], 400)
         self.assertEqual(self.report["summary"]["special_contracts"], 418)
         self.assertTrue(
             all("remediation" in item for item in self.report["boundaries"])

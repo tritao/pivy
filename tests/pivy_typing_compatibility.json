@@ -66,6 +66,87 @@
             ]
           }
         },
+        "SoSFNode": {
+          "bases": ["SoSField"],
+          "methods": {
+            "getValue": [{"parameters": [], "return": "SoNode | None"}],
+            "setValue": [
+              {
+                "parameters": [{"name": "newvalue", "type": "SoNode | None"}],
+                "return": "None"
+              },
+              {
+                "parameters": [{"name": "other", "type": "SoSFNode"}],
+                "return": "None"
+              }
+            ]
+          }
+        },
+        "SoSFPath": {
+          "bases": ["SoSField"],
+          "methods": {
+            "getValue": [{"parameters": [], "return": "SoPath | None"}],
+            "setValue": [
+              {
+                "parameters": [{"name": "newvalue", "type": "SoPath | None"}],
+                "return": "None"
+              },
+              {
+                "parameters": [{"name": "other", "type": "SoSFPath"}],
+                "return": "None"
+              }
+            ]
+          }
+        },
+        "SoSFVec3i32": {
+          "bases": ["SoSField"],
+          "methods": {
+            "getValue": [{"parameters": [], "return": "SbVec3i32"}],
+            "setValue": [
+              {
+                "parameters": [{"name": "newvalue", "type": "SbVec3i32"}],
+                "return": "None"
+              },
+              {
+                "parameters": [
+                  {"name": "x", "type": "int"},
+                  {"name": "y", "type": "int"},
+                  {"name": "z", "type": "int"}
+                ],
+                "return": "None"
+              },
+              {
+                "parameters": [{"name": "xyz", "type": "Sequence[int]"}],
+                "return": "None"
+              }
+            ]
+          }
+        },
+        "SoSFVec4ub": {
+          "bases": ["SoSField"],
+          "methods": {
+            "getValue": [{"parameters": [], "return": "SbVec4ub"}],
+            "setValue": [
+              {
+                "parameters": [{"name": "newvalue", "type": "SbVec4ub"}],
+                "return": "None"
+              },
+              {
+                "parameters": [
+                  {"name": "x", "type": "int"},
+                  {"name": "y", "type": "int"},
+                  {"name": "z", "type": "int"},
+                  {"name": "w", "type": "int"}
+                ],
+                "return": "None"
+              },
+              {
+                "parameters": [{"name": "xyzw", "type": "Sequence[int]"}],
+                "return": "None"
+              }
+            ]
+          }
+        },
         "SbVec3f": {
           "bases": [],
           "methods": {
@@ -117,8 +198,8 @@
             "addCallback": [
               {
                 "parameters": [
-                  {"name": "f", "type": "SoCallbackListCallback[object]"},
-                  {"name": "userData", "type": "object | None"}
+                  {"name": "f", "type": "SoCallbackListCallback[_CallbackListDataT]"},
+                  {"name": "userData", "type": "_CallbackListDataT | None"}
                 ],
                 "return": "None"
               }
@@ -181,6 +262,22 @@
                 "return": "SoNode | None"
               }
             ],
+            "getPartString": [
+              {
+                "parameters": [{"name": "part", "type": "SoBase"}],
+                "return": "SbString"
+              }
+            ],
+            "createPathToPart": [
+              {
+                "parameters": [
+                  {"name": "partname", "type": "SbName | str"},
+                  {"name": "makeifneeded", "type": "bool"},
+                  {"name": "pathtoextend", "type": "SoPath | None"}
+                ],
+                "return": "SoNodeKitPath | None"
+              }
+            ],
             "setPart": [
               {
                 "parameters": [
@@ -188,6 +285,38 @@
                   {"name": "srcFrom", "type": "SoNode"}
                 ],
                 "return": "bool"
+              }
+            ]
+          }
+        },
+        "SoChildList": {
+          "bases": ["SoNodeList"],
+          "methods": {
+            "traverseInPath": [
+              {
+                "parameters": [
+                  {"name": "action", "type": "SoAction"},
+                  {"name": "numindices", "type": "int"},
+                  {"name": "indices", "type": "Sequence[int]"}
+                ],
+                "return": "None"
+              }
+            ]
+          }
+        },
+        "SoNormalCache": {
+          "bases": ["SoCache"],
+          "methods": {
+            "generatePerFace": [
+              {
+                "parameters": [
+                  {"name": "coords", "type": "SbVec3f"},
+                  {"name": "numcoords", "type": "int"},
+                  {"name": "coordindices", "type": "Sequence[int]"},
+                  {"name": "numcoorindices", "type": "int"},
+                  {"name": "ccw", "type": "bool"}
+                ],
+                "return": "None"
               }
             ]
           }
@@ -222,7 +351,12 @@
       "aliases": {
         "SoExtSelectionLassoType": "Literal[0, 1, 2]",
         "SoExtSelectionLassoPolicy": "Literal[0, 1, 2, 3]",
-        "SoExtSelectionLassoMode": "Literal[0, 1]"
+        "SoExtSelectionLassoMode": "Literal[0, 1]",
+        "SoDepthBufferFunction": "Literal[0, 1, 2, 3, 4, 5, 6, 7]",
+        "SoSelectionPolicy": "Literal[0, 1, 2, 3]",
+        "SoRotationXYZAxis": "Literal[0, 1, 2]",
+        "SoSeparatorCacheEnabled": "Literal[0, 1, 2]",
+        "SoTransparencyTypeValue": "Literal[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]"
       }
     },
     "pivy.gui.soqt": {

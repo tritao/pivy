@@ -430,6 +430,41 @@ pivy_convert_numeric_sequence(PyObject * input, int kind, void ** output)
   *output = storage;
   return 0;
 }
+
+template <typename T>
+static bool
+pivy_convert_fixed_numeric_sequence(PyObject * input, int width, bool integer,
+                                    T * output)
+{
+  if (!PySequence_Check(input) || PySequence_Size(input) != width) {
+    PyErr_SetString(PyExc_TypeError, "expected a fixed-width numeric sequence");
+    return false;
+  }
+  for (int index = 0; index < width; ++index) {
+    PyObject * item = PySequence_GetItem(input, index);
+    if (item == NULL) return false;
+    if (integer) {
+      long long value = PyLong_AsLongLong(item);
+      if (PyErr_Occurred() ||
+          value < static_cast<long long>(std::numeric_limits<T>::min()) ||
+          value > static_cast<long long>(std::numeric_limits<T>::max())) {
+        Py_DECREF(item);
+        if (!PyErr_Occurred())
+          PyErr_SetString(PyExc_OverflowError, "component is outside the C range");
+        return false;
+      }
+      output[index] = static_cast<T>(value);
+    } else {
+      output[index] = static_cast<T>(PyFloat_AsDouble(item));
+      if (PyErr_Occurred()) {
+        Py_DECREF(item);
+        return false;
+      }
+    }
+    Py_DECREF(item);
+  }
+  return true;
+}
 %}
 
 %define PIVY_CONST_NUMERIC_SEQUENCE_POINTER(_type_, _kind_, _name_)
@@ -474,6 +509,45 @@ PIVY_CONST_NUMERIC_SEQUENCE_POINTER_NAMED(int32_t, 1, coordindices)
 PIVY_CONST_NUMERIC_SEQUENCE_POINTER_NAMED(int32_t, 1, matindices)
 PIVY_CONST_NUMERIC_SEQUENCE_POINTER_NAMED(int32_t, 1, normindices)
 PIVY_CONST_NUMERIC_SEQUENCE_POINTER_NAMED(int32_t, 1, texindices)
+PIVY_CONST_NUMERIC_SEQUENCE_POINTER_NAMED(int, 0, indices)
+
+%define PIVY_FIXED_NUMERIC_ARRAY_PARAMETER(_type_, _integer_, _name_, _width_)
+%typemap(in) const _type_ _name_[_width_] (_type_ temp[_width_]) {
+  if (!pivy_convert_fixed_numeric_sequence($input, _width_, _integer_, temp)) {
+    SWIG_fail;
+  }
+  $1 = temp;
+}
+
+%typemap(typecheck, precedence=SWIG_TYPECHECK_POINTER) const _type_ _name_[_width_] {
+  $1 = PySequence_Check($input) && PySequence_Size($input) == _width_;
+}
+%enddef
+
+PIVY_FIXED_NUMERIC_ARRAY_PARAMETER(int8_t, 1, xy, 2)
+PIVY_FIXED_NUMERIC_ARRAY_PARAMETER(int8_t, 1, xyz, 3)
+PIVY_FIXED_NUMERIC_ARRAY_PARAMETER(int8_t, 1, xyzw, 4)
+PIVY_FIXED_NUMERIC_ARRAY_PARAMETER(uint8_t, 1, xy, 2)
+PIVY_FIXED_NUMERIC_ARRAY_PARAMETER(uint8_t, 1, xyz, 3)
+PIVY_FIXED_NUMERIC_ARRAY_PARAMETER(uint8_t, 1, xyzw, 4)
+PIVY_FIXED_NUMERIC_ARRAY_PARAMETER(short, 1, xy, 2)
+PIVY_FIXED_NUMERIC_ARRAY_PARAMETER(short, 1, xyz, 3)
+PIVY_FIXED_NUMERIC_ARRAY_PARAMETER(short, 1, xyzw, 4)
+PIVY_FIXED_NUMERIC_ARRAY_PARAMETER(unsigned short, 1, xy, 2)
+PIVY_FIXED_NUMERIC_ARRAY_PARAMETER(unsigned short, 1, xyz, 3)
+PIVY_FIXED_NUMERIC_ARRAY_PARAMETER(unsigned short, 1, xyzw, 4)
+PIVY_FIXED_NUMERIC_ARRAY_PARAMETER(int32_t, 1, xy, 2)
+PIVY_FIXED_NUMERIC_ARRAY_PARAMETER(int32_t, 1, xyz, 3)
+PIVY_FIXED_NUMERIC_ARRAY_PARAMETER(int32_t, 1, xyzw, 4)
+PIVY_FIXED_NUMERIC_ARRAY_PARAMETER(uint32_t, 1, xy, 2)
+PIVY_FIXED_NUMERIC_ARRAY_PARAMETER(uint32_t, 1, xyz, 3)
+PIVY_FIXED_NUMERIC_ARRAY_PARAMETER(uint32_t, 1, xyzw, 4)
+PIVY_FIXED_NUMERIC_ARRAY_PARAMETER(float, 0, xy, 2)
+PIVY_FIXED_NUMERIC_ARRAY_PARAMETER(float, 0, xyz, 3)
+PIVY_FIXED_NUMERIC_ARRAY_PARAMETER(float, 0, xyzw, 4)
+PIVY_FIXED_NUMERIC_ARRAY_PARAMETER(double, 0, xy, 2)
+PIVY_FIXED_NUMERIC_ARRAY_PARAMETER(double, 0, xyz, 3)
+PIVY_FIXED_NUMERIC_ARRAY_PARAMETER(double, 0, xyzw, 4)
 
 /* if SWIG determines the class abstract it doesn't generate
  * constructors of any kind. the following %feature

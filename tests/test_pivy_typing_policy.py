@@ -400,8 +400,8 @@ class FieldTypePolicyTests(unittest.TestCase):
                 ("SoQt", "setFatalErrorHandler")
             ].parameter_types,
             (
-                ("cb", "SoQtFatalErrorCallback"),
-                ("userdata", "object"),
+                ("cb", "SoQtFatalErrorCallback[_SoQtFatalErrorDataT]"),
+                ("userdata", "_SoQtFatalErrorDataT"),
             ),
         )
         self.assertEqual(
@@ -441,9 +441,9 @@ class FieldTypePolicyTests(unittest.TestCase):
             policy.PYTHON_SHADOW_METHOD_TYPES[("SoDB", "registerHeader")],
             (
                 "headerstring: SbString, isbinary: bool, ivversion: float, "
-                "precallback: SoDBHeaderCallback, "
-                "postcallback: SoDBHeaderCallback, "
-                "userdata: object | None = ...",
+                "precallback: SoDBHeaderCallback[_SoDBHeaderDataT], "
+                "postcallback: SoDBHeaderCallback[_SoDBHeaderDataT], "
+                "userdata: _SoDBHeaderDataT | None = ...",
                 "bool",
             ),
         )
@@ -526,8 +526,8 @@ class FieldTypePolicyTests(unittest.TestCase):
         self.assertEqual(
             policy.PYTHON_SHADOW_METHOD_TYPES[("SoCallbackList", "addCallback")],
             (
-                "self, f: SoCallbackListCallback[object], "
-                "userData: object | None = ...",
+                "self, f: SoCallbackListCallback[_CallbackListDataT], "
+                "userData: _CallbackListDataT | None = ...",
                 "None",
             ),
         )
@@ -542,8 +542,8 @@ class FieldTypePolicyTests(unittest.TestCase):
                 ("SoContextHandler", "addContextDestructionCallback")
             ],
             (
-                "func: SoContextDestructionCallback, "
-                "userdata: object | None = ...",
+                "func: SoContextDestructionCallback[_ContextDestructionDataT], "
+                "userdata: _ContextDestructionDataT | None = ...",
                 "None",
             ),
         )
@@ -567,8 +567,8 @@ class FieldTypePolicyTests(unittest.TestCase):
                 ("SoGLImage", "setEndFrameCallback")
             ],
             (
-                "self, cb: SoGLImageEndFrameCallback | None, "
-                "closure: object | None = ...",
+                "self, cb: SoGLImageEndFrameCallback[_SoGLImageDataT] | None, "
+                "closure: _SoGLImageDataT | None = ...",
                 "None",
             ),
         )
@@ -577,8 +577,8 @@ class FieldTypePolicyTests(unittest.TestCase):
                 ("SoShaderProgram", "setEnableCallback")
             ],
             (
-                "self, cb: SoShaderEnableCallback | None, "
-                "closure: object | None = ...",
+                "self, cb: SoShaderEnableCallback[_SoShaderEnableDataT] | None, "
+                "closure: _SoShaderEnableDataT | None = ...",
                 "None",
             ),
         )
@@ -587,32 +587,32 @@ class FieldTypePolicyTests(unittest.TestCase):
                 ("SoProto", "setFetchExternProtoCallback")
             ],
             (
-                "cb: SoProtoFetchExternProtoCallback | None, "
-                "closure: object | None = ...",
+                "cb: SoProtoFetchExternProtoCallback[_SoProtoFetchDataT] | None, "
+                "closure: _SoProtoFetchDataT | None = ...",
                 "None",
             ),
         )
         self.assertEqual(
             policy.PYTHON_SHADOW_METHOD_TYPES[("SbImage", "addReadImageCB")],
             (
-                "cb: SbImageReadImageCallback, "
-                "closure: object | None = ...",
+                "cb: SbImageReadImageCallback[_SbImageReadDataT], "
+                "closure: _SbImageReadDataT | None = ...",
                 "None",
             ),
         )
         self.assertEqual(
             policy.PYTHON_SHADOW_METHOD_TYPES[("SbImage", "removeReadImageCB")],
             (
-                "cb: SbImageReadImageCallback, "
-                "closure: object | None = ...",
+                "cb: SbImageReadImageCallback[_SbImageReadDataT], "
+                "closure: _SbImageReadDataT | None = ...",
                 "None",
             ),
         )
         self.assertEqual(
             policy.PYTHON_SHADOW_METHOD_TYPES[("SbImage", "scheduleReadFile")],
             (
-                "self, cb: SbImageReadImageCallback, "
-                "closure: object | None, filename: SbString, "
+                "self, cb: SbImageReadImageCallback[_SbImageReadDataT], "
+                "closure: _SbImageReadDataT | None, filename: SbString, "
                 "searchdirectories: SbString | None = ..., "
                 "numdirectories: int = ...",
                 "bool",
@@ -969,7 +969,7 @@ class CallbackTypePolicyTests(unittest.TestCase):
                     )
 
     def test_error_callbacks_use_python_callable_overrides(self):
-        expected = "SoErrorCallback"
+        expected = "SoErrorCallback[_SoErrorDataT]"
 
         for class_name in (
             "SoError",
@@ -987,7 +987,7 @@ class CallbackTypePolicyTests(unittest.TestCase):
                 policy.CALLBACK_PARAMETER_TYPE_OVERRIDES[
                     (class_name, "setHandlerCallback", "data")
                 ],
-                "object",
+                "_SoErrorDataT",
             )
 
     def test_sensor_callbacks_use_python_callable_overrides(self):
@@ -1292,7 +1292,7 @@ class PolicyBoundaryTests(unittest.TestCase):
         baseline = replace(
             TYPING_QUALITY_BASELINE,
             max_incomplete_by_category=(
-                ("dynamic/runtime API", 248),
+                ("dynamic/runtime API", 231),
             ),
         )
         violations = quality_regressions(report, baseline)
@@ -1313,7 +1313,7 @@ class PolicyBoundaryTests(unittest.TestCase):
             {
                 "runtime factory returns": 0,
                 "opaque pointer/object returns": 40,
-                "opaque parameter boundaries": 209,
+                "opaque parameter boundaries": 192,
                 "opaque field storage": 0,
             },
         )
@@ -1323,18 +1323,18 @@ class PolicyBoundaryTests(unittest.TestCase):
                 "geometry": 18,
                 "image/buffer": 20,
                 "action": 4,
-                "array/output": 11,
+                "array/output": 6,
                 "callback/handle": 35,
-                "other": 121,
+                "other": 109,
             },
         )
 
     def test_verifytypes_summary_parser(self):
         output = """
-Symbols exported by "pivy.coin": 13917
-  With known type: 8519
+Symbols exported by "pivy.coin": 13940
+  With known type: 8541
   With ambiguous type: 0
-  With unknown type: 5398
+  With unknown type: 5399
 
 Other symbols referenced but not exported by "pivy.coin": 0
   With known type: 0
@@ -1349,10 +1349,10 @@ Type completeness score: 61%
             report,
             VerifyTypesReport(
                 module="pivy.coin",
-                exported_symbols=13917,
-                known_symbols=8519,
+                exported_symbols=13940,
+                known_symbols=8541,
                 ambiguous_symbols=0,
-                unknown_symbols=5398,
+                unknown_symbols=5399,
                 completeness_score=61.0,
                 pyright_returncode=1,
             ),

@@ -35,9 +35,11 @@ _SoQtRenderAreaDataT = TypeVar("_SoQtRenderAreaDataT", contravariant=True)
 class SoQtRenderAreaCallback(Protocol[_SoQtRenderAreaDataT]):
     def __call__(self, data: _SoQtRenderAreaDataT, event: QEvent, /) -> object: ...
 
-class SoQtFatalErrorCallback(Protocol):
+_SoQtFatalErrorDataT = TypeVar("_SoQtFatalErrorDataT", contravariant=True)
+
+class SoQtFatalErrorCallback(Protocol[_SoQtFatalErrorDataT]):
     def __call__(
-        self, message: SbString, line: int, data: object, /
+        self, message: SbString, line: int, data: _SoQtFatalErrorDataT, /
     ) -> None: ...
 
 _SoQtAutoClippingDataT = TypeVar("_SoQtAutoClippingDataT", contravariant=True)
@@ -379,7 +381,7 @@ class SoQt:
     @staticmethod
     def getVersionToolkitString() -> str: ...
     @staticmethod
-    def setFatalErrorHandler(cb: SoQtFatalErrorCallback, userdata: object) -> SoQtFatalErrorCallback | None: ...
+    def setFatalErrorHandler(cb: SoQtFatalErrorCallback[_SoQtFatalErrorDataT], userdata: _SoQtFatalErrorDataT) -> SoQtFatalErrorCallback[object] | None: ...
     @staticmethod
     def isDebugLibrary() -> bool: ...
     @staticmethod

@@ -40,9 +40,9 @@ class VerifyTypesBaseline:
 VERIFYTYPES_BASELINES = {
     "pivy.coin": VerifyTypesBaseline(
         min_score=61.0,
-        min_known_symbols=8519,
+        min_known_symbols=8541,
         max_ambiguous_symbols=0,
-        max_unknown_symbols=5398,
+        max_unknown_symbols=5399,
     ),
     "pivy.gui.soqt": VerifyTypesBaseline(
         min_score=75.4,

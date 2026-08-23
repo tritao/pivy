@@ -79,13 +79,13 @@ class TypingQualityBaseline:
 TYPING_QUALITY_BASELINE = TypingQualityBaseline(
     min_concrete_annotations=21842,
     max_any_annotations=0,
-    max_incomplete_annotations=417,
+    max_incomplete_annotations=400,
     max_incomplete_by_category=(
         ("raw C pointers", 102),
         ("callbacks", 30),
         ("unknown output parameters", 0),
         ("function pointers", 36),
-        ("dynamic/runtime API", 249),
+        ("dynamic/runtime API", 232),
         ("uncategorized", 0),
     ),
 )

@@ -35,10 +35,10 @@ def check_soqt_lifecycle_contract() -> None:
     ) -> None:
         del message, code, data
 
-    previous_handler: soqt.SoQtFatalErrorCallback | None = (
+    previous_handler: soqt.SoQtFatalErrorCallback[object] | None = (
         soqt.SoQt.setFatalErrorHandler(fatal_error_callback, None)
     )
-    assert_type(previous_handler, soqt.SoQtFatalErrorCallback | None)
+    assert_type(previous_handler, soqt.SoQtFatalErrorCallback[object] | None)
 
 
 def check_soqt_render_area_contract() -> None:

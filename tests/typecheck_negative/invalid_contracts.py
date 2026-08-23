@@ -43,9 +43,12 @@ def invalid_callback_arity() -> None:
 def invalid_stable_enum_value() -> None:
     style: coin.SoDrawStyleValue = 4
     lasso_type: coin.SoExtSelectionLassoType = 3
+    depth_function: coin.SoDepthBufferFunction = 8
+    selection_policy: coin.SoSelectionPolicy = 4
+    rotation_axis: coin.SoRotationXYZAxis = 3
     viewer = soqt.SoQtViewer()
     viewer.setDrawStyle(0, 99)
-    del style, lasso_type, viewer
+    del style, lasso_type, depth_function, selection_policy, rotation_axis, viewer
 
 
 def invalid_nodekit_lookup() -> None:

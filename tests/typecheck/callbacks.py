@@ -22,7 +22,8 @@ def check_named_callback_protocols() -> None:
         def __call__(self, data: object, error: coin.SoError) -> None:
             pass
 
-    coin.SoError.setHandlerCallback(ErrorCallbackObject(), None)
+    error_contract: coin.SoErrorCallback[object] = ErrorCallbackObject()
+    coin.SoError.setHandlerCallback(error_contract, None)
 
     class StateMachineDeleteCallback:
         def __call__(
@@ -97,7 +98,7 @@ def check_sensor_callbacks() -> None:
     def changed_callback(data: Any) -> None:
         pass
 
-    changed_contract: coin.SoSensorManagerChangedCallback = changed_callback
+    changed_contract: coin.SoSensorManagerChangedCallback[Any] = changed_callback
     coin.SoDB.getSensorManager().setChangedCallback(changed_contract, None)
 
 
@@ -105,7 +106,7 @@ def check_database_callbacks() -> None:
     def header_callback(data: object, input: coin.SoInput) -> None:
         pass
 
-    header_contract: coin.SoDBHeaderCallback = header_callback
+    header_contract: coin.SoDBHeaderCallback[object] = header_callback
 
     def progress_callback(
         data: object,
@@ -181,7 +182,7 @@ def check_context_handler_callbacks() -> None:
     def callback(data: object, contextid: int) -> None:
         pass
 
-    callback_contract: coin.SoContextDestructionCallback = callback
+    callback_contract: coin.SoContextDestructionCallback[object] = callback
 
     coin.SoContextHandler.addContextDestructionCallback(callback_contract, None)
     coin.SoContextHandler.removeContextDestructionCallback(callback_contract, None)
@@ -220,7 +221,7 @@ def check_graphics_callback_setters() -> None:
     def end_frame_callback(data: object) -> None:
         pass
 
-    end_frame_contract: coin.SoGLImageEndFrameCallback = end_frame_callback
+    end_frame_contract: coin.SoGLImageEndFrameCallback[object] = end_frame_callback
     image = coin.SoGLImage()
     image.setEndFrameCallback(end_frame_contract, None)
     image.setEndFrameCallback(None)
@@ -232,7 +233,7 @@ def check_graphics_callback_setters() -> None:
     ) -> None:
         pass
 
-    enable_contract: coin.SoShaderEnableCallback = enable_callback
+    enable_contract: coin.SoShaderEnableCallback[object] = enable_callback
     shader_program = coin.SoShaderProgram()
     shader_program.setEnableCallback(enable_contract, None)
     shader_program.setEnableCallback(None)
@@ -245,7 +246,7 @@ def check_graphics_callback_setters() -> None:
     ) -> coin.SoProto | None:
         return None if numurls != len(urls) else None
 
-    fetch_proto_contract: coin.SoProtoFetchExternProtoCallback = fetch_proto_callback
+    fetch_proto_contract: coin.SoProtoFetchExternProtoCallback[object] = fetch_proto_callback
     coin.SoProto.setFetchExternProtoCallback(fetch_proto_contract, None)
     coin.SoProto.setFetchExternProtoCallback(None)
 
@@ -256,7 +257,7 @@ def check_graphics_callback_setters() -> None:
     ) -> bool:
         return bool(filename) and isinstance(image, coin.SbImage)
 
-    image_read_contract: coin.SbImageReadImageCallback = image_read_callback
+    image_read_contract: coin.SbImageReadImageCallback[object] = image_read_callback
     coin.SbImage.addReadImageCB(image_read_contract, None)
     coin.SbImage.removeReadImageCB(image_read_contract, None)
 

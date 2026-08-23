@@ -500,8 +500,11 @@ RAW_BOUNDARY_METHOD_RULES = (
     ),
     _method_rule(
         "SoQt", "setFatalErrorHandler",
-        {"cb": "SoQtFatalErrorCallback", "userdata": "object"},
-        "SoQtFatalErrorCallback | None",
+        {
+            "cb": "SoQtFatalErrorCallback[_SoQtFatalErrorDataT]",
+            "userdata": "_SoQtFatalErrorDataT",
+        },
+        "SoQtFatalErrorCallback[object] | None",
         "SoQt fatal-error callback ownership is modeled separately from raw ABI data",
     ),
 )
