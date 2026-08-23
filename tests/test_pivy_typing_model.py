@@ -6,6 +6,7 @@ from collections import Counter
 
 from tools.pivy_typing.boundaries import resolve_incomplete_boundaries
 from tools.pivy_typing.model import parse_stub, render_stub
+from tools.pivy_typing.resolved import resolve_module
 
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -75,6 +76,14 @@ class Example:
         self.assertEqual(categories["uncategorized"], 0)
         self.assertEqual(categories["raw C pointers"], 103)
         self.assertEqual(categories["dynamic/runtime API"], 267)
+
+    def test_resolved_model_contains_policy_evidence(self):
+        source = (PROJECT_ROOT / "pivy" / "coin.pyi").read_text(encoding="utf-8")
+        resolved = resolve_module(parse_stub(source, name="pivy.coin"))
+
+        self.assertEqual(len(resolved.incomplete_boundaries), 436)
+        self.assertGreaterEqual(len(resolved.callback_contracts), 70)
+        self.assertEqual(resolved.source, source)
 
 
 if __name__ == "__main__":

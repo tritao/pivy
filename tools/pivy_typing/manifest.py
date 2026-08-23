@@ -7,9 +7,8 @@ import json
 from pathlib import Path
 from typing import Any
 
-from .boundaries import resolve_incomplete_boundaries
-from .callbacks import callback_contracts_for_module
-from .model import Class, Module, Overload, Parameter, TypeExpr, parse_stub
+from .model import Class, Module, Overload, Parameter, TypeExpr
+from .resolved import resolve_module, resolve_stub
 
 
 MANIFEST_SCHEMA_VERSION = 1
@@ -106,8 +105,9 @@ def _callback_contract_manifest(contract) -> dict[str, Any]:
 def module_to_manifest(module: Module) -> dict[str, Any]:
     """Convert a semantic model into a deterministic JSON-compatible value."""
 
+    resolved = resolve_module(module)
     boundaries = sorted(
-        resolve_incomplete_boundaries(module),
+        resolved.incomplete_boundaries,
         key=lambda item: (
             item.kind,
             item.class_name,
@@ -116,13 +116,8 @@ def module_to_manifest(module: Module) -> dict[str, Any]:
             item.category,
         ),
     )
-    class_names = {class_.name for class_ in module.classes}
     contracts = sorted(
-        (
-            contract
-            for contract in callback_contracts_for_module(module.name)
-            if contract.class_name in class_names
-        ),
+        resolved.callback_contracts,
         key=lambda item: item.key,
     )
     return {
@@ -159,7 +154,7 @@ def manifest_from_stub(stub_path: Path) -> dict[str, Any]:
         module_name = stub_path.stem
     else:
         module_name = ".".join(parts[package_index:])
-    return module_to_manifest(parse_stub(source, name=module_name))
+    return module_to_manifest(resolve_stub(source, name=module_name).module)
 
 
 def _diff_values(left: Any, right: Any, path: str) -> list[str]:

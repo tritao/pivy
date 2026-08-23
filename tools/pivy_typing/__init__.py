@@ -28,6 +28,7 @@ from .manifest import (
     render_manifest,
 )
 from .pipeline import PipelineResult, Stage, run_pipeline
+from .resolved import ResolvedModule, resolve_module, resolve_stub
 
 __all__ = [
     "Attribute",
@@ -50,6 +51,9 @@ __all__ = [
     "CALLBACK_CONTRACTS",
     "callback_contracts_for_module",
     "callback_method_checks",
+    "ResolvedModule",
+    "resolve_module",
+    "resolve_stub",
     "MANIFEST_SCHEMA_VERSION",
     "manifest_diff",
     "manifest_from_stub",

@@ -2,10 +2,17 @@
 
 from __future__ import annotations
 
-from .model import parse_stub, render_stub
+from .model import render_stub
+from .resolved import ResolvedModule, resolve_stub
+
+
+def render_resolved_pyi(resolved: ResolvedModule) -> str:
+    """Render syntax from a resolved model without owning policy decisions."""
+
+    return render_stub(resolved.module)
 
 
 def render_pyi(text: str, module: str) -> str:
-    """Validate and render a processed stub without changing its bytes."""
+    """Resolve and render a processed stub without changing its bytes."""
 
-    return render_stub(parse_stub(text, name=module))
+    return render_resolved_pyi(resolve_stub(text, name=module))

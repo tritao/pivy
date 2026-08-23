@@ -21,8 +21,7 @@ from tools.pivy_stub_typing_policy import (
     classify_incomplete,
     classify_dynamic_runtime_site,
 )
-from tools.pivy_typing.boundaries import resolve_incomplete_boundaries
-from tools.pivy_typing.model import parse_stub as parse_semantic_stub
+from tools.pivy_typing.resolved import resolve_stub
 
 
 @dataclass(frozen=True)
@@ -168,10 +167,16 @@ def iter_class_members(tree: ast.Module) -> Iterable[tuple[ast.ClassDef, ast.stm
 def collect_report(stub_path: Path) -> TypingReport:
     source = stub_path.read_text(encoding="utf-8")
     tree = ast.parse(source, filename=str(stub_path))
-    semantic_model = parse_semantic_stub(source, name=str(stub_path))
+    resolved_model = resolve_stub(source, name=str(stub_path))
     semantic_boundaries = {
-        (boundary.kind, boundary.class_name, boundary.method_name, boundary.name, boundary.line): boundary.category
-        for boundary in resolve_incomplete_boundaries(semantic_model)
+        (
+            boundary.kind,
+            boundary.class_name,
+            boundary.method_name,
+            boundary.name,
+            boundary.line,
+        ): boundary.category
+        for boundary in resolved_model.incomplete_boundaries
     }
     source_lines = source.splitlines()
     classes = [node for node in tree.body if isinstance(node, ast.ClassDef)]
