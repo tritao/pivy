@@ -390,7 +390,27 @@ Phase 8 is now implemented with the first backend-neutral API artifact:
 - Manifest tests cover deterministic output, normalized annotation spelling,
   structural self-comparison and the real Coin API surface.
 
-The next slice is to remove the remaining duplicated structural expectation
-tables and make the current `.pyi` renderer purely a syntax backend. The later
-work is to declare the backend-neutral baseline and only then compare an
-experimental SWIG 4.5 producer against the manifest.
+The resolved model is now the shared backend boundary:
+
+- `tools/pivy_typing/resolved.py` combines parsed syntax with boundary and
+  callback policy decisions in one `ResolvedModule` value.
+- The manifest, quality report and `.pyi` renderer consume that resolved view
+  instead of independently rediscovering policy facts.
+- The renderer remains lossless today, but its public entry point is now
+  explicitly `ResolvedModule -> syntax`, leaving semantic decisions outside
+  the rendering backend.
+
+The first remaining structural validator table has also been removed:
+
+- vector, matrix, color and enum sequence expectations are represented by
+  provenance-bearing `MethodSignatureRule` objects in the typing policy;
+- positive array checks are derived from those rules, while unsupported-array
+  checks remain independent negative safeguards;
+- the same special sequence parameter rules feed stub generation, so the
+  validator no longer owns a second copy of those signatures.
+
+The next slice is to migrate the remaining duplicated positive structural
+tables—pointer helpers, typedef/string adapters, documented typed methods,
+operators and deferred raw boundaries—into the resolved model or policy
+registries. After that, declare the backend-neutral baseline and only then
+compare an experimental SWIG 4.5 producer against the manifest.

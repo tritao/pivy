@@ -82,6 +82,29 @@ class OverrideRule:
     owner: PolicyOwner = PolicyOwner.COIN
 
 
+@dataclass(frozen=True)
+class MethodSignatureRule:
+    """One complete Python-facing method signature contract."""
+
+    target: PolicyTarget
+    parameter_types: tuple[tuple[str, str], ...]
+    return_type: str
+    reason: str
+    source: str = "tools/pivy_stub_typing_policy.py"
+    owner: PolicyOwner = PolicyOwner.COIN
+
+    @property
+    def check(self):
+        """Return the legacy validator shape during the migration."""
+
+        return (
+            self.target.class_name,
+            self.target.method_name,
+            dict(self.parameter_types),
+            self.return_type,
+        )
+
+
 def _rules_from_mapping(mapping, reason):
     return tuple(
         OverrideRule(
@@ -309,6 +332,149 @@ MATRIX_VALUE_RETURN_TYPES = {
     "SbMatrix": "Sequence[Sequence[float]]",
 }
 MATRIX_ROW_RETURN_TYPES = {"SbMatrix": "Sequence[float]"}
+
+
+def _method_signature_rule(
+    class_name,
+    method_name,
+    parameter_types,
+    return_type,
+    reason,
+):
+    target = PolicyTarget(class_name, method_name)
+    return MethodSignatureRule(
+        target=target,
+        parameter_types=tuple(parameter_types),
+        return_type=return_type,
+        reason=reason,
+        owner=policy_owner_for_target(target),
+    )
+
+
+def _sequence_method_rules():
+    rules = []
+    for (class_name, method_name, parameter_name), (python_type, _) in (
+        SEQUENCE_ARRAY_PARAMETERS.items()
+    ):
+        rules.append(
+            _method_signature_rule(
+                class_name,
+                method_name,
+                ((parameter_name, python_type),),
+                "None" if method_name == "__init__" else class_name,
+                "Fixed-width native array exposed as a Python sequence",
+            )
+        )
+
+    for class_name, python_type in SEQUENCE_VALUE_RETURN_TYPES.items():
+        if class_name == "SbColor":
+            # SbColor exposes getHSVValue but inherits getValue from
+            # SbVec3f; the generated class body has no separate getValue
+            # declaration for the validator to check.
+            continue
+        rules.append(
+            _method_signature_rule(
+                class_name,
+                "getValue",
+                (),
+                python_type,
+                "Native vector value exposed as a Python sequence",
+            )
+        )
+
+    for class_name in ("SbColor", "SbColor4f"):
+        rules.append(
+            _method_signature_rule(
+                class_name,
+                "getHSVValue",
+                (),
+                SEQUENCE_VALUE_RETURN_TYPES[class_name],
+                "Native color value exposed as a Python sequence",
+            )
+        )
+
+    for class_name, python_type in MATRIX_VALUE_RETURN_TYPES.items():
+        rules.append(
+            _method_signature_rule(
+                class_name,
+                "getValue",
+                (),
+                python_type,
+                "Native matrix value exposed as nested Python sequences",
+            )
+        )
+
+    for class_name, python_type in MATRIX_ROW_RETURN_TYPES.items():
+        rules.append(
+            _method_signature_rule(
+                class_name,
+                "__getitem__",
+                (("i", "int"),),
+                python_type,
+                "Native matrix row exposed as a Python sequence",
+            )
+        )
+
+    rules.extend(
+        (
+            _method_signature_rule(
+                "SoSFEnum",
+                "setEnums",
+                (
+                    ("num", "int"),
+                    ("vals", "Sequence[int]"),
+                    ("names", "SbName | Sequence[SbName | str]"),
+                ),
+                "None",
+                "Enum arrays exposed as Python sequences",
+            ),
+            _method_signature_rule(
+                "SbColor",
+                "setHSVValue",
+                (("hsv", "Sequence[float]"),),
+                "SbColor",
+                "Color components exposed as a Python sequence",
+            ),
+            _method_signature_rule(
+                "SbColor4f",
+                "setHSVValue",
+                (("hsv", "Sequence[float]"),),
+                "SbColor4f",
+                "Color components exposed as a Python sequence",
+            ),
+            _method_signature_rule(
+                "SoMFColor",
+                "setHSVValues",
+                (
+                    ("start", "int"),
+                    ("num", "int"),
+                    ("hsv", "Sequence[Sequence[float]]"),
+                ),
+                "None",
+                "Color arrays exposed as nested Python sequences",
+            ),
+        )
+    )
+    return tuple(rules)
+
+
+SEQUENCE_METHOD_RULES = _sequence_method_rules()
+
+
+def sequence_method_checks():
+    """Return compatibility checks derived from sequence method policy."""
+
+    return tuple(rule.check for rule in SEQUENCE_METHOD_RULES)
+
+
+SEQUENCE_PARAMETER_TYPE_OVERRIDES = {
+    (rule.target.class_name, rule.target.method_name, parameter_name): parameter_type
+    for rule in SEQUENCE_METHOD_RULES
+    for parameter_name, parameter_type in rule.parameter_types
+    if rule.target.method_name not in {"__init__", "setValue", "getValue"}
+}
+
+
 STRING_POINTER_PARAMETERS = {
     ("SbName", "__eq__", "u"),
     ("SbName", "__nq__", "u"),
@@ -493,6 +659,7 @@ _PYTHON_PARAMETER_TYPE_OVERRIDES = {
     # SoSensor stores and returns an arbitrary Python callback payload.  The
     # getter is already object-valued; keep the setter symmetric.
     ("SoSensor", "setData", "callbackdata"): "object",
+    **SEQUENCE_PARAMETER_TYPE_OVERRIDES,
 }
 PYTHON_PARAMETER_RULES = tuple(
     OverrideRule(

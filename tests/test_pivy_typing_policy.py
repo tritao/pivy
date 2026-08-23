@@ -103,6 +103,31 @@ class FieldTypePolicyTests(unittest.TestCase):
                 getattr(policy, mapping_name),
             )
 
+    def test_sequence_method_rules_are_complete_and_provenanced(self):
+        rules = policy.SEQUENCE_METHOD_RULES
+        targets = [rule.target.key for rule in rules]
+
+        self.assertEqual(len(targets), len(set(targets)))
+        self.assertTrue(all(rule.reason for rule in rules))
+        self.assertTrue(all(rule.source for rule in rules))
+        self.assertIn(
+            (
+                "SoSFEnum",
+                "setEnums",
+                {
+                    "num": "int",
+                    "vals": "Sequence[int]",
+                    "names": "SbName | Sequence[SbName | str]",
+                },
+                "None",
+            ),
+            policy.sequence_method_checks(),
+        )
+        self.assertIn(
+            ("SbMatrix", "__getitem__", {"i": "int"}, "Sequence[float]"),
+            policy.sequence_method_checks(),
+        )
+
     def test_coin_typing_policy_registry_is_complete(self):
         self.assertEqual(COIN_TYPING_POLICY.fields, policy.FIELD_TYPE_POLICIES)
         self.assertEqual(
