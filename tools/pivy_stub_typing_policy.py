@@ -444,6 +444,30 @@ _METHOD_RETURN_TYPE_OVERRIDES = {
     ("SoQtRenderArea", "getOverlaySceneGraph"): "SoNode | None",
     ("SoQtViewer", "getCamera"): "SoCamera | None",
     ("SoQtViewer", "getSceneGraph"): "SoNode | None",
+    # These adapter return types were formerly repeated in the validator's
+    # handwritten structural-check table.  Keep them in the canonical policy
+    # so generation and validation cannot silently diverge.
+    ("SbByteBuffer", "data"): "bytes",
+    ("SbBox2i32", "getBounds"): "tuple[int, int, int, int]",
+    ("SbBox2i32", "getOrigin"): "tuple[int, int]",
+    ("SbBox2s", "getBounds"): "tuple[int, int, int, int]",
+    ("SbBox2s", "getOrigin"): "tuple[int, int]",
+    ("SbBox2s", "getSize"): "SbVec2s",
+    ("SbBox3i32", "getBounds"): "tuple[int, int, int, int, int, int]",
+    ("SbBox3i32", "getOrigin"): "tuple[int, int, int]",
+    ("SbBox3s", "getBounds"): "tuple[int, int, int, int, int, int]",
+    ("SbBox3s", "getOrigin"): "tuple[int, int, int]",
+    ("SbBox3s", "getSize"): "SbVec3s",
+    ("SoCallbackAction", "getTextureImage2dValue"): (
+        "tuple[bytes | None, SbVec2s, int]"
+    ),
+    ("SoCallbackAction", "getTextureImage3dValue"): (
+        "tuple[bytes | None, SbVec3s, int]"
+    ),
+    ("SoEngine", "getOutputNameValue"): "tuple[bool, str]",
+    ("SoSFImage", "getSubTextureValue"): (
+        "tuple[bytes | None, SbVec2s, SbVec2s, int]"
+    ),
 }
 
 METHOD_RETURN_RULES = tuple(

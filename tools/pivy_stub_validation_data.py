@@ -1287,26 +1287,8 @@ EXTEND_HELPER_METHOD_CHECKS = {
         ),
     ),
 }
-_LEGACY_METHOD_RETURN_TYPE_CHECKS = (
-    ("SbByteBuffer", "data", "bytes"),
-    ("SbBox2i32", "getBounds", "tuple[int, int, int, int]"),
-    ("SbBox2i32", "getOrigin", "tuple[int, int]"),
-    ("SbBox2s", "getBounds", "tuple[int, int, int, int]"),
-    ("SbBox2s", "getOrigin", "tuple[int, int]"),
-    ("SbBox2s", "getSize", "SbVec2s"),
-    ("SbBox3i32", "getBounds", "tuple[int, int, int, int, int, int]"),
-    ("SbBox3i32", "getOrigin", "tuple[int, int, int]"),
-    ("SbBox3s", "getBounds", "tuple[int, int, int, int, int, int]"),
-    ("SbBox3s", "getOrigin", "tuple[int, int, int]"),
-    ("SbBox3s", "getSize", "SbVec3s"),
-    ("SoCallbackAction", "getTextureImage2dValue", "tuple[bytes | None, SbVec2s, int]"),
-    ("SoCallbackAction", "getTextureImage3dValue", "tuple[bytes | None, SbVec3s, int]"),
-    ("SoEngine", "getOutputNameValue", "tuple[bool, str]"),
-    ("SoSFImage", "getSubTextureValue", "tuple[bytes | None, SbVec2s, SbVec2s, int]"),
-)
-
 METHOD_RETURN_TYPE_CHECKS = {
-    "coin.pyi": _LEGACY_METHOD_RETURN_TYPE_CHECKS,
+    "coin.pyi": (),
     os.path.join("gui", "soqt.pyi"): (),
 }
 PROPERTY_ATTRIBUTE_CHECKS = {
