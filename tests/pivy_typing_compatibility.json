@@ -159,6 +159,33 @@
             ]
           }
         },
+        "SbBSPTree": {
+          "bases": [],
+          "methods": {
+            "findPoints": [
+              {
+                "parameters": [
+                  {"name": "sphere", "type": "SbSphere"},
+                  {"name": "array", "type": "SbIntList"}
+                ],
+                "return": "None"
+              }
+            ],
+            "findClosest": [
+              {
+                "parameters": [{"name": "pos", "type": "SbVec3f"}],
+                "return": "int"
+              },
+              {
+                "parameters": [
+                  {"name": "sphere", "type": "SbSphere"},
+                  {"name": "array", "type": "SbIntList"}
+                ],
+                "return": "int"
+              }
+            ]
+          }
+        },
         "SoMFVec3f": {
           "bases": ["SoMField"],
           "methods": {

@@ -60,6 +60,7 @@ try:
         CALLBACK_TYPE_SIGNATURES,
         COIN_TYPING_POLICY,
         COMPARISON_METHODS,
+        EXCLUDED_CPP_SIGNATURES,
         factory_method_return_type,
         EXTEND_HELPER_METHOD_TYPES,
         FIELD_ATTRIBUTE_TYPE_POLICIES,
@@ -116,6 +117,7 @@ except ImportError:
         CALLBACK_TYPE_SIGNATURES,
         COIN_TYPING_POLICY,
         COMPARISON_METHODS,
+        EXCLUDED_CPP_SIGNATURES,
         factory_method_return_type,
         EXTEND_HELPER_METHOD_TYPES,
         FIELD_ATTRIBUTE_TYPE_POLICIES,
@@ -182,6 +184,12 @@ def normalize_cpp_type(cpp_type):
     cleaned = cleaned.replace("*", " * ").replace("&", " & ")
     cleaned = re.sub(r"\s+", " ", cleaned).strip()
     return cleaned
+
+
+def canonical_cpp_signature_type(cpp_type):
+    """Normalize a C++ type for matching an explicit excluded overload."""
+
+    return re.sub(r"\s+", "", normalize_cpp_type(cpp_type))
 
 
 def base_cpp_type(cpp_type):
@@ -749,6 +757,23 @@ def pop_decorators(lines, indent):
     return decorators
 
 
+def is_excluded_cpp_signature(class_name, method_name, signature):
+    """Return whether policy deliberately omits this native overload."""
+
+    rule = EXCLUDED_CPP_SIGNATURES.get((class_name, method_name))
+    if rule is None:
+        return False
+
+    parameters = {
+        (parameter.name, canonical_cpp_signature_type(parameter.type))
+        for parameter in drop_self_argument(signature.args)
+    }
+    return all(
+        (name, cpp_type) in parameters
+        for name, cpp_type in rule.parameter_types
+    )
+
+
 def render_unique_python_signatures(
     def_match,
     signatures,
@@ -762,6 +787,8 @@ def render_unique_python_signatures(
     callback_types, callback_handle_types = infer_python_callback_types(signatures)
 
     for signature in signatures:
+        if is_excluded_cpp_signature(class_name, def_match.group("name"), signature):
+            continue
         if is_c_callback_signature(signature, callback_types):
             continue
 
@@ -2328,6 +2355,18 @@ def postprocess_stub(path, module, output_dir):
                 continue
 
             signatures, end = signature_docstring
+            signatures = [
+                signature
+                for signature in signatures
+                if not is_excluded_cpp_signature(
+                    current_class, def_match.group("name"), signature
+                )
+            ]
+            if not signatures:
+                pop_decorators(updated, def_match.group("indent"))
+                index = end
+                continue
+
             if len(signatures) == 1:
                 updated.append(
                     render_python_signature(

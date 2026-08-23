@@ -1292,7 +1292,7 @@ class PolicyBoundaryTests(unittest.TestCase):
         baseline = replace(
             TYPING_QUALITY_BASELINE,
             max_incomplete_by_category=(
-                ("dynamic/runtime API", 231),
+                ("dynamic/runtime API", 229),
             ),
         )
         violations = quality_regressions(report, baseline)
@@ -1313,7 +1313,7 @@ class PolicyBoundaryTests(unittest.TestCase):
             {
                 "runtime factory returns": 0,
                 "opaque pointer/object returns": 40,
-                "opaque parameter boundaries": 192,
+                "opaque parameter boundaries": 190,
                 "opaque field storage": 0,
             },
         )
@@ -1323,7 +1323,7 @@ class PolicyBoundaryTests(unittest.TestCase):
                 "geometry": 18,
                 "image/buffer": 20,
                 "action": 4,
-                "array/output": 6,
+                "array/output": 4,
                 "callback/handle": 35,
                 "other": 109,
             },

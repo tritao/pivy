@@ -1408,6 +1408,29 @@ class TypingSequenceAdapterTests(unittest.TestCase):
         children = SoGroup().getChildren()
         children.traverseInPath(SoCallbackAction(), 0, [])
 
+    def testBSPTreeTypedIndexOutput(self):
+        tree = SbBSPTree()
+        for point in ((0.0, 0.0, 0.0), (1.0, 0.0, 0.0), (5.0, 0.0, 0.0)):
+            tree.addPoint(SbVec3f(*point))
+
+        sphere = SbSphere(SbVec3f(0.0, 0.0, 0.0), 2.0)
+        indices = SbIntList()
+        self.assertIsNone(tree.findPoints(sphere, indices))
+        self.assertEqual(
+            [indices.get(index) for index in range(indices.getLength())],
+            [0, 1],
+        )
+
+        closest_indices = SbIntList()
+        self.assertEqual(tree.findClosest(sphere, closest_indices), 0)
+        self.assertEqual(
+            [
+                closest_indices.get(index)
+                for index in range(closest_indices.getLength())
+            ],
+            [0, 1],
+        )
+
 class OperatorTests(unittest.TestCase):
     """checks various operator overloaded methods"""
     def testEqNone(self):

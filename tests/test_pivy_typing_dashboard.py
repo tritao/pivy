@@ -29,7 +29,7 @@ class TypingDashboardTests(unittest.TestCase):
                 "geometry": 18,
                 "image/buffer": 20,
                 "action": 4,
-                "array/output": 6,
+                "array/output": 4,
                 "callback/handle": 35,
                 "other": 109,
             },

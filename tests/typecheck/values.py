@@ -142,3 +142,14 @@ def check_int32_scalar_output_helpers() -> None:
     assert_type(box3.getBounds(), tuple[int, int, int, int, int, int])
     assert_type(box3.getOrigin(), tuple[int, int, int])
     assert_type(box3.getSize(), coin.SbVec3i32)
+
+
+def check_bsp_tree_index_outputs() -> None:
+    tree = coin.SbBSPTree()
+    sphere = coin.SbSphere(coin.SbVec3f(0.0, 0.0, 0.0), 2.0)
+    indices = coin.SbIntList()
+
+    assert_type(tree.findPoints(sphere, indices), None)
+    assert_type(tree.findClosest(sphere, indices), int)
+    assert_type(indices.getLength(), int)
+    assert_type(indices.get(0), int)

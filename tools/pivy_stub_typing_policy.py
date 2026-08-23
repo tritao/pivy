@@ -105,6 +105,14 @@ class MethodSignatureRule:
         )
 
 
+@dataclass(frozen=True)
+class ExcludedCppSignature:
+    """A native overload intentionally omitted from the public Python stub."""
+
+    parameter_types: tuple[tuple[str, str], ...]
+    reason: str
+
+
 def _rules_from_mapping(mapping, reason):
     return tuple(
         OverrideRule(
@@ -4207,14 +4215,26 @@ INCOMPLETE_RULES = (
     ),
 )
 
+# Deprecated Coin overloads with no usable Python representation. The supported
+# SbIntList overloads remain in the generated stub; these native compatibility
+# overloads are omitted instead of being advertised as ``Incomplete``.
+EXCLUDED_CPP_SIGNATURES = {
+    ("SbBSPTree", "findPoints"): ExcludedCppSignature(
+        parameter_types=(("array", "SbList<int>&"),),
+        reason="Deprecated SbList<int> overload; use the SbIntList overload.",
+    ),
+    ("SbBSPTree", "findClosest"): ExcludedCppSignature(
+        parameter_types=(("array", "SbList<int>&"),),
+        reason="Deprecated SbList<int> overload; use the SbIntList overload.",
+    ),
+}
+
 # Conservative inventory for currently opaque or domain-specific surfaces. These
 # remain ``Incomplete`` intentionally, but they are known deferred runtime API
 # work rather than unknown typing holes. New sites must be added deliberately.
 TRIAGED_INCOMPLETE_SITES = frozenset(
     {
         ('parameter', 'SbBSPTree', 'addPoint', 'userdata'),
-        ('parameter', 'SbBSPTree', 'findClosest', 'array'),
-        ('parameter', 'SbBSPTree', 'findPoints', 'array'),
         ('parameter', 'SbBox2i32', 'getBounds', 'xmax'),
         ('parameter', 'SbBox2i32', 'getBounds', 'xmin'),
         ('parameter', 'SbBox2i32', 'getBounds', 'ymax'),

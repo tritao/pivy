@@ -26,6 +26,12 @@ def invalid_multifield_slice() -> None:
     field[0:1]
 
 
+def invalid_deprecated_bsp_output() -> None:
+    tree = coin.SbBSPTree()
+    sphere = coin.SbSphere(coin.SbVec3f(), 1.0)
+    tree.findPoints(sphere, coin.SbPList())
+
+
 def invalid_double_multifield_element() -> None:
     field = coin.SoMFDouble()
     field.setValues([object()])

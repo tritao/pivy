@@ -69,7 +69,7 @@ class Example:
             "getValues",
             manifest["classes"]["SoMFDouble"]["methods"],
         )
-        self.assertEqual(len(manifest["boundaries"]), 400)
+        self.assertEqual(len(manifest["boundaries"]), 398)
         self.assertEqual(
             manifest["boundaries"][0]["source"],
             "tools/pivy_stub_typing_policy.py",
