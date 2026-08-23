@@ -9,6 +9,10 @@ from tools.pivy_typing.manifest import (
     module_to_manifest,
     render_manifest,
 )
+from tools.pivy_typing.baseline import (
+    COIN_MANIFEST_BASELINE,
+    manifest_baseline_issues,
+)
 from tools.pivy_typing.model import parse_stub
 
 
@@ -33,6 +37,7 @@ class Example:
         self.assertNotIn('"self"', rendered)
         self.assertEqual(manifest["boundaries"], [])
         self.assertEqual(manifest["callback_contracts"], {})
+        self.assertEqual(manifest["method_contracts"], [])
 
     def test_equivalent_annotation_spelling_has_no_semantic_diff(self):
         left = module_to_manifest(
@@ -73,6 +78,13 @@ class Example:
             "SoSelection.addSelectionCallback",
             manifest["callback_contracts"],
         )
+
+    def test_real_coin_manifest_matches_reviewed_baseline(self):
+        source = (PROJECT_ROOT / "pivy" / "coin.pyi").read_text(encoding="utf-8")
+        manifest = module_to_manifest(parse_stub(source, name="pivy.coin"))
+
+        self.assertEqual(manifest_baseline_issues(manifest), ())
+        self.assertEqual(manifest["module"], COIN_MANIFEST_BASELINE["module"])
 
 
 if __name__ == "__main__":

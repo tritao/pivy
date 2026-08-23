@@ -102,6 +102,21 @@ def _callback_contract_manifest(contract) -> dict[str, Any]:
     }
 
 
+def _method_contract_manifest(contract) -> dict[str, Any]:
+    return {
+        "class": contract.target.class_name,
+        "method": contract.target.method_name,
+        "owner": contract.owner.value,
+        "parameters": [
+            {"name": name, "type": annotation}
+            for name, annotation in contract.parameter_types
+        ],
+        "reason": contract.reason,
+        "return": contract.return_type,
+        "source": contract.source,
+    }
+
+
 def module_to_manifest(module: Module) -> dict[str, Any]:
     """Convert a semantic model into a deterministic JSON-compatible value."""
 
@@ -120,12 +135,25 @@ def module_to_manifest(module: Module) -> dict[str, Any]:
         resolved.callback_contracts,
         key=lambda item: item.key,
     )
+    method_contracts = sorted(
+        resolved.method_contracts,
+        key=lambda item: (
+            item.target.class_name,
+            item.target.method_name,
+            item.parameter_types,
+            item.return_type,
+        ),
+    )
     return {
         "boundaries": [_boundary_manifest(boundary) for boundary in boundaries],
         "callback_contracts": {
             "%s.%s" % (contract.class_name, contract.method_name): _callback_contract_manifest(contract)
             for contract in contracts
         },
+        "method_contracts": [
+            _method_contract_manifest(contract)
+            for contract in method_contracts
+        ],
         "classes": {
             class_.name: _class_manifest(class_)
             for class_ in module.classes

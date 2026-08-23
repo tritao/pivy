@@ -83,6 +83,7 @@ class Example:
 
         self.assertEqual(len(resolved.incomplete_boundaries), 436)
         self.assertGreaterEqual(len(resolved.callback_contracts), 70)
+        self.assertGreaterEqual(len(resolved.method_contracts), 100)
         self.assertEqual(resolved.source, source)
 
 

@@ -431,7 +431,30 @@ The remaining validator contracts are now registry-backed too:
 - multifield, Python-helper and extension-helper expectations are derived from
   the existing binding policy rather than maintained in validator-only tables.
 
-The remaining roadmap work is now the final architecture seam: check and
-document a backend-neutral manifest baseline, expose a producer comparison
-command for future SWIG 4.5 output, and remove any compatibility projections
-that no longer have independent consumers.
+The backend-neutral architecture seam is now complete:
+
+- `tools/pivy_typing/resolved.py` carries the policy-owned method contracts in
+  addition to boundary and callback contracts, so the manifest records the
+  full resolved contract surface rather than only syntax and exceptions;
+- `tools/pivy_typing/baseline.py` defines the reviewed Coin manifest counts and
+  canonical digest, and `pixi run typecheck_manifest_baseline` makes accidental
+  public-surface drift explicit;
+- `tools/compare_pivy_typing_producers.py` compares two stub producers through
+  the canonical manifest and classifies differences as Python API,
+  intentional-boundary, binding-metadata or schema changes;
+- `pixi run typecheck_producer_comparison` compares the checked-in stubs with
+  the freshly generated build stubs, while the producer test exercises both
+  equivalence and semantic-difference reporting;
+- CMake tracks the new contract registry as a generator dependency, and the
+  validator no longer duplicates the policy-owned pointer-helper map or raw
+  boundary note.
+
+The current repository provides SWIG 4.2, not SWIG 4.5. Therefore the roadmap
+does not claim a 4.5 migration or comparison that was not actually run. The
+comparison command is deliberately ready for a future SWIG 4.5-generated stub
+to be supplied as its candidate input; the current generated producer is
+already semantically equivalent to the reviewed public baseline.
+
+This completes the backend-neutral baseline roadmap. Future work is a bounded
+SWIG 4.5 experiment and subsequent policy improvements, not another tooling
+architecture rewrite.

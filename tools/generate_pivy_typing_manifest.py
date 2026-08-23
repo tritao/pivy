@@ -11,6 +11,7 @@ from tools.pivy_typing.manifest import (
     manifest_from_stub,
     render_manifest,
 )
+from tools.pivy_typing.baseline import manifest_baseline_issues
 
 
 def parse_args() -> argparse.Namespace:
@@ -26,6 +27,11 @@ def parse_args() -> argparse.Namespace:
         type=Path,
         help="write the manifest to this path instead of stdout",
     )
+    parser.add_argument(
+        "--check-baseline",
+        action="store_true",
+        help="check the input against the reviewed Coin manifest baseline",
+    )
     return parser.parse_args()
 
 
@@ -40,6 +46,15 @@ def main() -> int:
             print("\n".join(differences))
             return 1
         print("Pivy typing manifests are semantically equivalent")
+        return 0
+
+    if args.check_baseline:
+        issues = manifest_baseline_issues(manifest)
+        if issues:
+            print("Pivy typing manifest baseline mismatch:")
+            print("\n".join(issues))
+            return 1
+        print("Pivy typing manifest matches the reviewed baseline")
         return 0
 
     output = render_manifest(manifest)

@@ -6,6 +6,8 @@ import os
 
 from tools.pivy_stub_typing_policy import (
     FIELD_ATTRIBUTE_TYPE_POLICIES,
+    POINTER_HELPER_TYPES,
+    RUNTIME_UNSUPPORTED_NOTE,
     multifield_iter_element_types,
     documented_method_checks,
     operator_method_checks,
@@ -42,10 +44,6 @@ class StubSpec:
     kind: StubKind
 
 
-RUNTIME_UNSUPPORTED_NOTE = (
-    "NOTE: SWIG exposes raw C pointers here; keep Incomplete until a "
-    "Python-level wrapper exists."
-)
 STUB_SPECS = (
     StubSpec("coin.pyi", StubKind.PUBLIC),
     StubSpec(os.path.join("gui", "soqt.pyi"), StubKind.PUBLIC),
@@ -72,14 +70,6 @@ SOQT_COIN_SHARED_TYPES = {
     "SoNotRec",
     "SoSField",
     "SoType",
-}
-POINTER_HELPER_TYPES = {
-    "charp": "str",
-    "intp": "int",
-    "uintp": "int",
-    "longp": "int",
-    "floatp": "float",
-    "doublep": "float",
 }
 ITER_CONTAINER_TYPES = {
     "SbIntList": "int",

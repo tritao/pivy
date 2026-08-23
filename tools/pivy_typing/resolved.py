@@ -6,6 +6,7 @@ from dataclasses import dataclass
 
 from .boundaries import IncompleteBoundary, resolve_incomplete_boundaries
 from .callbacks import CallbackContract, callback_contracts_for_module
+from .contracts import MethodSignatureRule, method_contracts_for_classes
 from .model import Class, Module, parse_stub
 
 
@@ -16,6 +17,7 @@ class ResolvedModule:
     module: Module
     incomplete_boundaries: tuple[IncompleteBoundary, ...]
     callback_contracts: tuple[CallbackContract, ...]
+    method_contracts: tuple[MethodSignatureRule, ...]
 
     @property
     def name(self) -> str:
@@ -39,10 +41,12 @@ def resolve_module(module: Module) -> ResolvedModule:
         for contract in callback_contracts_for_module(module.name)
         if contract.class_name in class_names
     )
+    method_contracts = method_contracts_for_classes(class_names)
     return ResolvedModule(
         module=module,
         incomplete_boundaries=resolve_incomplete_boundaries(module),
         callback_contracts=callback_contracts,
+        method_contracts=method_contracts,
     )
 
 

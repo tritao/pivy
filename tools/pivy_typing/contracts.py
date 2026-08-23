@@ -4,17 +4,38 @@ from __future__ import annotations
 
 import ast
 
-from tools.pivy_stub_typing_policy import (
-    EXTEND_HELPER_METHOD_TYPES,
-    MULTIFIELD_TYPE_POLICIES,
-    MethodSignatureRule,
-    PolicyTarget,
-    PYTHON_HELPER_METHOD_POLICIES,
-    multifield_component_sequence_types,
-    multifield_setvalues_types,
-    multifield_single_value_types,
-    policy_owner_for_target,
-)
+try:
+    from tools.pivy_stub_typing_policy import (
+        DOCUMENTED_METHOD_RULES,
+        EXTEND_HELPER_METHOD_TYPES,
+        MULTIFIELD_TYPE_POLICIES,
+        MethodSignatureRule,
+        OPERATOR_METHOD_RULES,
+        PolicyTarget,
+        PYTHON_HELPER_METHOD_POLICIES,
+        SEQUENCE_METHOD_RULES,
+        TYPEDEF_AND_STRING_METHOD_RULES,
+        multifield_component_sequence_types,
+        multifield_setvalues_types,
+        multifield_single_value_types,
+        policy_owner_for_target,
+    )
+except ImportError:
+    from pivy_stub_typing_policy import (
+        DOCUMENTED_METHOD_RULES,
+        EXTEND_HELPER_METHOD_TYPES,
+        MULTIFIELD_TYPE_POLICIES,
+        MethodSignatureRule,
+        OPERATOR_METHOD_RULES,
+        PolicyTarget,
+        PYTHON_HELPER_METHOD_POLICIES,
+        SEQUENCE_METHOD_RULES,
+        TYPEDEF_AND_STRING_METHOD_RULES,
+        multifield_component_sequence_types,
+        multifield_setvalues_types,
+        multifield_single_value_types,
+        policy_owner_for_target,
+    )
 
 
 def _method_rule(class_name, method_name, parameters, return_type, reason):
@@ -660,6 +681,28 @@ def extend_helper_method_checks(module):
     return tuple(rule.check for rule in EXTEND_HELPER_METHOD_RULES)
 
 
+METHOD_CONTRACT_RULES = (
+    *SEQUENCE_METHOD_RULES,
+    *TYPEDEF_AND_STRING_METHOD_RULES,
+    *OPERATOR_METHOD_RULES,
+    *DOCUMENTED_METHOD_RULES,
+    *POINTER_HELPER_METHOD_RULES,
+    *RAW_BOUNDARY_METHOD_RULES,
+    *MULTIFIELD_METHOD_RULES,
+    *PYTHON_HELPER_METHOD_RULES,
+    *EXTEND_HELPER_METHOD_RULES,
+)
+
+
+def method_contracts_for_classes(class_names):
+    """Return all resolved contracts whose class exists in one module."""
+
+    return tuple(
+        rule for rule in METHOD_CONTRACT_RULES
+        if rule.target.class_name in class_names
+    )
+
+
 __all__ = [
     "POINTER_HELPER_METHOD_RULES",
     "pointer_helper_method_checks",
@@ -672,4 +715,6 @@ __all__ = [
     "python_helper_method_checks",
     "EXTEND_HELPER_METHOD_RULES",
     "extend_helper_method_checks",
+    "METHOD_CONTRACT_RULES",
+    "method_contracts_for_classes",
 ]
