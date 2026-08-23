@@ -74,6 +74,20 @@ class FieldTypePolicyTests(unittest.TestCase):
         self.assertEqual(parameter_rules, policy.PYTHON_PARAMETER_TYPE_OVERRIDES)
         self.assertTrue(all(rule.reason for rule in policy.METHOD_RETURN_RULES))
         self.assertTrue(all(rule.source for rule in policy.PYTHON_PARAMETER_RULES))
+        self.assertTrue(
+            all(
+                rule.owner is policy.PolicyOwner.SOQT
+                for rule in policy.METHOD_RETURN_RULES
+                if rule.target.class_name.startswith("SoQt")
+            )
+        )
+        self.assertTrue(
+            all(
+                rule.owner is policy.PolicyOwner.COIN
+                for rule in policy.PYTHON_PARAMETER_RULES
+                if not rule.target.class_name.startswith("SoQt")
+            )
+        )
 
         for rule_name, mapping_name in (
             ("SCALAR_POINTER_HELPER_RULES", "SCALAR_POINTER_HELPER_PARAMETERS"),

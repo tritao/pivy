@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from dataclasses import dataclass
+from enum import Enum
 from types import MappingProxyType
 
 try:
@@ -54,6 +55,22 @@ class PolicyTarget:
         return (self.class_name, self.method_name, self.parameter_name)
 
 
+class PolicyOwner(Enum):
+    """Binding domain that owns an exceptional typing rule."""
+
+    COIN = "coin"
+    SOQT = "soqt"
+    GENERIC = "generic"
+
+
+def policy_owner_for_target(target: PolicyTarget) -> PolicyOwner:
+    """Assign the current ownership boundary without changing semantics."""
+
+    if target.class_name.startswith("SoQt"):
+        return PolicyOwner.SOQT
+    return PolicyOwner.COIN
+
+
 @dataclass(frozen=True)
 class OverrideRule:
     """One Python-facing override with reviewable provenance."""
@@ -62,6 +79,7 @@ class OverrideRule:
     python_type: object
     reason: str
     source: str = "tools/pivy_stub_typing_policy.py"
+    owner: PolicyOwner = PolicyOwner.COIN
 
 
 def _rules_from_mapping(mapping, reason):
@@ -70,6 +88,7 @@ def _rules_from_mapping(mapping, reason):
             target=PolicyTarget(*target),
             python_type=python_type,
             reason=reason,
+            owner=policy_owner_for_target(PolicyTarget(*target)),
         )
         for target, python_type in mapping.items()
     )
@@ -432,6 +451,7 @@ METHOD_RETURN_RULES = tuple(
         target=PolicyTarget(class_name, method_name),
         python_type=python_type,
         reason="Python-facing return type for a binding-specific API surface",
+        owner=policy_owner_for_target(PolicyTarget(class_name, method_name)),
     )
     for (class_name, method_name), python_type in _METHOD_RETURN_TYPE_OVERRIDES.items()
 )
@@ -455,6 +475,9 @@ PYTHON_PARAMETER_RULES = tuple(
         target=PolicyTarget(class_name, method_name, parameter_name),
         python_type=python_type,
         reason="Python-facing parameter type for a binding-specific API surface",
+        owner=policy_owner_for_target(
+            PolicyTarget(class_name, method_name, parameter_name)
+        ),
     )
     for (class_name, method_name, parameter_name), python_type
     in _PYTHON_PARAMETER_TYPE_OVERRIDES.items()

@@ -346,3 +346,8 @@ matrix parameter maps now use the same rule representation as well. The
 remaining Phase 3 work is to migrate the other exceptional factory/callback
 maps where doing so clarifies ownership rather than just wrapping generic
 type tables.
+
+Phase 4 has begun by attaching an explicit `PolicyOwner` to structured rules.
+The current classification distinguishes Coin and SoQt domains without moving
+files or changing generated output; that gives the next refactor a safe seam
+for splitting policy by binding ownership instead of by generator operation.
