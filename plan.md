@@ -312,5 +312,16 @@ Already established before this plan:
 - typed remaining Coin ScXML factories
 - cleanup of leaked module-local names
 
-The next implementation slice should begin with Phase 1, while preserving the
-byte-for-byte generated-stub invariant.
+Phase 1 is now implemented on this branch:
+
+- `tools/pivy_typing/model.py` records classes, methods, overloads, parameters,
+  annotations, defaults, decorators and annotated attributes.
+- The production generator parses every postprocessed stub through that model.
+- The compatibility renderer returns the retained source unchanged, so the
+  generated Coin and SoQt stubs remain byte-for-byte identical.
+- `tests/test_pivy_typing_model.py` covers full-stub round trips and signature
+  details, and CMake tracks the model as a stub-generation dependency.
+
+The next implementation slice is Phase 2: extract explicit parser,
+normalization, policy and renderer stages around the existing generator while
+keeping the same output invariant.

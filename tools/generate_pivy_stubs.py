@@ -43,6 +43,7 @@ class PyObjectArgumentRole(Enum):
 
 try:
     # Support both module imports and direct script execution from build tooling.
+    from tools.pivy_typing.model import parse_stub, render_stub
     from tools.pivy_stub_typing_policy import (
         BOOL_SEQUENCE_ARRAY_PARAMETERS,
         BOOL_TYPES,
@@ -90,6 +91,7 @@ try:
         field_method_type_overrides,
     )
 except ImportError:
+    from pivy_typing.model import parse_stub, render_stub
     from pivy_stub_typing_policy import (
         BOOL_SEQUENCE_ARRAY_PARAMETERS,
         BOOL_TYPES,
@@ -2157,6 +2159,9 @@ def postprocess_stub(path, module, output_dir):
     processed = add_typing_import(processed, "Sequence")
     processed = add_typing_import(processed, "TypeVar")
     processed = add_generated_header(processed)
+    # Phase 1: make the semantic model part of the production path while its
+    # compatibility renderer still guarantees byte-for-byte output.
+    processed = render_stub(parse_stub(processed, name=module))
     if processed != original:
         with open(path, "w") as stub_file:
             stub_file.write(processed)

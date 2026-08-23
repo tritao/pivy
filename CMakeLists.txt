@@ -155,6 +155,7 @@ if(PIVY_GENERATE_PYI)
                 ${PIVY_STUBGEN_ARGS}
             DEPENDS
                 ${CMAKE_SOURCE_DIR}/tools/generate_pivy_stubs.py
+                ${CMAKE_SOURCE_DIR}/tools/pivy_typing/model.py
                 ${CMAKE_SOURCE_DIR}/tools/pivy_stub_typing_policy.py
             WORKING_DIRECTORY ${PIVY_PACKAGE_PARENT_DIR}
             COMMENT "Generating Pivy .pyi stubs"
