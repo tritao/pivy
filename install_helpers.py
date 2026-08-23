@@ -11,26 +11,52 @@ PIVY_HEADER = """\
 """
 
 
-def swigify_header(header_file, include_file):
-    sys.stdout.write("create swigified header: " + header_file + "\n")
+def write_if_changed(path, contents):
+    """Write text only when the destination content differs."""
 
-    fd = open(header_file, "r+")
-    contents = fd.readlines()
+    try:
+        with open(path, "r") as existing_file:
+            if existing_file.read() == contents:
+                return False
+    except FileNotFoundError:
+        pass
 
-    ins_line_nr = -1
-    for line in contents:
-        ins_line_nr += 1
+    with open(path, "w") as output_file:
+        output_file.write(contents)
+    return True
+
+
+def swigified_header_contents(contents, include_file):
+    swig_header = PIVY_HEADER % include_file
+    if swig_header in contents:
+        return contents
+
+    lines = contents.splitlines(True)
+    for line_number, line in enumerate(lines):
         if line.find("#include ") != -1:
+            ins_line_nr = line_number
             break
-
-    if ins_line_nr != -1:
-        contents.insert(ins_line_nr, PIVY_HEADER % (include_file))
-        fd.seek(0)
-        fd.writelines(contents)
     else:
+        return None
+
+    lines.insert(ins_line_nr, swig_header)
+    return "".join(lines)
+
+
+def swigify_header(header_file, include_file):
+    with open(header_file, "r") as header:
+        contents = header.read()
+
+    swigified = swigified_header_contents(contents, include_file)
+    if swigified is None:
         print("[failed]")
         sys.exit(1)
-    fd.close
+    if swigified == contents:
+        return False
+
+    write_if_changed(header_file, swigified)
+    sys.stdout.write("create swigified header: " + header_file + "\n")
+    return True
 
 
 def copy_and_swigify_header(interface_dir, include_dir, fname):
@@ -63,12 +89,29 @@ def copy_and_swigify_header(interface_dir, include_dir, fname):
     if not os.path.isfile(os.path.join(from_file)):
         return
 
-    # copy
-    shutil.copyfile(from_file, to_file)
-
-    # and swigify
+    # Copy only when the source content differs.  CMake runs this helper on
+    # every configure, and needless mtime changes force the large SWIG
+    # wrappers to rebuild.
     if fname.endswith(".i"):  # consider ".i" files
-        swigify_header(to_file, fname)
+        with open(from_file, "r") as source_file:
+            source_contents = source_file.read()
+        swigified = swigified_header_contents(source_contents, fname)
+        if swigified is None:
+            print("[failed]")
+            sys.exit(1)
+        if write_if_changed(to_file, swigified):
+            sys.stdout.write("create swigified header: " + to_file + "\n")
+    else:
+        with open(from_file, "rb") as source_file:
+            source_contents = source_file.read()
+        try:
+            with open(to_file, "rb") as destination_file:
+                destination_contents = destination_file.read()
+        except FileNotFoundError:
+            destination_contents = None
+        if destination_contents != source_contents:
+            with open(to_file, "wb") as destination_file:
+                destination_file.write(source_contents)
 
 
 def swigify(interface_dir, include_dir, component="Inventor"):
