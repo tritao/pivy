@@ -53,6 +53,7 @@ try:
         PYTHON_PROTOCOL_DEFINITIONS,
         PYTHON_PROTOCOL_MODULES,
         CALLBACK_TYPE_SIGNATURES,
+        COIN_TYPING_POLICY,
         COMPARISON_METHODS,
         factory_method_return_type,
         EXTEND_HELPER_METHOD_TYPES,
@@ -99,6 +100,7 @@ except ImportError:
         PYTHON_PROTOCOL_DEFINITIONS,
         PYTHON_PROTOCOL_MODULES,
         CALLBACK_TYPE_SIGNATURES,
+        COIN_TYPING_POLICY,
         COMPARISON_METHODS,
         factory_method_return_type,
         EXTEND_HELPER_METHOD_TYPES,
@@ -138,6 +140,10 @@ except ImportError:
 
 FIELD_METHOD_TYPE_OVERRIDES = field_method_type_overrides()
 VECTOR_OUTPUT_PARAMETER_TYPES = vector_output_parameter_types()
+# New generator code should consume this registry.  The local aliases retain
+# the existing helper names while keeping older policy consumers compatible.
+FIELD_ATTRIBUTE_TYPE_POLICIES = COIN_TYPING_POLICY.field_attributes
+MULTIFIELD_TYPE_POLICIES = COIN_TYPING_POLICY.multifields
 
 
 def stub_path(output_dir, module):

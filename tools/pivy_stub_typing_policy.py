@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import dataclass
+from types import MappingProxyType
 
 try:
     from tools.pivy_factory_registry import (
@@ -3064,6 +3066,39 @@ RAW_POINTER_AUDIT = {
         ),
     ),
 }
+
+
+@dataclass(frozen=True)
+class CoinTypingPolicy:
+    """Single registry for the Python-facing Coin binding policy."""
+
+    vectors: Mapping[str, VectorTypePolicy]
+    fields: Mapping[str, FieldTypePolicy]
+    multifields: Mapping[str, MultifieldTypePolicy]
+    field_attributes: Mapping[str, Mapping[str, str]]
+    field_aliases: Mapping[tuple[str, str], str]
+    method_return_overrides: Mapping[tuple[str, str], object]
+    callback_methods: Mapping[tuple[str, str], CallbackMethodPolicy]
+    protocols: tuple[tuple[str, tuple[str, ...], str], ...]
+    incomplete_rules: tuple[IncompleteRule, ...]
+
+
+# Keep the individual names above as compatibility aliases for focused
+# generator helpers, but expose one immutable registry for new consumers.
+COIN_TYPING_POLICY = CoinTypingPolicy(
+    vectors=MappingProxyType(dict(VECTOR_TYPE_POLICIES)),
+    fields=MappingProxyType(dict(FIELD_TYPE_POLICIES)),
+    multifields=MappingProxyType(dict(MULTIFIELD_TYPE_POLICIES)),
+    field_attributes=MappingProxyType(
+        {name: MappingProxyType(dict(attributes))
+         for name, attributes in FIELD_ATTRIBUTE_TYPE_POLICIES.items()}
+    ),
+    field_aliases=MappingProxyType(dict(FIELD_ATTRIBUTE_NAME_ALIASES)),
+    method_return_overrides=MappingProxyType(dict(METHOD_RETURN_TYPE_OVERRIDES)),
+    callback_methods=MappingProxyType(dict(CALLBACK_METHOD_POLICIES)),
+    protocols=tuple(PYTHON_PROTOCOL_DEFINITIONS),
+    incomplete_rules=tuple(INCOMPLETE_RULES),
+)
 
 # These are intentionally opaque pointer-to-pointer or platform-structure
 # surfaces. Keep them visible in the report without pretending that the raw

@@ -7,10 +7,8 @@ import ast
 from pathlib import Path
 
 from tools.pivy_stub_typing_policy import (
+    COIN_TYPING_POLICY,
     FACTORY_CLASSES,
-    FIELD_ATTRIBUTE_TYPE_POLICIES,
-    FIELD_TYPE_POLICIES,
-    MULTIFIELD_TYPE_POLICIES,
 )
 
 
@@ -69,7 +67,7 @@ def policy_coverage_errors(stub_path: Path) -> tuple[str, ...]:
         if any(_has_incomplete(method.returns) for method in factories):
             errors.append("%s.createInstance still contains Incomplete" % class_name)
 
-    for class_name, field_policy in FIELD_TYPE_POLICIES.items():
+    for class_name, field_policy in COIN_TYPING_POLICY.fields.items():
         get_values = _check_method(errors, methods, class_name, "getValue")
         if any(_has_incomplete(method.returns) for method in get_values):
             errors.append("%s.getValue still contains Incomplete" % class_name)
@@ -78,7 +76,7 @@ def policy_coverage_errors(stub_path: Path) -> tuple[str, ...]:
         if setters and all(_has_incomplete(method) for method in setters):
             errors.append("%s.setValue has no typed overload" % class_name)
 
-    for class_name, field_policy in MULTIFIELD_TYPE_POLICIES.items():
+    for class_name, field_policy in COIN_TYPING_POLICY.multifields.items():
         get_items = methods.get(class_name, {}).get("__getitem__", [])
         if any(_has_incomplete(method.returns) for method in get_items):
             errors.append("%s.__getitem__ still contains Incomplete" % class_name)
@@ -113,7 +111,7 @@ def policy_coverage_errors(stub_path: Path) -> tuple[str, ...]:
             if setters and all(_has_incomplete(method) for method in setters):
                 errors.append("%s.setValue has no typed overload" % class_name)
 
-    for class_name, attributes in FIELD_ATTRIBUTE_TYPE_POLICIES.items():
+    for class_name, attributes in COIN_TYPING_POLICY.field_attributes.items():
         node = next(
             (candidate for candidate in tree.body
              if isinstance(candidate, ast.ClassDef)

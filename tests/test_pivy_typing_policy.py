@@ -33,6 +33,7 @@ from tools.report_pivy_verifytypes import (
 from tools.check_pivy_policy_coverage import policy_coverage_errors
 from tools.check_pivy_stubtest import curated_runtime_errors
 from tools.pivy_stub_typing_policy import (
+    COIN_TYPING_POLICY,
     FACTORY_CLASSES,
     ENGINE_FACTORY_CLASSES,
     FIELD_ATTRIBUTE_TYPE_POLICIES,
@@ -59,6 +60,21 @@ from tools.pivy_stub_typing_policy import (
 
 
 class FieldTypePolicyTests(unittest.TestCase):
+    def test_coin_typing_policy_registry_is_complete(self):
+        self.assertEqual(COIN_TYPING_POLICY.fields, policy.FIELD_TYPE_POLICIES)
+        self.assertEqual(
+            COIN_TYPING_POLICY.multifields, policy.MULTIFIELD_TYPE_POLICIES
+        )
+        self.assertEqual(
+            set(COIN_TYPING_POLICY.vectors), set(policy.VECTOR_TYPE_POLICIES)
+        )
+        self.assertEqual(
+            set(COIN_TYPING_POLICY.field_attributes),
+            set(policy.FIELD_ATTRIBUTE_TYPE_POLICIES),
+        )
+        self.assertEqual(len(COIN_TYPING_POLICY.protocols), len(policy.PYTHON_PROTOCOL_DEFINITIONS))
+        self.assertEqual(COIN_TYPING_POLICY.incomplete_rules, policy.INCOMPLETE_RULES)
+
     def test_engine_factory_policy(self):
         self.assertEqual(len(ENGINE_FACTORY_CLASSES), 37)
         self.assertEqual(set(ENGINE_FACTORY_CLASS_NAMES), ENGINE_FACTORY_CLASSES)
