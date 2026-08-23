@@ -22,7 +22,9 @@
   def values(self):
     def _values(obj):
       for value in obj:
-        if hasattr(value, "__iter__"):
+        if isinstance(value, (SbString, SbName)):
+          yield value.getString()
+        elif hasattr(value, "__iter__"):
           yield list(_values(value))
         else:
           yield value

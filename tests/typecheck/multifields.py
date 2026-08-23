@@ -101,7 +101,8 @@ def check_vector_multifield() -> None:
     coordinates: Sequence[Sequence[float]] = [(1.0, 2.0, 3.0)]
 
     assert_type(iter(values), Iterator[coin.SbVec3f])
-    assert_type(values.values, list[coin.SbVec3f])
+    assert_type(values.values, list[Sequence[float]])
+    values.values = [[1.0, 2.0, 3.0]]
     assert_type(values[0], coin.SbVec3f)
     assert_type(values.getValues(), list[coin.SbVec3f])
     values.setValues(0, 1, vectors)
@@ -110,6 +111,16 @@ def check_vector_multifield() -> None:
     values.setValues(1, coordinates)
     values.set1Value(0, coordinates[0])
     values[0] = coin.SbVec3f()
+
+
+def check_string_multifield_values() -> None:
+    names = coin.SoMFName()
+    names.values = ["one", "two"]
+    assert_type(names.values, list[str])
+
+    strings = coin.SoMFString()
+    strings.values = ["one", "two"]
+    assert_type(strings.values, list[str])
 
 
 def check_numeric_vector_multifield_families() -> None:

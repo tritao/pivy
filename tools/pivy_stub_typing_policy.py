@@ -2932,6 +2932,27 @@ def multifield_getvalues_types():
     }
 
 
+def multifield_values_types():
+    """Return Python types exposed by the convenience ``values`` property.
+
+    ``values`` is intentionally different from ``getValuesSnapshot``.  The
+    binding converts iterable vector/color values to nested Python sequences,
+    and converts ``SbName``/``SbString`` values to ordinary strings.
+    """
+
+    values = {}
+    for field_class, policy in MULTIFIELD_TYPE_POLICIES.items():
+        if field_class in {"SoMFName", "SoMFString"}:
+            values[field_class] = "str"
+        elif field_class == "SoMFColor":
+            values[field_class] = "Sequence[float]"
+        elif policy.component_sequence_type:
+            values[field_class] = policy.component_sequence_type
+        else:
+            values[field_class] = policy.element_type
+    return values
+
+
 def multifield_snapshot_types():
     """Return element types for owned Python multifield snapshots."""
 

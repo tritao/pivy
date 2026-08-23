@@ -70,6 +70,7 @@ try:
         INT_TYPES,
         KNOWN_ITER_ELEMENT_TYPES,
         MULTIFIELD_TYPE_POLICIES,
+        multifield_values_types,
         METHOD_RETURN_TYPE_OVERRIDES,
         MATRIX_CPP_TYPES,
         MATRIX_ROW_RETURN_TYPES,
@@ -122,6 +123,7 @@ except ImportError:
         INT_TYPES,
         KNOWN_ITER_ELEMENT_TYPES,
         MULTIFIELD_TYPE_POLICIES,
+        multifield_values_types,
         METHOD_RETURN_TYPE_OVERRIDES,
         MATRIX_CPP_TYPES,
         MATRIX_ROW_RETURN_TYPES,
@@ -1831,10 +1833,7 @@ def normalize_multifield_values(text):
         if current_class == "SoMField":
             value_type = "object"
         else:
-            multifield_policy = MULTIFIELD_TYPE_POLICIES.get(current_class)
-            value_type = (
-                multifield_policy.element_type if multifield_policy else None
-            )
+            value_type = multifield_values_types().get(current_class)
         if value_type is None:
             updated.extend(current_lines)
             return

@@ -11,7 +11,7 @@
   /* iterator for string */
 %pythoncode %{
   def __iter__(self):
-    return getString().__iter__()
+    return self.getString().__iter__()
 %} 
   const char * __repr__(void) { return self->getString(); }
 }

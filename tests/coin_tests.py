@@ -1297,6 +1297,14 @@ class SoFieldMethods(unittest.TestCase):
         vector = SoMFVec3f()
         vector.values = [[1.0, 2.0, 3.0]]
         self.assertEqual(vector.values, [[1.0, 2.0, 3.0]])
+
+        names = SoMFName()
+        names.values = ["one", "two"]
+        self.assertEqual(names.values, ["one", "two"])
+
+        strings = SoMFString()
+        strings.values = ["one", "two"]
+        self.assertEqual(strings.values, ["one", "two"])
         
 class SbTimeMethods(unittest.TestCase):
     """test SbTime methods"""

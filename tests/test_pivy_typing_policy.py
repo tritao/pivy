@@ -60,6 +60,7 @@ from tools.pivy_stub_typing_policy import (
     multifield_snapshot_types,
     multifield_single_value_types,
     multifield_setvalues_types,
+    multifield_values_types,
     vector_iter_element_types,
     vector_output_parameter_types,
     vector_multifield_type_policies,
@@ -628,6 +629,15 @@ class MultifieldTypePolicyTests(unittest.TestCase):
                 for name, policy in MULTIFIELD_TYPE_POLICIES.items()
             },
         )
+
+    def test_multifield_values_types_model_python_conversions(self):
+        values_types = multifield_values_types()
+
+        self.assertEqual(values_types["SoMFFloat"], "float")
+        self.assertEqual(values_types["SoMFVec3f"], "Sequence[float]")
+        self.assertEqual(values_types["SoMFColor"], "Sequence[float]")
+        self.assertEqual(values_types["SoMFName"], "str")
+        self.assertEqual(values_types["SoMFString"], "str")
 
     def test_vector_component_sequence_types_are_derived_from_policy(self):
         component_types = multifield_component_sequence_types()
