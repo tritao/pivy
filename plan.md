@@ -351,3 +351,9 @@ Phase 4 has begun by attaching an explicit `PolicyOwner` to structured rules.
 The current classification distinguishes Coin and SoQt domains without moving
 files or changing generated output; that gives the next refactor a safe seam
 for splitting policy by binding ownership instead of by generator operation.
+
+Phase 5 has started with method-return validation. Policy-owned return checks
+are now generated from `METHOD_RETURN_TYPE_OVERRIDES` and validated against the
+semantic model; the validation-data table retains only legacy exceptions that
+are not yet represented by policy. The existing AST-based checks remain for
+those independent behavioral/legacy expectations.

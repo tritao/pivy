@@ -10,7 +10,12 @@ import tempfile
 from pathlib import Path
 
 from tools.report_pivy_typing import collect_report
-from tools.pivy_stub_typing_policy import FACTORY_CLASSES, multifield_getvalues_types
+from tools.pivy_stub_typing_policy import (
+    FACTORY_CLASSES,
+    METHOD_RETURN_TYPE_OVERRIDES,
+    multifield_getvalues_types,
+)
+from tools.pivy_typing.model import parse_stub as parse_semantic_stub
 
 from tools.pivy_stub_validation_data import (
     ARRAY_METHOD_CHECKS,
@@ -427,6 +432,44 @@ def assert_method_return_types(path, tree, checks):
         assert_method_signature(path, classes, class_name, method_name, {}, return_type)
 
 
+def assert_policy_method_return_types(path, model):
+    """Validate policy-owned returns directly from the semantic model."""
+
+    if path.endswith("coin.pyi"):
+        expected = {
+            key: value
+            for key, value in METHOD_RETURN_TYPE_OVERRIDES.items()
+            if not key[0].startswith("SoQt")
+        }
+    elif path.endswith(os.path.join("gui", "soqt.pyi")):
+        expected = {
+            key: value
+            for key, value in METHOD_RETURN_TYPE_OVERRIDES.items()
+            if key[0].startswith("SoQt")
+        }
+    else:
+        return
+
+    classes = {item.name: item for item in model.classes}
+    for (class_name, method_name), return_type in expected.items():
+        node = classes.get(class_name)
+        if node is None:
+            raise AssertionError("%s is missing %s" % (path, class_name))
+        method = next(
+            (item for item in node.methods if item.name == method_name),
+            None,
+        )
+        if method is None or not any(
+            overload.return_type is not None
+            and overload.return_type.text == return_type
+            for overload in method.overloads
+        ):
+            raise AssertionError(
+                "%s is missing policy return annotation for %s.%s"
+                % (path, class_name, method_name)
+            )
+
+
 def assert_factory_methods(path, tree):
     if not path.endswith("coin.pyi"):
         return
@@ -615,6 +658,7 @@ def validate_stub_files(package_dir):
     for spec in STUB_SPECS:
         path = os.path.join(package_dir, spec.relative_path)
         text, tree = parse_stub(path)
+        semantic_model = parse_semantic_stub(text, name=path)
         assert_generated_header(path, text)
         match spec.kind:
             case StubKind.PUBLIC:
@@ -670,6 +714,7 @@ def validate_stub_files(package_dir):
                 assert_method_return_types(
                     path, tree, METHOD_RETURN_TYPE_CHECKS.get(relative, ())
                 )
+                assert_policy_method_return_types(path, semantic_model)
                 assert_factory_methods(path, tree)
                 assert_property_attributes(
                     path, tree, PROPERTY_ATTRIBUTE_CHECKS.get(relative, ())
