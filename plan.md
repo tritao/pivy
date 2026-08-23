@@ -322,6 +322,13 @@ Phase 1 is now implemented on this branch:
 - `tests/test_pivy_typing_model.py` covers full-stub round trips and signature
   details, and CMake tracks the model as a stub-generation dependency.
 
-The next implementation slice is Phase 2: extract explicit parser,
-normalization, policy and renderer stages around the existing generator while
-keeping the same output invariant.
+Phase 2 is also now in place as a mechanical pipeline boundary:
+
+- raw stubgen reads are represented by `StubgenOutput`;
+- named normalization and policy stages run through a shared pipeline;
+- the compatibility `.pyi` renderer is a distinct final stage;
+- stage-order tests, stub drift, determinism and lint all pass with no public
+  stub changes.
+
+The next implementation slice is Phase 3: replace the remaining unstructured
+policy tuples with typed rule objects carrying target and provenance metadata.

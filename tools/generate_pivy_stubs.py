@@ -43,7 +43,11 @@ class PyObjectArgumentRole(Enum):
 
 try:
     # Support both module imports and direct script execution from build tooling.
-    from tools.pivy_typing.model import parse_stub, render_stub
+    from tools.pivy_typing.normalize import apply_normalization
+    from tools.pivy_typing.parse_stubgen import read_stubgen_output
+    from tools.pivy_typing.pipeline import Stage
+    from tools.pivy_typing.policy import apply_policy
+    from tools.pivy_typing.render_pyi import render_pyi
     from tools.pivy_stub_typing_policy import (
         BOOL_SEQUENCE_ARRAY_PARAMETERS,
         BOOL_TYPES,
@@ -91,7 +95,11 @@ try:
         field_method_type_overrides,
     )
 except ImportError:
-    from pivy_typing.model import parse_stub, render_stub
+    from pivy_typing.normalize import apply_normalization
+    from pivy_typing.parse_stubgen import read_stubgen_output
+    from pivy_typing.pipeline import Stage
+    from pivy_typing.policy import apply_policy
+    from pivy_typing.render_pyi import render_pyi
     from pivy_stub_typing_policy import (
         BOOL_SEQUENCE_ARRAY_PARAMETERS,
         BOOL_TYPES,
@@ -2030,11 +2038,11 @@ def add_runtime_unsupported_notes(text, module):
 
 
 def postprocess_stub(path, module, output_dir):
-    if not os.path.exists(path):
+    stubgen_output = read_stubgen_output(path, module)
+    if stubgen_output is None:
         return 0
 
-    with open(path) as stub_file:
-        original = stub_file.read()
+    original = stubgen_output.text
 
     class_names = collect_class_names(original)
     external_class_modules = collect_external_class_modules(
@@ -2044,124 +2052,182 @@ def postprocess_stub(path, module, output_dir):
         external_duplicate_class_modules(output_dir, module, class_names)
     )
     used_external_types = set()
-    lines = original.splitlines()
-    updated = []
     converted = 0
-    index = 0
-    current_class = None
+    def convert_signatures(text):
+        nonlocal converted
+        lines = text.splitlines()
+        updated = []
+        index = 0
+        current_class = None
 
-    while index < len(lines):
-        line = lines[index]
-        class_match = re.match(r"^class\s+([A-Za-z_]\w*)", line)
-        if class_match:
-            current_class = class_match.group(1)
-        elif current_class and is_top_level_statement(line):
-            current_class = None
+        while index < len(lines):
+            line = lines[index]
+            class_match = re.match(r"^class\s+([A-Za-z_]\w*)", line)
+            if class_match:
+                current_class = class_match.group(1)
+            elif current_class and is_top_level_statement(line):
+                current_class = None
 
-        def_match = DEF_RE.match(line)
-        if not def_match:
-            updated.append(line)
-            index += 1
-            continue
+            def_match = DEF_RE.match(line)
+            if not def_match:
+                updated.append(line)
+                index += 1
+                continue
 
-        signature_docstring = read_signature_docstring(
-            lines, index + 1, def_match.group("name")
-        )
-        if not signature_docstring:
-            updated.append(line)
-            index += 1
-            continue
+            signature_docstring = read_signature_docstring(
+                lines, index + 1, def_match.group("name")
+            )
+            if not signature_docstring:
+                updated.append(line)
+                index += 1
+                continue
 
-        signatures, end = signature_docstring
-        if len(signatures) == 1:
-            updated.append(
-                render_python_signature(
+            signatures, end = signature_docstring
+            if len(signatures) == 1:
+                updated.append(
+                    render_python_signature(
+                        def_match,
+                        signatures[0],
+                        class_names,
+                        class_name=current_class,
+                        external_class_modules=external_class_modules,
+                        used_external_types=used_external_types,
+                    )
+                )
+                converted += 1
+            else:
+                decorators = pop_decorators(updated, def_match.group("indent"))
+                rendered_signatures = render_unique_python_signatures(
                     def_match,
-                    signatures[0],
+                    signatures,
                     class_names,
-                    class_name=current_class,
-                    external_class_modules=external_class_modules,
-                    used_external_types=used_external_types,
+                    current_class,
+                    external_class_modules,
+                    used_external_types,
+                )
+                if len(rendered_signatures) == 1:
+                    updated.extend(decorators)
+                    updated.append(rendered_signatures[0])
+                else:
+                    updated.extend(
+                        render_overload_block(
+                            def_match,
+                            rendered_signatures,
+                            decorators,
+                        )
+                    )
+                converted += len(rendered_signatures)
+            index = end
+
+        return "\n".join(updated) + "\n"
+
+    processed = convert_signatures(original)
+    removed_classes = set()
+
+    def remove_duplicate_classes(text):
+        nonlocal removed_classes
+        text, removed_classes = remove_external_duplicate_classes(
+            text, module, output_dir, class_names
+        )
+        if removed_classes:
+            used_external_types.update(
+                collect_referenced_external_types(
+                    text,
+                    class_names - removed_classes,
+                    external_class_modules,
                 )
             )
-            converted += 1
-        else:
-            decorators = pop_decorators(updated, def_match.group("indent"))
-            rendered_signatures = render_unique_python_signatures(
-                def_match,
-                signatures,
+        return text
+
+    def add_property_attributes(text):
+        return normalize_property_attributes(
+            text,
+            collect_property_doc_types(
+                output_dir,
+                module,
                 class_names,
-                current_class,
                 external_class_modules,
                 used_external_types,
-            )
-            if len(rendered_signatures) == 1:
-                updated.extend(decorators)
-                updated.append(rendered_signatures[0])
-            else:
-                updated.extend(
-                    render_overload_block(def_match, rendered_signatures, decorators)
-                )
-            converted += len(rendered_signatures)
-        index = end
-
-    processed = "\n".join(updated) + "\n"
-    processed, removed_classes = remove_external_duplicate_classes(
-        processed, module, output_dir, class_names
-    )
-    if removed_classes:
-        used_external_types.update(
-            collect_referenced_external_types(
-                processed,
-                class_names - removed_classes,
-                external_class_modules,
-            )
+            ),
         )
-    processed = normalize_operator_helpers(processed)
-    processed = normalize_multifield_helpers(processed)
-    processed = normalize_multifield_getvalues(processed)
-    processed = normalize_multifield_snapshots(processed)
-    processed = normalize_multifield_single_values(processed)
-    processed = normalize_vector_getvalue_helpers(processed)
-    processed = normalize_python_helpers(processed)
-    processed = normalize_extend_helpers(processed)
-    processed = normalize_property_attributes(
+
+    normalization = apply_normalization(
         processed,
-        collect_property_doc_types(
-            output_dir,
-            module,
-            class_names,
-            external_class_modules,
-            used_external_types,
+        (
+            Stage("remove external duplicate classes", remove_duplicate_classes),
+            Stage("normalize operator helpers", normalize_operator_helpers),
+            Stage("normalize multifield helpers", normalize_multifield_helpers),
+            Stage("normalize multifield getValues", normalize_multifield_getvalues),
+            Stage("normalize multifield snapshots", normalize_multifield_snapshots),
+            Stage(
+                "normalize multifield single values",
+                normalize_multifield_single_values,
+            ),
+            Stage("normalize vector getValue helpers", normalize_vector_getvalue_helpers),
+            Stage("normalize Python helpers", normalize_python_helpers),
+            Stage("normalize extend helpers", normalize_extend_helpers),
+            Stage("normalize property attributes", add_property_attributes),
+            Stage("normalize field attribute policies", normalize_field_attribute_policies),
+            Stage("add overload import", add_overload_import),
+            Stage("add missing imports", add_missing_imports),
+            Stage(
+                "add external type imports",
+                lambda text: add_type_imports(
+                    text,
+                    used_external_types,
+                    external_class_modules,
+                ),
+            ),
         ),
     )
-    processed = normalize_field_attribute_policies(processed)
-    processed = add_overload_import(processed)
-    processed = add_missing_imports(processed)
-    processed = add_type_imports(processed, used_external_types, external_class_modules)
-    processed = normalize_swig_helpers(processed)
-    processed = normalize_container_helpers(processed)
-    processed = normalize_callback_helpers(processed)
-    processed = normalize_shadow_methods(processed)
-    processed = normalize_method_return_overrides(processed)
-    processed = remove_swig_meta_classmethod(processed)
-    processed = add_runtime_unsupported_notes(processed, module)
-    processed = add_python_protocols(
-        processed,
-        class_names - removed_classes,
-        external_class_modules,
-        module,
+
+    policy = apply_policy(
+        normalization.text,
+        (
+            Stage("normalize SWIG helpers", normalize_swig_helpers),
+            Stage("normalize container helpers", normalize_container_helpers),
+            Stage("normalize callback helpers", normalize_callback_helpers),
+            Stage("normalize shadow methods", normalize_shadow_methods),
+            Stage("normalize method return overrides", normalize_method_return_overrides),
+            Stage("remove SWIG metaclass methods", remove_swig_meta_classmethod),
+            Stage(
+                "add runtime unsupported notes",
+                lambda text: add_runtime_unsupported_notes(text, module),
+            ),
+            Stage(
+                "add Python protocols",
+                lambda text: add_python_protocols(
+                    text,
+                    class_names - removed_classes,
+                    external_class_modules,
+                    module,
+                ),
+            ),
+            Stage("add Any import", lambda text: add_typing_import(text, "Any")),
+            Stage(
+                "add Callable import",
+                lambda text: add_typing_import(text, "Callable"),
+            ),
+            Stage(
+                "add Iterator import",
+                lambda text: add_typing_import(text, "Iterator"),
+            ),
+            Stage(
+                "add Protocol import",
+                lambda text: add_typing_import(text, "Protocol"),
+            ),
+            Stage(
+                "add Sequence import",
+                lambda text: add_typing_import(text, "Sequence"),
+            ),
+            Stage(
+                "add TypeVar import",
+                lambda text: add_typing_import(text, "TypeVar"),
+            ),
+            Stage("add generated header", add_generated_header),
+        ),
     )
-    processed = add_typing_import(processed, "Any")
-    processed = add_typing_import(processed, "Callable")
-    processed = add_typing_import(processed, "Iterator")
-    processed = add_typing_import(processed, "Protocol")
-    processed = add_typing_import(processed, "Sequence")
-    processed = add_typing_import(processed, "TypeVar")
-    processed = add_generated_header(processed)
-    # Phase 1: make the semantic model part of the production path while its
-    # compatibility renderer still guarantees byte-for-byte output.
-    processed = render_stub(parse_stub(processed, name=module))
+    processed = render_pyi(policy.text, module)
     if processed != original:
         with open(path, "w") as stub_file:
             stub_file.write(processed)

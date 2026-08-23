@@ -11,6 +11,7 @@ from .model import (
     parse_stub,
     render_stub,
 )
+from .pipeline import PipelineResult, Stage, run_pipeline
 
 __all__ = [
     "Attribute",
@@ -22,4 +23,7 @@ __all__ = [
     "TypeExpr",
     "parse_stub",
     "render_stub",
+    "PipelineResult",
+    "Stage",
+    "run_pipeline",
 ]
