@@ -28,3 +28,27 @@ def check_sogui_viewer_aliases() -> None:
     assert_type(viewer, sogui.SoGui_Quarter_Wrapper)
     assert_type(sogui.SoGuiViewer.BROWSER, int)
     assert_type(sogui.SoGui.init(), Any)
+
+
+def check_backend_contract() -> None:
+    backend: sogui.SoGuiBinding = sogui.SoGui
+    backend.mainLoop()
+    backend.show(object())
+
+
+class _Widget:
+    def show(self) -> None:
+        pass
+
+    def setWindowTitle(self, title: str) -> None:
+        pass
+
+    def resize(self, width: int, height: int) -> None:
+        pass
+
+
+def check_widget_contract() -> None:
+    widget: sogui.SoGuiWidget = _Widget()
+    widget.setWindowTitle("Pivy")
+    widget.resize(640, 480)
+    widget.show()

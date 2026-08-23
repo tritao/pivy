@@ -118,6 +118,7 @@ def check_database_callbacks() -> None:
 
 def check_callback_list() -> None:
     callback_list = coin.SoCallbackList()
+    callback_api: coin.SoCallbackListAPI = callback_list
 
     def callback(data: object, callbackdata: object) -> None:
         pass
@@ -125,6 +126,7 @@ def check_callback_list() -> None:
     callback_contract: coin.SoCallbackListCallback = callback
 
     callback_list.addCallback(callback_contract, None)
+    callback_api.addCallback(callback_contract, None)
     callback_list.removeCallback(callback_contract, None)
     callback_list.invokeCallbacks({"source": "typing"})
 

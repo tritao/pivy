@@ -160,6 +160,18 @@
     },
     "pivy.sogui": {
       "classes": {
+        "SoGuiBinding": {
+          "bases": ["Protocol"],
+          "methods": {
+            "mainLoop": [{"parameters": [], "return": "None"}],
+            "show": [
+              {
+                "parameters": [{"name": "mainwindow", "type": "Any"}],
+                "return": "None"
+              }
+            ]
+          }
+        },
         "SoGui_Quarter_Wrapper": {
           "bases": [],
           "attributes": {"_root": "coin.SoNode | None"},

@@ -1,6 +1,23 @@
-from typing import Any, ClassVar, Sequence
+from typing import Any, ClassVar, Protocol, Sequence
 
 from pivy import coin
+
+
+class SoGuiBinding(Protocol):
+    @staticmethod
+    def init(*args: Any, **kwargs: Any) -> Any: ...
+
+    @staticmethod
+    def mainLoop() -> None: ...
+
+    @staticmethod
+    def show(mainwindow: Any) -> None: ...
+
+
+class SoGuiWidget(Protocol):
+    def show(self) -> None: ...
+    def setWindowTitle(self, title: str) -> None: ...
+    def resize(self, width: int, height: int) -> None: ...
 
 
 class SoGui_Proxy:

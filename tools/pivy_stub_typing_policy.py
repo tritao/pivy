@@ -740,6 +740,20 @@ PYTHON_PROTOCOL_DEFINITIONS = (
         "    ) -> None: ...",
     ),
     (
+        "SoCallbackListAPI",
+        ("SoCallbackList",),
+        "class SoCallbackListAPI(Protocol):\n"
+        "    def addCallback(\n"
+        "        self, f: SoCallbackListCallback, userData: object | None = ..., /\n"
+        "    ) -> None: ...\n"
+        "    def removeCallback(\n"
+        "        self, f: SoCallbackListCallback, userdata: object | None = ..., /\n"
+        "    ) -> None: ...\n"
+        "    def clearCallbacks(self) -> None: ...\n"
+        "    def getNumCallbacks(self) -> int: ...\n"
+        "    def invokeCallbacks(self, callbackdata: object, /) -> None: ...",
+    ),
+    (
         "SoContextDestructionCallback",
         ("SoContextHandler",),
         "class SoContextDestructionCallback(Protocol):\n"
