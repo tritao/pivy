@@ -1072,6 +1072,21 @@ class FieldSetValue(unittest.TestCase):
             double_field.setValues(0, 1, [1, 2])
 
 
+class ZZMultifieldIndexingContractTests(unittest.TestCase):
+    def testMultifieldsUseIntegerIndexingOnly(self):
+        for field in (
+            SoMFFloat(),
+            SoMFVec3f(),
+            SoMFName(),
+            SoMFMatrix(),
+            SoMFColorRGBA(),
+            SoMFBitMask(),
+        ):
+            with self.subTest(field=type(field).__name__):
+                with self.assertRaises(TypeError):
+                    field[0:1]
+
+
 class SbStringMethods(unittest.TestCase):
     """tests various string stuff"""
     def testCharConstructor(self):
@@ -1915,6 +1930,23 @@ class ZZSoDBCallbackTests(unittest.TestCase):
                 None,
                 header_callback,
             )
+
+
+class ZZTextureEnumContractTests(unittest.TestCase):
+    def testTextureEnumValues(self):
+        self.assertEqual(SoTexture2.MODULATE, SoMultiTextureImageElement.MODULATE)
+        self.assertEqual(SoTexture2.DECAL, SoMultiTextureImageElement.DECAL)
+        self.assertEqual(SoTexture2.BLEND, SoMultiTextureImageElement.BLEND)
+        self.assertEqual(SoTexture2.REPLACE, SoMultiTextureImageElement.REPLACE)
+        self.assertEqual(SoTexture2.REPEAT, SoMultiTextureImageElement.REPEAT)
+        self.assertEqual(SoTexture2.CLAMP, SoMultiTextureImageElement.CLAMP)
+        self.assertEqual(SoMultiTextureImageElement.CLAMP_TO_BORDER, 33069)
+
+    def testSoGLImageWrapValuesUseTheirOwnDomain(self):
+        self.assertEqual(SoGLImage.REPEAT, 0)
+        self.assertEqual(SoGLImage.CLAMP, 1)
+        self.assertEqual(SoGLImage.CLAMP_TO_EDGE, 2)
+        self.assertEqual(SoGLImage.CLAMP_TO_BORDER, 3)
 
 
 class ZZCallbackListTests(unittest.TestCase):

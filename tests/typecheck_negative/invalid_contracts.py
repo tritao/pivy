@@ -19,6 +19,13 @@ def invalid_multifield_item() -> None:
     field[0] = "not a vector"
 
 
+def invalid_multifield_slice() -> None:
+    # Coin's SWIG sequence helpers accept integer indexing only; a Python
+    # slice reaches the native int overload and raises TypeError at runtime.
+    field = coin.SoMFFloat()
+    field[0:1]
+
+
 def invalid_double_multifield_element() -> None:
     field = coin.SoMFDouble()
     field.setValues([object()])

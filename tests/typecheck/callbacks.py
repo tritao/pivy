@@ -198,6 +198,19 @@ def check_database_progress_callback_protocol() -> None:
     coin.SoDB.addProgressCallback(callback_contract, None)
     coin.SoDB.removeProgressCallback(callback_contract, None)
 
+    def typed_callback(
+        data: str,
+        itemid: coin.SbName,
+        fraction: float,
+        interruptible: bool,
+    ) -> bool:
+        del data, itemid, fraction
+        return interruptible
+
+    typed_contract: coin.SoDBProgressCallback[str] = typed_callback
+    coin.SoDB.addProgressCallback(typed_contract, "progress-owner")
+    coin.SoDB.removeProgressCallback(typed_contract, "progress-owner")
+
 
 def check_graphics_callback_setters() -> None:
     def end_frame_callback(data: object) -> None:
@@ -497,6 +510,13 @@ def check_other_callback_domains() -> None:
     dragger.removeStartCallback(dragger_callback)
     dragger.addMotionCallback(dragger_callback)
     dragger.removeMotionCallback(dragger_callback)
+
+    def typed_dragger_callback(data: str, callback_dragger: coin.SoDragger) -> None:
+        del data, callback_dragger
+
+    typed_dragger_contract: coin.SoDraggerCallback[str] = typed_dragger_callback
+    dragger.addValueChangedCallback(typed_dragger_contract, "dragger-owner")
+    dragger.removeValueChangedCallback(typed_dragger_contract, "dragger-owner")
 
     def visitation_callback(data: Any, path: coin.SoPath) -> int:
         return 0

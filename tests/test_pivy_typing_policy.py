@@ -447,9 +447,44 @@ class FieldTypePolicyTests(unittest.TestCase):
         self.assertEqual(
             policy.PYTHON_SHADOW_METHOD_TYPES[("SoDB", "addProgressCallback")],
             (
-                "func: SoDBProgressCallback, "
-                "userdata: object | None",
+                "func: SoDBProgressCallback[_ProgressDataT], "
+                "userdata: _ProgressDataT | None",
                 "None",
+            ),
+        )
+
+    def test_texture_enum_domains_are_runtime_backed(self):
+        aliases = policy.PYTHON_TYPE_ALIAS_DEFINITIONS["pivy.coin"]
+        self.assertIn("SoTextureModel = Literal[3042, 7681, 8448, 8449]", aliases)
+        self.assertIn("SoTextureWrap = Literal[10496, 10497, 33069]", aliases)
+        self.assertIn("SoGLImageWrap = Literal[0, 1, 2, 3]", aliases)
+        self.assertEqual(
+            policy.PYTHON_ENUM_CONSTANT_TYPES["pivy.coin"][("SoTexture2", "REPLACE")],
+            "SoTextureModel",
+        )
+        self.assertEqual(
+            policy.PYTHON_ENUM_CONSTANT_TYPES["pivy.coin"][("SoGLImage", "CLAMP_TO_EDGE")],
+            "SoGLImageWrap",
+        )
+
+    def test_generic_userdata_callback_policies(self):
+        for class_name, method_name in (
+            ("SoDB", "addProgressCallback"),
+            ("SoDB", "removeProgressCallback"),
+        ):
+            with self.subTest(class_name=class_name, method_name=method_name):
+                self.assertEqual(
+                    policy.CALLBACK_METHOD_POLICIES[(class_name, method_name)].parameter_types,
+                    (
+                        ("func", "SoDBProgressCallback[_ProgressDataT]"),
+                        ("userdata", "_ProgressDataT | None"),
+                    ),
+                )
+        self.assertEqual(
+            policy.CALLBACK_METHOD_POLICIES[("SoDragger", "addValueChangedCallback")].parameter_types,
+            (
+                ("pyfunc", "SoDraggerCallback[_DraggerDataT]"),
+                ("data", "_DraggerDataT | None"),
             ),
         )
 

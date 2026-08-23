@@ -1,6 +1,6 @@
 # pyright: reportMissingModuleSource=false
 
-from typing import Iterator
+from typing import Iterator, cast
 from typing_extensions import assert_type
 
 from pivy import coin
@@ -278,6 +278,28 @@ def check_enum_constant_contract() -> None:
     assert_type(coin.SoUnits.MILES, coin.SoUnitsValue)
     assert_type(coin.SoSearchAction.NAME, coin.SoSearchFind)
     assert_type(coin.SoSearchAction.ALL, coin.SoSearchInterest)
+    assert_type(coin.SoTexture2.MODULATE, coin.SoTextureModel)
+    assert_type(coin.SoTexture2.REPLACE, coin.SoTextureModel)
+    assert_type(coin.SoTexture2.REPEAT, coin.SoTextureWrap)
+    assert_type(coin.SoTexture3.CLAMP, coin.SoTextureWrap)
+    assert_type(
+        coin.SoMultiTextureImageElement.CLAMP_TO_BORDER,
+        coin.SoTextureWrap,
+    )
+    assert_type(coin.SoGLImage.REPEAT, coin.SoGLImageWrap)
+    assert_type(coin.SoGLImage.CLAMP_TO_EDGE, coin.SoGLImageWrap)
+
+    state = cast(coin.SoState, object())
+    assert_type(
+        coin.SoMultiTextureImageElement.getModel(state),
+        coin.SoTextureModel,
+    )
+    assert_type(
+        coin.SoMultiTextureImageElement.getWrapS(state),
+        coin.SoTextureWrap,
+    )
+    gl_image = coin.SoGLImage()
+    assert_type(gl_image.getWrapR(), coin.SoGLImageWrap)
 
 
 def check_open_enum_field_contract() -> None:

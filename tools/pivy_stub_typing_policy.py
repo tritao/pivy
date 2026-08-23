@@ -828,6 +828,11 @@ PYTHON_TYPE_ALIAS_DEFINITIONS = {
         "SoShapeHintsShapeType = Literal[0, 1]",
         "SoShapeHintsFaceType = Literal[0, 1]",
         "SoShapeHintsWindingType = Literal[0]",
+        # Coin uses OpenGL enum values for texture model and wrap modes.
+        "SoTextureModel = Literal[3042, 7681, 8448, 8449]",
+        "SoTextureWrap = Literal[10496, 10497, 33069]",
+        # SoGLImage has a separate wrap enum with binding-local values.
+        "SoGLImageWrap = Literal[0, 1, 2, 3]",
         "SoUnitsValue = Literal[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]",
         "SoSearchFind = Literal[1, 2, 4]",
         "SoSearchInterest = Literal[0, 1, 2]",
@@ -926,6 +931,33 @@ PYTHON_ENUM_CONSTANT_TYPES = {
         **{
             ("SoSearchAction", constant): "SoSearchInterest"
             for constant in ("FIRST", "LAST", "ALL")
+        },
+        **{
+            (class_name, constant): "SoTextureModel"
+            for class_name in (
+                "SoTexture2",
+                "SoTexture3",
+                "SoMultiTextureImageElement",
+            )
+            for constant in ("MODULATE", "DECAL", "BLEND", "REPLACE")
+            if not (class_name == "SoTexture3" and constant == "REPLACE")
+        },
+        **{
+            (class_name, constant): "SoTextureWrap"
+            for class_name in (
+                "SoTexture2",
+                "SoTexture3",
+                "SoMultiTextureImageElement",
+            )
+            for constant in ("REPEAT", "CLAMP", "CLAMP_TO_BORDER")
+            if not (
+                class_name in ("SoTexture2", "SoTexture3")
+                and constant == "CLAMP_TO_BORDER"
+            )
+        },
+        **{
+            ("SoGLImage", constant): "SoGLImageWrap"
+            for constant in ("REPEAT", "CLAMP", "CLAMP_TO_EDGE", "CLAMP_TO_BORDER")
         },
     },
     "pivy.gui.soqt": {
@@ -1038,6 +1070,13 @@ _METHOD_RETURN_TYPE_OVERRIDES = {
     ("SoQtRenderArea", "getOverlaySceneGraph"): "SoNode | None",
     ("SoQtViewer", "getCamera"): "SoCamera | None",
     ("SoQtViewer", "getSceneGraph"): "SoNode | None",
+    ("SoMultiTextureImageElement", "getModel"): "SoTextureModel",
+    ("SoMultiTextureImageElement", "getWrapS"): "SoTextureWrap",
+    ("SoMultiTextureImageElement", "getWrapT"): "SoTextureWrap",
+    ("SoMultiTextureImageElement", "getWrapR"): "SoTextureWrap",
+    ("SoGLImage", "getWrapS"): "SoGLImageWrap",
+    ("SoGLImage", "getWrapT"): "SoGLImageWrap",
+    ("SoGLImage", "getWrapR"): "SoGLImageWrap",
     # These adapter return types were formerly repeated in the validator's
     # handwritten structural-check table.  Keep them in the canonical policy
     # so generation and validation cannot silently diverge.
@@ -1087,6 +1126,24 @@ _PYTHON_PARAMETER_TYPE_OVERRIDES = {
     # SoSensor stores and returns an arbitrary Python callback payload.  The
     # getter is already object-valued; keep the setter symmetric.
     ("SoSensor", "setData", "callbackdata"): "object",
+    # Texture image APIs use two distinct native enum domains: Coin's
+    # OpenGL-backed texture modes/wraps and SoGLImage's local wrap values.
+    ("SoMultiTextureImageElement", "setElt", "wrapS"): "SoTextureWrap",
+    ("SoMultiTextureImageElement", "setElt", "wrapT"): "SoTextureWrap",
+    ("SoMultiTextureImageElement", "setElt", "wrapR"): "SoTextureWrap",
+    ("SoMultiTextureImageElement", "setElt", "model"): "SoTextureModel",
+    ("SoMultiTextureImageElement", "set", "wrapS"): "SoTextureWrap",
+    ("SoMultiTextureImageElement", "set", "wrapT"): "SoTextureWrap",
+    ("SoMultiTextureImageElement", "set", "wrapR"): "SoTextureWrap",
+    ("SoMultiTextureImageElement", "set", "model"): "SoTextureModel",
+    ("SoGLMultiTextureImageElement", "set", "model"): "SoTextureModel",
+    ("SoGLImage", "setGLDisplayList", "wraps"): "SoGLImageWrap",
+    ("SoGLImage", "setGLDisplayList", "wrapt"): "SoGLImageWrap",
+    ("SoGLImage", "setPBuffer", "wraps"): "SoGLImageWrap",
+    ("SoGLImage", "setPBuffer", "wrapt"): "SoGLImageWrap",
+    ("SoGLImage", "setData", "wraps"): "SoGLImageWrap",
+    ("SoGLImage", "setData", "wrapt"): "SoGLImageWrap",
+    ("SoGLImage", "setData", "wrapr"): "SoGLImageWrap",
     **SEQUENCE_PARAMETER_TYPE_OVERRIDES,
     **DOCUMENTED_PARAMETER_TYPE_OVERRIDES,
 }
@@ -1503,9 +1560,11 @@ PYTHON_PROTOCOL_DEFINITIONS = (
     (
         "SoDBProgressCallback",
         ("SbName", "SoDB"),
-        "class SoDBProgressCallback(Protocol):\n"
+        "_ProgressDataT = TypeVar(\"_ProgressDataT\", contravariant=True)\n"
+        "\n"
+        "class SoDBProgressCallback(Protocol[_ProgressDataT]):\n"
         "    def __call__(\n"
-        "        self, data: object, itemid: SbName, fraction: float,\n"
+        "        self, data: _ProgressDataT, itemid: SbName, fraction: float,\n"
         "        interruptible: bool, /\n"
         "    ) -> bool: ...",
     ),
@@ -1709,8 +1768,12 @@ PYTHON_PROTOCOL_DEFINITIONS = (
     (
         "SoDraggerCallback",
         ("SoDragger",),
-        "class SoDraggerCallback(Protocol):\n"
-        "    def __call__(self, data: object, dragger: SoDragger, /) -> None: ...",
+        "_DraggerDataT = TypeVar(\"_DraggerDataT\", contravariant=True)\n"
+        "\n"
+        "class SoDraggerCallback(Protocol[_DraggerDataT]):\n"
+        "    def __call__(\n"
+        "        self, data: _DraggerDataT, dragger: SoDragger, /\n"
+        "    ) -> None: ...",
     ),
     (
         "SoEventCallbackHandler",
@@ -2348,23 +2411,23 @@ CALLBACK_METHOD_POLICIES = {
     ),
     ("SoDB", "addProgressCallback"): CallbackMethodPolicy(
         (
-            ("func", "SoDBProgressCallback"),
-            ("userdata", "object | None"),
+            ("func", "SoDBProgressCallback[_ProgressDataT]"),
+            ("userdata", "_ProgressDataT | None"),
         ),
         (
-            "func: SoDBProgressCallback, "
-            "userdata: object | None",
+            "func: SoDBProgressCallback[_ProgressDataT], "
+            "userdata: _ProgressDataT | None",
             "None",
         ),
     ),
     ("SoDB", "removeProgressCallback"): CallbackMethodPolicy(
         (
-            ("func", "SoDBProgressCallback"),
-            ("userdata", "object | None"),
+            ("func", "SoDBProgressCallback[_ProgressDataT]"),
+            ("userdata", "_ProgressDataT | None"),
         ),
         (
-            "func: SoDBProgressCallback, "
-            "userdata: object | None",
+            "func: SoDBProgressCallback[_ProgressDataT], "
+            "userdata: _ProgressDataT | None",
             "None",
         ),
     ),
@@ -2406,12 +2469,12 @@ for _dragger_callback_name in (
             )
         ] = CallbackMethodPolicy(
             (
-                ("pyfunc", "SoDraggerCallback"),
-                ("data", "object | None"),
+                ("pyfunc", "SoDraggerCallback[_DraggerDataT]"),
+                ("data", "_DraggerDataT | None"),
             ),
             (
-                "self, pyfunc: SoDraggerCallback, "
-                "data: object | None = ...",
+                "self, pyfunc: SoDraggerCallback[_DraggerDataT], "
+                "data: _DraggerDataT | None = ...",
                 "None",
             ),
         )

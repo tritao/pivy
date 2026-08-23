@@ -458,8 +458,9 @@ RAW_BOUNDARY_METHOD_RULES = (
         "SoMultiTextureImageElement", "set",
         {
             "state": "SoState", "node": "SoNode", "size": "SbVec2s",
-            "numComponents": "int", "bytes": "Incomplete", "wrapS": "int",
-            "wrapT": "int", "model": "int", "blendColor": "SbColor",
+            "numComponents": "int", "bytes": "Incomplete",
+            "wrapS": "SoTextureWrap", "wrapT": "SoTextureWrap",
+            "model": "SoTextureModel", "blendColor": "SbColor",
         },
         "None",
         "Native texture image storage remains an explicit raw boundary",
