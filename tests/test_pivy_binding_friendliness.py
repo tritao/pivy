@@ -17,7 +17,7 @@ class BindingFriendlinessTests(unittest.TestCase):
 
     def test_all_boundaries_and_special_contracts_are_classified(self):
         self.assertEqual(self.report["summary"]["boundaries"], 417)
-        self.assertEqual(self.report["summary"]["special_contracts"], 415)
+        self.assertEqual(self.report["summary"]["special_contracts"], 418)
         self.assertTrue(
             all("remediation" in item for item in self.report["boundaries"])
         )
@@ -102,7 +102,7 @@ class BindingFriendlinessTests(unittest.TestCase):
         self.assertEqual(kinds, {"method", "callback"})
         self.assertEqual(
             sum(item["kind"] == "method" for item in self.report["special_contracts"]),
-            337,
+            340,
         )
         self.assertEqual(
             sum(item["kind"] == "callback" for item in self.report["special_contracts"]),

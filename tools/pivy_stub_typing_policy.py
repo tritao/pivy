@@ -731,6 +731,19 @@ PYTHON_HELPER_METHOD_POLICIES = {
         "self, outputname: SbName | str",
         "SoEngineOutput | None",
     ),
+    ("SoBaseKit", "getPart"): PythonMethodPolicy(
+        "self, partname: SbName | str, makeifneeded: bool",
+        "SoNode | None",
+    ),
+    ("SoBaseKit", "createPathToPart"): PythonMethodPolicy(
+        "self, partname: SbName | str, makeifneeded: bool, "
+        "pathtoextend: SoPath | None = ...",
+        "SoNodeKitPath | None",
+    ),
+    ("SoBaseKit", "setPart"): PythonMethodPolicy(
+        "self, partname: SbName | str, srcFrom: SoNode",
+        "bool",
+    ),
     ("SoEngine", "getOutputNameValue"): PythonMethodPolicy(
         "self, output: SoEngineOutput",
         "tuple[bool, str]",
@@ -836,6 +849,9 @@ PYTHON_TYPE_ALIAS_DEFINITIONS = {
         "SoUnitsValue = Literal[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]",
         "SoSearchFind = Literal[1, 2, 4]",
         "SoSearchInterest = Literal[0, 1, 2]",
+        "SoExtSelectionLassoType = Literal[0, 1, 2]",
+        "SoExtSelectionLassoPolicy = Literal[0, 1, 2, 3]",
+        "SoExtSelectionLassoMode = Literal[0, 1]",
     ),
     "pivy.gui.soqt": (
         "SoQtViewerType = Literal[0, 1]",
@@ -933,6 +949,18 @@ PYTHON_ENUM_CONSTANT_TYPES = {
             for constant in ("FIRST", "LAST", "ALL")
         },
         **{
+            ("SoExtSelection", constant): "SoExtSelectionLassoType"
+            for constant in ("NOLASSO", "LASSO", "RECTANGLE")
+        },
+        **{
+            ("SoExtSelection", constant): "SoExtSelectionLassoPolicy"
+            for constant in ("FULL_BBOX", "PART_BBOX", "FULL", "PART")
+        },
+        **{
+            ("SoExtSelection", constant): "SoExtSelectionLassoMode"
+            for constant in ("ALL_SHAPES", "VISIBLE_SHAPES")
+        },
+        **{
             (class_name, constant): "SoTextureModel"
             for class_name in (
                 "SoTexture2",
@@ -1005,6 +1033,13 @@ PYTHON_ENUM_CONSTANT_TYPES = {
     },
 }
 _METHOD_RETURN_TYPE_OVERRIDES = {
+    # Callback handles preserve the callback and its exact Python userdata
+    # payload, rather than widening the second tuple item to ``object``.
+    (
+        "SoEventCallback",
+        "addEventCallback",
+    ): "tuple[SoEventCallbackHandler[_SoEventCallbackDataT], "
+    "_SoEventCallbackDataT | None]",
     # The Python-level SbImage adapter snapshots the native pixel buffer, so
     # callers never receive a borrowed C pointer.  ``None`` represents an
     # image with no allocated pixel data.
@@ -1642,18 +1677,20 @@ PYTHON_PROTOCOL_DEFINITIONS = (
     (
         "ScXMLStateMachineDeleteCallback",
         ("ScXMLStateMachine",),
-        "class ScXMLStateMachineDeleteCallback(Protocol):\n"
+        "_ScXMLDataT = TypeVar(\"_ScXMLDataT\", contravariant=True)\n"
+        "\n"
+        "class ScXMLStateMachineDeleteCallback(Protocol[_ScXMLDataT]):\n"
         "    def __call__(\n"
-        "        self, data: object, machine: ScXMLStateMachine, /\n"
+        "        self, data: _ScXMLDataT, machine: ScXMLStateMachine, /\n"
         "    ) -> None: ...",
     ),
     (
         "ScXMLStateChangeCallback",
         ("ScXMLStateMachine",),
-        "class ScXMLStateChangeCallback(Protocol):\n"
+        "class ScXMLStateChangeCallback(Protocol[_ScXMLDataT]):\n"
         "    def __call__(\n"
         "        self,\n"
-        "        data: object,\n"
+        "        data: _ScXMLDataT,\n"
         "        machine: ScXMLStateMachine,\n"
         "        stateidentifier: str,\n"
         "        enterstate: bool,\n"
@@ -1787,9 +1824,11 @@ PYTHON_PROTOCOL_DEFINITIONS = (
     (
         "SoEventCallbackHandler",
         ("SoEventCallback",),
-        "class SoEventCallbackHandler(Protocol):\n"
+        "_SoEventCallbackDataT = TypeVar(\"_SoEventCallbackDataT\", contravariant=True)\n"
+        "\n"
+        "class SoEventCallbackHandler(Protocol[_SoEventCallbackDataT]):\n"
         "    def __call__(\n"
-        "        self, data: object, eventcallback: SoEventCallback, /\n"
+        "        self, data: _SoEventCallbackDataT, eventcallback: SoEventCallback, /\n"
         "    ) -> None: ...",
     ),
     (
@@ -1872,17 +1911,21 @@ PYTHON_PROTOCOL_DEFINITIONS = (
     (
         "SoRenderManagerCallback",
         ("SoRenderManager",),
-        "class SoRenderManagerCallback(Protocol):\n"
+        "_SoRenderManagerDataT = TypeVar(\"_SoRenderManagerDataT\", contravariant=True)\n"
+        "\n"
+        "class SoRenderManagerCallback(Protocol[_SoRenderManagerDataT]):\n"
         "    def __call__(\n"
-        "        self, data: object, manager: SoRenderManager, /\n"
+        "        self, data: _SoRenderManagerDataT, manager: SoRenderManager, /\n"
         "    ) -> None: ...",
     ),
     (
         "SoSceneManagerCallback",
         ("SoSceneManager",),
-        "class SoSceneManagerCallback(Protocol):\n"
+        "_SoSceneManagerDataT = TypeVar(\"_SoSceneManagerDataT\", contravariant=True)\n"
+        "\n"
+        "class SoSceneManagerCallback(Protocol[_SoSceneManagerDataT]):\n"
         "    def __call__(\n"
-        "        self, data: object, manager: SoSceneManager, /\n"
+        "        self, data: _SoSceneManagerDataT, manager: SoSceneManager, /\n"
         "    ) -> None: ...",
     ),
     (
@@ -1928,17 +1971,19 @@ PYTHON_PROTOCOL_DEFINITIONS = (
     (
         "SoExtSelectionLassoFilterCallback",
         ("SoPath",),
-        "class SoExtSelectionLassoFilterCallback(Protocol):\n"
+        "_SoExtSelectionDataT = TypeVar(\"_SoExtSelectionDataT\", contravariant=True)\n"
+        "\n"
+        "class SoExtSelectionLassoFilterCallback(Protocol[_SoExtSelectionDataT]):\n"
         "    def __call__(\n"
-        "        self, data: object, path: SoPath, /\n"
+        "        self, data: _SoExtSelectionDataT, path: SoPath, /\n"
         "    ) -> SoPath | None: ...",
     ),
     (
         "SoExtSelectionTriangleFilterCallback",
         ("SoCallbackAction", "SoPrimitiveVertex"),
-        "class SoExtSelectionTriangleFilterCallback(Protocol):\n"
+        "class SoExtSelectionTriangleFilterCallback(Protocol[_SoExtSelectionDataT]):\n"
         "    def __call__(\n"
-        "        self, data: object, action: SoCallbackAction,\n"
+        "        self, data: _SoExtSelectionDataT, action: SoCallbackAction,\n"
         "        first: SoPrimitiveVertex, second: SoPrimitiveVertex,\n"
         "        third: SoPrimitiveVertex, /\n"
         "    ) -> bool: ...",
@@ -1946,18 +1991,18 @@ PYTHON_PROTOCOL_DEFINITIONS = (
     (
         "SoExtSelectionLineSegmentFilterCallback",
         ("SoCallbackAction", "SoPrimitiveVertex"),
-        "class SoExtSelectionLineSegmentFilterCallback(Protocol):\n"
+        "class SoExtSelectionLineSegmentFilterCallback(Protocol[_SoExtSelectionDataT]):\n"
         "    def __call__(\n"
-        "        self, data: object, action: SoCallbackAction,\n"
+        "        self, data: _SoExtSelectionDataT, action: SoCallbackAction,\n"
         "        first: SoPrimitiveVertex, second: SoPrimitiveVertex, /\n"
         "    ) -> bool: ...",
     ),
     (
         "SoExtSelectionPointFilterCallback",
         ("SoCallbackAction", "SoPrimitiveVertex"),
-        "class SoExtSelectionPointFilterCallback(Protocol):\n"
+        "class SoExtSelectionPointFilterCallback(Protocol[_SoExtSelectionDataT]):\n"
         "    def __call__(\n"
-        "        self, data: object, action: SoCallbackAction,\n"
+        "        self, data: _SoExtSelectionDataT, action: SoCallbackAction,\n"
         "        vertex: SoPrimitiveVertex, /\n"
         "    ) -> bool: ...",
     ),
@@ -2003,12 +2048,12 @@ PYTHON_PROTOCOL_MODULES = {
     for name, _, _ in PYTHON_PROTOCOL_DEFINITIONS
 }
 CALLBACK_TYPE_SIGNATURES = {
-    "ScXMLStateChangeCB": "ScXMLStateChangeCallback",
-    "ScXMLStateMachineDeleteCB": "ScXMLStateMachineDeleteCallback",
+    "ScXMLStateChangeCB": "ScXMLStateChangeCallback[_ScXMLDataT]",
+    "ScXMLStateMachineDeleteCB": "ScXMLStateMachineDeleteCallback[_ScXMLDataT]",
     "SoCallbackAction::SoCallbackActionCB": "SoCallbackActionNodeCallback",
     "SoCallbackCB": "SoActionCallback",
     "SoDraggerCB": "SoDraggerCallback",
-    "SoEventCallbackCB": "SoEventCallbackHandler",
+    "SoEventCallbackCB": "SoEventCallbackHandler[_SoEventCallbackDataT]",
     "SoGLPreRenderCB": "SoGLPreRenderCallback",
     "SoGLRenderAction::SoGLRenderAbortCB": "SoGLRenderAbortCallback",
     "SoGLRenderPassCB": "SoGLRenderPassCallback",
@@ -2017,8 +2062,8 @@ CALLBACK_TYPE_SIGNATURES = {
     "SoIntersectionDetectionAction::SoIntersectionVisitationCB": "SoIntersectionVisitationCallback",
     "SoLineSegmentCB": "SoLineSegmentCallback",
     "SoPointCB": "SoPointCallback",
-    "SoRenderManagerRenderCB": "SoRenderManagerCallback",
-    "SoSceneManagerRenderCB": "SoSceneManagerCallback",
+    "SoRenderManagerRenderCB": "SoRenderManagerCallback[_SoRenderManagerDataT]",
+    "SoSceneManagerRenderCB": "SoSceneManagerCallback[_SoSceneManagerDataT]",
     "SoSelectionClassCB": "SoSelectionClassCallback[object]",
     "SoSelectionPathCB": "SoSelectionPathCallback[object]",
     "SoSelectionPickCB": "SoSelectionPickCallback[object]",
@@ -2172,6 +2217,146 @@ class CallbackMethodPolicy:
 
 
 CALLBACK_METHOD_POLICIES = {
+    ("SoEventCallback", "addEventCallback"): CallbackMethodPolicy(
+        (
+            ("eventtype", "SoType"),
+            ("pyfunc", "SoEventCallbackHandler[_SoEventCallbackDataT]"),
+            ("userdata", "_SoEventCallbackDataT | None"),
+        ),
+        (
+            "self, eventtype: SoType, "
+            "pyfunc: SoEventCallbackHandler[_SoEventCallbackDataT], "
+            "userdata: _SoEventCallbackDataT | None = ...",
+            "tuple[SoEventCallbackHandler[_SoEventCallbackDataT], "
+            "_SoEventCallbackDataT | None]",
+        ),
+    ),
+    ("SoEventCallback", "removeEventCallback"): CallbackMethodPolicy(
+        (
+            ("eventtype", "SoType"),
+            (
+                "tuple",
+                "tuple[SoEventCallbackHandler[_SoEventCallbackDataT], "
+                "_SoEventCallbackDataT | None]",
+            ),
+        ),
+        (
+            "self, eventtype: SoType, tuple: "
+            "tuple[SoEventCallbackHandler[_SoEventCallbackDataT], "
+            "_SoEventCallbackDataT | None]",
+            "None",
+        ),
+    ),
+    ("SoSceneManager", "setRenderCallback"): CallbackMethodPolicy(
+        (
+            ("pyfunc", "SoSceneManagerCallback[_SoSceneManagerDataT]"),
+            ("userData", "_SoSceneManagerDataT | None"),
+        ),
+        (
+            "self, pyfunc: SoSceneManagerCallback[_SoSceneManagerDataT], "
+            "userData: _SoSceneManagerDataT | None = ...",
+            "None",
+        ),
+    ),
+    ("SoRenderManager", "setRenderCallback"): CallbackMethodPolicy(
+        (
+            ("pyfunc", "SoRenderManagerCallback[_SoRenderManagerDataT]"),
+            ("userData", "_SoRenderManagerDataT | None"),
+        ),
+        (
+            "self, pyfunc: SoRenderManagerCallback[_SoRenderManagerDataT], "
+            "userData: _SoRenderManagerDataT | None = ...",
+            "None",
+        ),
+    ),
+    ("SoRenderManager", "addPreRenderCallback"): CallbackMethodPolicy(
+        (
+            ("pyfunc", "SoRenderManagerCallback[_SoRenderManagerDataT]"),
+            ("data", "_SoRenderManagerDataT | None"),
+        ),
+        (
+            "self, pyfunc: SoRenderManagerCallback[_SoRenderManagerDataT], "
+            "data: _SoRenderManagerDataT | None",
+            "None",
+        ),
+    ),
+    ("SoRenderManager", "removePreRenderCallback"): CallbackMethodPolicy(
+        (
+            ("pyfunc", "SoRenderManagerCallback[_SoRenderManagerDataT]"),
+            ("data", "_SoRenderManagerDataT | None"),
+        ),
+        (
+            "self, pyfunc: SoRenderManagerCallback[_SoRenderManagerDataT], "
+            "data: _SoRenderManagerDataT | None",
+            "None",
+        ),
+    ),
+    ("SoRenderManager", "addPostRenderCallback"): CallbackMethodPolicy(
+        (
+            ("pyfunc", "SoRenderManagerCallback[_SoRenderManagerDataT]"),
+            ("data", "_SoRenderManagerDataT | None"),
+        ),
+        (
+            "self, pyfunc: SoRenderManagerCallback[_SoRenderManagerDataT], "
+            "data: _SoRenderManagerDataT | None",
+            "None",
+        ),
+    ),
+    ("SoRenderManager", "removePostRenderCallback"): CallbackMethodPolicy(
+        (
+            ("pyfunc", "SoRenderManagerCallback[_SoRenderManagerDataT]"),
+            ("data", "_SoRenderManagerDataT | None"),
+        ),
+        (
+            "self, pyfunc: SoRenderManagerCallback[_SoRenderManagerDataT], "
+            "data: _SoRenderManagerDataT | None",
+            "None",
+        ),
+    ),
+    ("ScXMLStateMachine", "addDeleteCallback"): CallbackMethodPolicy(
+        (
+            ("pyfunc", "ScXMLStateMachineDeleteCallback[_ScXMLDataT]"),
+            ("userdata", "_ScXMLDataT | None"),
+        ),
+        (
+            "self, pyfunc: ScXMLStateMachineDeleteCallback[_ScXMLDataT], "
+            "userdata: _ScXMLDataT | None = ...",
+            "None",
+        ),
+    ),
+    ("ScXMLStateMachine", "removeDeleteCallback"): CallbackMethodPolicy(
+        (
+            ("pyfunc", "ScXMLStateMachineDeleteCallback[_ScXMLDataT]"),
+            ("userdata", "_ScXMLDataT | None"),
+        ),
+        (
+            "self, pyfunc: ScXMLStateMachineDeleteCallback[_ScXMLDataT], "
+            "userdata: _ScXMLDataT | None = ...",
+            "None",
+        ),
+    ),
+    ("ScXMLStateMachine", "addStateChangeCallback"): CallbackMethodPolicy(
+        (
+            ("pyfunc", "ScXMLStateChangeCallback[_ScXMLDataT]"),
+            ("userdata", "_ScXMLDataT | None"),
+        ),
+        (
+            "self, pyfunc: ScXMLStateChangeCallback[_ScXMLDataT], "
+            "userdata: _ScXMLDataT | None = ...",
+            "None",
+        ),
+    ),
+    ("ScXMLStateMachine", "removeStateChangeCallback"): CallbackMethodPolicy(
+        (
+            ("pyfunc", "ScXMLStateChangeCallback[_ScXMLDataT]"),
+            ("userdata", "_ScXMLDataT | None"),
+        ),
+        (
+            "self, pyfunc: ScXMLStateChangeCallback[_ScXMLDataT], "
+            "userdata: _ScXMLDataT | None = ...",
+            "None",
+        ),
+    ),
     ("SoCallbackAction", "addPreCallback"): CallbackMethodPolicy(
         (
             ("type", "SoType"),
@@ -2808,14 +2993,14 @@ CALLBACK_METHOD_POLICIES.update(
             (
                 (
                     "f",
-                    "SoExtSelectionLassoFilterCallback | None",
+                    "SoExtSelectionLassoFilterCallback[_SoExtSelectionDataT] | None",
                 ),
-                ("userdata", "object | None"),
+                ("userdata", "_SoExtSelectionDataT | None"),
                 ("callonlyifselectable", "bool"),
             ),
             (
-                "self, f: SoExtSelectionLassoFilterCallback | None, "
-                "userdata: object | None = ..., "
+                "self, f: SoExtSelectionLassoFilterCallback[_SoExtSelectionDataT] | None, "
+                "userdata: _SoExtSelectionDataT | None = ..., "
                 "callonlyifselectable: bool = ...",
                 "None",
             ),
@@ -2827,13 +3012,13 @@ CALLBACK_METHOD_POLICIES.update(
             (
                 (
                     "func",
-                    "SoExtSelectionTriangleFilterCallback | None",
+                    "SoExtSelectionTriangleFilterCallback[_SoExtSelectionDataT] | None",
                 ),
-                ("userdata", "object | None"),
+                ("userdata", "_SoExtSelectionDataT | None"),
             ),
             (
-                "self, func: SoExtSelectionTriangleFilterCallback | None, "
-                "userdata: object | None = ...",
+                "self, func: SoExtSelectionTriangleFilterCallback[_SoExtSelectionDataT] | None, "
+                "userdata: _SoExtSelectionDataT | None = ...",
                 "None",
             ),
         ),
@@ -2844,13 +3029,13 @@ CALLBACK_METHOD_POLICIES.update(
             (
                 (
                     "func",
-                    "SoExtSelectionLineSegmentFilterCallback | None",
+                    "SoExtSelectionLineSegmentFilterCallback[_SoExtSelectionDataT] | None",
                 ),
-                ("userdata", "object | None"),
+                ("userdata", "_SoExtSelectionDataT | None"),
             ),
             (
-                "self, func: SoExtSelectionLineSegmentFilterCallback | None, "
-                "userdata: object | None = ...",
+                "self, func: SoExtSelectionLineSegmentFilterCallback[_SoExtSelectionDataT] | None, "
+                "userdata: _SoExtSelectionDataT | None = ...",
                 "None",
             ),
         ),
@@ -2858,13 +3043,13 @@ CALLBACK_METHOD_POLICIES.update(
             (
                 (
                     "func",
-                    "SoExtSelectionPointFilterCallback | None",
+                    "SoExtSelectionPointFilterCallback[_SoExtSelectionDataT] | None",
                 ),
-                ("userdata", "object | None"),
+                ("userdata", "_SoExtSelectionDataT | None"),
             ),
             (
-                "self, func: SoExtSelectionPointFilterCallback | None, "
-                "userdata: object | None = ...",
+                "self, func: SoExtSelectionPointFilterCallback[_SoExtSelectionDataT] | None, "
+                "userdata: _SoExtSelectionDataT | None = ...",
                 "None",
             ),
         ),

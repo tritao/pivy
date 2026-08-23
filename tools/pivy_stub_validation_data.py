@@ -204,7 +204,7 @@ PROPERTY_ATTRIBUTE_CHECKS = {
     ),
 }
 MYPY_SNIPPET = """
-from typing import Any, Callable, Iterator, Sequence
+from typing import Any, Iterator, Sequence
 
 from pivy.coin import (
     SbIntList,
@@ -235,6 +235,7 @@ from pivy.coin import (
     SoEngineOutput,
     SoEvent,
     SoEventCallback,
+    SoEventCallbackHandler,
     SoField,
     SoFieldData,
     SoFieldContainer,
@@ -565,7 +566,7 @@ dragger.removeOtherEventCallback(dragger_callback, None)
 
 def event_callback(data: Any, event: SoEventCallback) -> None: ...
 event_node = SoEventCallback()
-event_handle: tuple[Callable[[object, SoEventCallback], None], object] = (
+event_handle: tuple[SoEventCallbackHandler[Any], Any | None] = (
     event_node.addEventCallback(SoType.badType(), event_callback, None)
 )
 event_node.removeEventCallback(SoType.badType(), event_handle)

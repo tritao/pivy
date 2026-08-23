@@ -1407,6 +1407,8 @@ class NodeKitTests(unittest.TestCase):
         s = SoShapeKit()
         self.assertTrue(isinstance(s.__getattr__("shape"), SoNode))
         self.assertTrue(isinstance(s.__getattr__("appearance"), SoAppearanceKit))
+        self.assertTrue(isinstance(s.getPart("shape", False), SoNode))
+        self.assertIsNone(s.getPart("missing", False))
         self.assertRaises(AttributeError, s.__getattr__, "missing")
 
 class SoGroupMethods(unittest.TestCase):

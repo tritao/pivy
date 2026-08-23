@@ -36,6 +36,17 @@ class CallbackContractTests(unittest.TestCase):
         self.assertEqual(selection.removal, CallbackRemoval.IDENTITY)
         self.assertTrue(selection.has_userdata)
 
+        event = CALLBACK_CONTRACTS[("SoEventCallback", "addEventCallback")]
+        self.assertEqual(
+            event.callback_type,
+            "SoEventCallbackHandler[_SoEventCallbackDataT]",
+        )
+        self.assertEqual(
+            event.return_type,
+            "tuple[SoEventCallbackHandler[_SoEventCallbackDataT], "
+            "_SoEventCallbackDataT | None]",
+        )
+
     def test_contract_checks_preserve_existing_validator_shapes(self):
         coin_checks = callback_method_checks(module="coin.pyi")
         soqt_checks = callback_method_checks(module="gui/soqt.pyi")

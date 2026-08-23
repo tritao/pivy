@@ -8,9 +8,15 @@ from pathlib import Path
 import sys
 
 try:
-    from tools.pivy_stub_typing_policy import MULTIFIELD_TYPE_POLICIES
+    from tools.pivy_stub_typing_policy import (
+        MULTIFIELD_TYPE_POLICIES,
+        multifield_values_types,
+    )
 except ImportError:
-    from pivy_stub_typing_policy import MULTIFIELD_TYPE_POLICIES
+    from pivy_stub_typing_policy import (
+        MULTIFIELD_TYPE_POLICIES,
+        multifield_values_types,
+    )
 
 
 @dataclass(frozen=True)
@@ -62,6 +68,36 @@ def _methods(
     for base in info.bases:
         inherited.extend(_methods(base, method_name, classes, seen))
     return tuple(inherited)
+
+
+def _attribute_annotation(
+    class_name: str,
+    attribute_name: str,
+    classes: dict[str, _ClassInfo],
+    seen: set[str] | None = None,
+) -> str | None:
+    """Find a class annotation, including the generated inheritance chain."""
+
+    seen = set() if seen is None else seen
+    if class_name in seen:
+        return None
+    seen.add(class_name)
+    info = classes.get(class_name)
+    if info is None:
+        return None
+
+    for node in info.body:
+        if isinstance(node, ast.AnnAssign) and isinstance(node.target, ast.Name):
+            if node.target.id == attribute_name:
+                return _annotation(node.annotation)
+
+    for base in info.bases:
+        annotation = _attribute_annotation(
+            base, attribute_name, classes, seen
+        )
+        if annotation is not None:
+            return annotation
+    return None
 
 
 def _parameters(method: ast.FunctionDef) -> tuple[tuple[str, str], ...]:
@@ -122,6 +158,16 @@ def audit(path: Path) -> tuple[list[str], int]:
         if class_name not in classes:
             errors.append("%s is missing from %s" % (class_name, path))
             continue
+
+        expected_values_type = "list[%s]" % multifield_values_types()[class_name]
+        actual_values_type = _attribute_annotation(
+            class_name, "values", classes
+        )
+        if actual_values_type != expected_values_type:
+            errors.append(
+                "%s.values must be %s (found %s)"
+                % (class_name, expected_values_type, actual_values_type or "missing")
+            )
 
         # The generated bindings use either ``i`` or ``index`` for integer
         # indexing.  Keep the check semantic while still rejecting slices.

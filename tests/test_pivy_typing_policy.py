@@ -469,6 +469,27 @@ class FieldTypePolicyTests(unittest.TestCase):
             policy.PYTHON_ENUM_CONSTANT_TYPES["pivy.coin"][("SoGLImage", "CLAMP_TO_EDGE")],
             "SoGLImageWrap",
         )
+        self.assertIn("SoExtSelectionLassoType = Literal[0, 1, 2]", aliases)
+        self.assertEqual(
+            policy.PYTHON_ENUM_CONSTANT_TYPES["pivy.coin"][("SoExtSelection", "RECTANGLE")],
+            "SoExtSelectionLassoType",
+        )
+
+    def test_nodekit_lookup_matches_python_adapter(self):
+        self.assertEqual(
+            policy.PYTHON_HELPER_METHOD_POLICIES[("SoBaseKit", "getPart")],
+            policy.PythonMethodPolicy(
+                "self, partname: SbName | str, makeifneeded: bool",
+                "SoNode | None",
+            ),
+        )
+        self.assertEqual(
+            policy.PYTHON_HELPER_METHOD_POLICIES[("SoBaseKit", "setPart")],
+            policy.PythonMethodPolicy(
+                "self, partname: SbName | str, srcFrom: SoNode",
+                "bool",
+            ),
+        )
 
     def test_generic_userdata_callback_policies(self):
         for class_name, method_name in (
@@ -488,6 +509,16 @@ class FieldTypePolicyTests(unittest.TestCase):
             (
                 ("pyfunc", "SoDraggerCallback[_DraggerDataT]"),
                 ("data", "_DraggerDataT | None"),
+            ),
+        )
+        self.assertEqual(
+            policy.CALLBACK_METHOD_POLICIES[("SoEventCallback", "addEventCallback")].shadow_signature,
+            (
+                "self, eventtype: SoType, "
+                "pyfunc: SoEventCallbackHandler[_SoEventCallbackDataT], "
+                "userdata: _SoEventCallbackDataT | None = ...",
+                "tuple[SoEventCallbackHandler[_SoEventCallbackDataT], "
+                "_SoEventCallbackDataT | None]",
             ),
         )
 
@@ -1006,11 +1037,11 @@ class CallbackTypePolicyTests(unittest.TestCase):
         )
         self.assertEqual(
             policy.CALLBACK_TYPE_SIGNATURES["ScXMLStateMachineDeleteCB"],
-            "ScXMLStateMachineDeleteCallback",
+            "ScXMLStateMachineDeleteCallback[_ScXMLDataT]",
         )
         self.assertEqual(
             policy.CALLBACK_TYPE_SIGNATURES["ScXMLStateChangeCB"],
-            "ScXMLStateChangeCallback",
+            "ScXMLStateChangeCallback[_ScXMLDataT]",
         )
         self.assertEqual(
             definitions["SoFieldContainerAccess"],

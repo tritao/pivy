@@ -65,6 +65,9 @@ def check_nodekit_lookup() -> None:
     assert_type(nodekit_access.__getattr__("shape"), coin.SoNode | coin.SoField)
     assert_type(kit.shape, coin.SoNode | coin.SoField)
     assert_type(kit.appearance, coin.SoNode | coin.SoField)
+    assert_type(kit.getPart("shape", True), coin.SoNode | None)
+    assert_type(kit.createPathToPart("shape", True), coin.SoNodeKitPath | None)
+    assert_type(kit.setPart("shape", coin.SoCube()), bool)
 
 
 def check_reflection_contract() -> None:

@@ -145,6 +145,67 @@
             ]
           }
         },
+        "SoEventCallback": {
+          "bases": ["SoNode"],
+          "methods": {
+            "addEventCallback": [
+              {
+                "parameters": [
+                  {"name": "eventtype", "type": "SoType"},
+                  {"name": "pyfunc", "type": "SoEventCallbackHandler[_SoEventCallbackDataT]"},
+                  {"name": "userdata", "type": "_SoEventCallbackDataT | None"}
+                ],
+                "return": "tuple[SoEventCallbackHandler[_SoEventCallbackDataT], _SoEventCallbackDataT | None]"
+              }
+            ],
+            "removeEventCallback": [
+              {
+                "parameters": [
+                  {"name": "eventtype", "type": "SoType"},
+                  {"name": "tuple", "type": "tuple[SoEventCallbackHandler[_SoEventCallbackDataT], _SoEventCallbackDataT | None]"}
+                ],
+                "return": "None"
+              }
+            ]
+          }
+        },
+        "SoBaseKit": {
+          "bases": ["SoNode"],
+          "methods": {
+            "getPart": [
+              {
+                "parameters": [
+                  {"name": "partname", "type": "SbName | str"},
+                  {"name": "makeifneeded", "type": "bool"}
+                ],
+                "return": "SoNode | None"
+              }
+            ],
+            "setPart": [
+              {
+                "parameters": [
+                  {"name": "partname", "type": "SbName | str"},
+                  {"name": "srcFrom", "type": "SoNode"}
+                ],
+                "return": "bool"
+              }
+            ]
+          }
+        },
+        "SoExtSelection": {
+          "bases": ["SoSelection"],
+          "methods": {
+            "setPointFilterCallback": [
+              {
+                "parameters": [
+                  {"name": "func", "type": "SoExtSelectionPointFilterCallback[_SoExtSelectionDataT] | None"},
+                  {"name": "userdata", "type": "_SoExtSelectionDataT | None"}
+                ],
+                "return": "None"
+              }
+            ]
+          }
+        },
         "SoSensor": {
           "bases": [],
           "methods": {
@@ -157,6 +218,11 @@
             "getData": [{"parameters": [], "return": "object | None"}]
           }
         }
+      },
+      "aliases": {
+        "SoExtSelectionLassoType": "Literal[0, 1, 2]",
+        "SoExtSelectionLassoPolicy": "Literal[0, 1, 2, 3]",
+        "SoExtSelectionLassoMode": "Literal[0, 1]"
       }
     },
     "pivy.gui.soqt": {

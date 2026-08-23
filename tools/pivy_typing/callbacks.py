@@ -194,70 +194,12 @@ def _contract_from_policy(
     )
 
 
-def _manual_contract(
-    class_name: str,
-    method_name: str,
-    parameter_types: Mapping[str, str],
-    return_type: str,
-) -> CallbackContract:
-    parameters = tuple(parameter_types.items())
-    callback_parameters = tuple(
-        (name, annotation)
-        for name, annotation in parameters
-        if _is_callback_parameter(name, annotation) or name == "tuple"
-    )
-    userdata_parameters = tuple(
-        name for name, _ in parameters if _is_userdata_parameter(name)
-    )
-    retention, removal = _lifecycle(class_name, method_name)
-    return CallbackContract(
-        class_name=class_name,
-        method_name=method_name,
-        parameter_types=parameters,
-        callback_parameters=callback_parameters,
-        userdata_parameters=userdata_parameters,
-        return_type=return_type,
-        retention=retention,
-        removal=removal,
-        nullable=any("| None" in annotation for _, annotation in callback_parameters),
-        python_safe=True,
-        source="tools/pivy_typing/callbacks.py",
-        reason=(
-            "Existing runtime and static validation establish a Python-safe "
-            "callback adapter and its closure lifecycle."
-        ),
-    )
-
-
-# These were previously maintained only as validator tuples.  Keeping them
-# here makes the contract registry the source for both validation and the
-# manifest while preserving the exact existing expected signatures.
-_MANUAL_CALLBACK_CONTRACTS = (
-    ("SoEventCallback", "addEventCallback", {"pyfunc": "SoEventCallbackHandler", "userdata": "object | None"}, "tuple[SoEventCallbackHandler, object]"),
-    ("SoEventCallback", "removeEventCallback", {"tuple": "tuple[SoEventCallbackHandler, object]"}, "None"),
-    ("SoSceneManager", "setRenderCallback", {"pyfunc": "SoSceneManagerCallback", "userData": "object | None"}, "None"),
-    ("SoRenderManager", "setRenderCallback", {"pyfunc": "SoRenderManagerCallback", "userData": "object | None"}, "None"),
-    ("SoRenderManager", "addPreRenderCallback", {"pyfunc": "SoRenderManagerCallback", "data": "object"}, "None"),
-    ("SoRenderManager", "removePreRenderCallback", {"pyfunc": "SoRenderManagerCallback", "data": "object"}, "None"),
-    ("SoRenderManager", "addPostRenderCallback", {"pyfunc": "SoRenderManagerCallback", "data": "object"}, "None"),
-    ("SoRenderManager", "removePostRenderCallback", {"pyfunc": "SoRenderManagerCallback", "data": "object"}, "None"),
-    ("ScXMLStateMachine", "addDeleteCallback", {"pyfunc": "ScXMLStateMachineDeleteCallback", "userdata": "object"}, "None"),
-    ("ScXMLStateMachine", "removeDeleteCallback", {"pyfunc": "ScXMLStateMachineDeleteCallback", "userdata": "object"}, "None"),
-    ("ScXMLStateMachine", "addStateChangeCallback", {"pyfunc": "ScXMLStateChangeCallback", "userdata": "object"}, "None"),
-    ("ScXMLStateMachine", "removeStateChangeCallback", {"pyfunc": "ScXMLStateChangeCallback", "userdata": "object"}, "None"),
-)
-
-
 def _build_contracts() -> dict[tuple[str, str], CallbackContract]:
     contracts = {
         key: _contract_from_policy(class_name, method_name, method_policy)
         for key, method_policy in CALLBACK_METHOD_POLICIES.items()
         for class_name, method_name in (key,)
     }
-    for class_name, method_name, parameters, return_type in _MANUAL_CALLBACK_CONTRACTS:
-        contracts[(class_name, method_name)] = _manual_contract(
-            class_name, method_name, parameters, return_type
-        )
     return contracts
 
 

@@ -27,7 +27,7 @@ def check_named_callback_protocols() -> None:
     class StateMachineDeleteCallback:
         def __call__(
             self,
-            data: object,
+            data: str,
             machine: coin.ScXMLStateMachine,
         ) -> None:
             pass
@@ -35,7 +35,7 @@ def check_named_callback_protocols() -> None:
     class StateChangeCallback:
         def __call__(
             self,
-            data: object,
+            data: str,
             machine: coin.ScXMLStateMachine,
             stateidentifier: str,
             enterstate: bool,
@@ -44,8 +44,12 @@ def check_named_callback_protocols() -> None:
             pass
 
     state_machine = coin.ScXMLStateMachine()
-    state_machine.addDeleteCallback(StateMachineDeleteCallback(), None)
-    state_machine.addStateChangeCallback(StateChangeCallback(), None)
+    delete_contract: coin.ScXMLStateMachineDeleteCallback[str] = (
+        StateMachineDeleteCallback()
+    )
+    state_change_contract: coin.ScXMLStateChangeCallback[str] = StateChangeCallback()
+    state_machine.addDeleteCallback(delete_contract, "delete")
+    state_machine.addStateChangeCallback(state_change_contract, "state")
 
 
 def check_sensor_callbacks() -> None:
@@ -323,16 +327,16 @@ def check_callback_action_callbacks() -> None:
 
 
 def check_event_and_selection_callbacks() -> None:
-    def event_callback(data: Any, event: coin.SoEventCallback) -> None:
+    def event_callback(data: str, event: coin.SoEventCallback) -> None:
         pass
 
     event_node = coin.SoEventCallback()
     event_handle = event_node.addEventCallback(
-        coin.SoType.badType(), event_callback, None
+        coin.SoType.badType(), event_callback, "event"
     )
     assert_type(
         event_handle,
-        tuple[coin.SoEventCallbackHandler, object],
+        tuple[coin.SoEventCallbackHandler[str], str | None],
     )
     event_node.removeEventCallback(coin.SoType.badType(), event_handle)
 
@@ -404,13 +408,13 @@ def check_event_and_selection_callbacks() -> None:
     selection.removeChangeCallback(selection_class_callback, None)
 
     def lasso_filter_callback(
-        data: object,
+        data: str,
         path: coin.SoPath,
     ) -> coin.SoPath | None:
         return path
 
     def triangle_filter_callback(
-        data: object,
+        data: str,
         action: coin.SoCallbackAction,
         v1: coin.SoPrimitiveVertex,
         v2: coin.SoPrimitiveVertex,
@@ -419,7 +423,7 @@ def check_event_and_selection_callbacks() -> None:
         return True
 
     def line_filter_callback(
-        data: object,
+        data: str,
         action: coin.SoCallbackAction,
         v1: coin.SoPrimitiveVertex,
         v2: coin.SoPrimitiveVertex,
@@ -427,35 +431,35 @@ def check_event_and_selection_callbacks() -> None:
         return False
 
     def point_filter_callback(
-        data: object,
+        data: str,
         action: coin.SoCallbackAction,
         vertex: coin.SoPrimitiveVertex,
     ) -> bool:
         return True
 
-    lasso_contract: coin.SoExtSelectionLassoFilterCallback = lasso_filter_callback
-    triangle_contract: coin.SoExtSelectionTriangleFilterCallback = triangle_filter_callback
-    line_contract: coin.SoExtSelectionLineSegmentFilterCallback = line_filter_callback
-    point_contract: coin.SoExtSelectionPointFilterCallback = point_filter_callback
+    lasso_contract: coin.SoExtSelectionLassoFilterCallback[str] = lasso_filter_callback
+    triangle_contract: coin.SoExtSelectionTriangleFilterCallback[str] = triangle_filter_callback
+    line_contract: coin.SoExtSelectionLineSegmentFilterCallback[str] = line_filter_callback
+    point_contract: coin.SoExtSelectionPointFilterCallback[str] = point_filter_callback
 
     extended_selection = coin.SoExtSelection()
     extended_selection.setLassoFilterCallback(
         lasso_filter_callback,
-        None,
+        "lasso",
         False,
     )
     extended_selection.setLassoFilterCallback(None)
     extended_selection.setTriangleFilterCallback(
         triangle_filter_callback,
-        None,
+        "triangle",
     )
     extended_selection.setTriangleFilterCallback(None)
     extended_selection.setLineSegmentFilterCallback(
         line_filter_callback,
-        None,
+        "line",
     )
     extended_selection.setLineSegmentFilterCallback(None)
-    extended_selection.setPointFilterCallback(point_filter_callback, None)
+    extended_selection.setPointFilterCallback(point_filter_callback, "point")
     extended_selection.setPointFilterCallback(None)
 
 
@@ -497,21 +501,23 @@ def check_render_and_scene_callbacks() -> None:
     )
     gl_action.setSortedObjectOrderStrategy(coin.SoGLRenderAction.BBOX_CENTER)
 
-    def scene_callback(data: Any, manager: coin.SoSceneManager) -> None:
+    def scene_callback(data: str, manager: coin.SoSceneManager) -> None:
         pass
 
-    def render_callback(data: Any, manager: coin.SoRenderManager) -> None:
+    def render_callback(data: int, manager: coin.SoRenderManager) -> None:
         pass
 
     scene_manager = coin.SoSceneManager()
-    scene_manager.setRenderCallback(scene_callback)
+    scene_contract: coin.SoSceneManagerCallback[str] = scene_callback
+    scene_manager.setRenderCallback(scene_contract, "scene")
 
     render_manager = coin.SoRenderManager()
-    render_manager.setRenderCallback(render_callback)
-    render_manager.addPreRenderCallback(render_callback, None)
-    render_manager.removePreRenderCallback(render_callback, None)
-    render_manager.addPostRenderCallback(render_callback, None)
-    render_manager.removePostRenderCallback(render_callback, None)
+    render_contract: coin.SoRenderManagerCallback[int] = render_callback
+    render_manager.setRenderCallback(render_contract, 1)
+    render_manager.addPreRenderCallback(render_contract, 2)
+    render_manager.removePreRenderCallback(render_contract, 2)
+    render_manager.addPostRenderCallback(render_contract, 3)
+    render_manager.removePostRenderCallback(render_contract, 3)
 
 
 def check_other_callback_domains() -> None:

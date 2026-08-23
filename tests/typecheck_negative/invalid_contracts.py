@@ -42,9 +42,15 @@ def invalid_callback_arity() -> None:
 
 def invalid_stable_enum_value() -> None:
     style: coin.SoDrawStyleValue = 4
+    lasso_type: coin.SoExtSelectionLassoType = 3
     viewer = soqt.SoQtViewer()
     viewer.setDrawStyle(0, 99)
-    del style, viewer
+    del style, lasso_type, viewer
+
+
+def invalid_nodekit_lookup() -> None:
+    kit = coin.SoShapeKit()
+    kit.getPart(123, True)
 
 
 def invalid_soqt_build_flag() -> None:
