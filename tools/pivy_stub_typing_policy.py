@@ -2169,6 +2169,116 @@ FIELD_ATTRIBUTE_TYPE_POLICIES = {
         "isBound": "SoSFBool",
     },
 }
+RUNTIME_FIELD_ATTRIBUTE_TYPE_POLICIES = {
+    class_name: dict(attributes)
+    for class_name, attributes in FIELD_ATTRIBUTE_TYPE_POLICIES.items()
+}
+
+# These public attributes are emitted by stubgen or documented by the native
+# runtime rather than added by the field-registry normalizer above.  Keep
+# their expected Python types in the same policy registry so structural
+# validation does not maintain a second attribute database.
+FIELD_ATTRIBUTE_TYPE_POLICIES.update(
+    {
+        "SoBoolOperation": {
+            "inverse": "SoEngineOutput",
+            "output": "SoEngineOutput",
+        },
+        "SoComposeVec3f": {"vector": "SoEngineOutput"},
+        "SoDecomposeVec3f": {
+            "x": "SoEngineOutput",
+            "vector": "SoMFVec3f",
+        },
+        "SoCube": {
+            "width": "SoSFFloat",
+            "height": "SoSFFloat",
+            "depth": "SoSFFloat",
+        },
+        "SoMaterial": {
+            "diffuseColor": "SoMFColor",
+            "ambientColor": "SoMFColor",
+            "emissiveColor": "SoMFColor",
+            "specularColor": "SoMFColor",
+            "shininess": "SoMFFloat",
+            "transparency": "SoMFFloat",
+        },
+        "SoTransform": {
+            "center": "SoSFVec3f",
+            "scaleFactor": "SoSFVec3f",
+            "translation": "SoSFVec3f",
+            "rotation": "SoSFRotation",
+            "scaleOrientation": "SoSFRotation",
+        },
+        "SoCamera": {
+            "aspectRatio": "SoSFFloat",
+            "farDistance": "SoSFFloat",
+            "focalDistance": "SoSFFloat",
+            "nearDistance": "SoSFFloat",
+            "orientation": "SoSFRotation",
+            "position": "SoSFVec3f",
+            "viewportMapping": "SoSFEnum",
+        },
+        "SoLight": {
+            "color": "SoSFColor",
+            "intensity": "SoSFFloat",
+            "on": "SoSFBool",
+        },
+        "SoSphere": {"radius": "SoSFFloat"},
+        "SoCylinder": {"parts": "SoSFBitMask"},
+        "SoCone": {"parts": "SoSFBitMask"},
+        "SoDirectionalLight": {"direction": "SoSFVec3f"},
+        "SoTexture2": {
+            "blendColor": "SoSFColor",
+            "enableCompressedTexture": "SoSFBool",
+            "filename": "SoSFString",
+            "image": "SoSFImage",
+            "model": "SoSFEnum",
+            "wrapS": "SoSFEnum",
+            "wrapT": "SoSFEnum",
+        },
+        "SoCoordinate3": {"point": "SoMFVec3f"},
+        "SoNormal": {"vector": "SoMFVec3f"},
+        "SoTextureCoordinate2": {"point": "SoMFVec2f"},
+        "SoVertexProperty": {
+            "normal": "SoMFVec3f",
+            "texCoord": "SoMFVec2f",
+            "vertex": "SoMFVec3f",
+            "textureUnit": "SoMFInt32",
+        },
+        "SoIndexedShape": {
+            "coordIndex": "SoMFInt32",
+            "materialIndex": "SoMFInt32",
+            "normalIndex": "SoMFInt32",
+            "textureCoordIndex": "SoMFInt32",
+        },
+        "SoShapeHints": {
+            "creaseAngle": "SoSFFloat",
+            "faceType": "SoSFEnum",
+            "shapeType": "SoSFEnum",
+            "useVBO": "SoSFBool",
+            "vertexOrdering": "SoSFEnum",
+            "windingType": "SoSFEnum",
+        },
+        "SbViewVolume": {
+            "type": "int",
+            "projPoint": "SbVec3f",
+            "projDir": "SbVec3f",
+            "nearDist": "float",
+            "nearToFar": "float",
+            "llf": "SbVec3f",
+            "lrf": "SbVec3f",
+            "ulf": "SbVec3f",
+        },
+        "SoIntersectingPrimitive": {
+            "path": "SoPath | None",
+            "type": "int",
+            "vertex": "SbVec3f",
+            "xf_vertex": "SbVec3f",
+        },
+        "SoNormalBundle": {"generator": "SoNormalGenerator | None"},
+        "SoSearchAction": {"duringSearchAll": "bool"},
+    }
+)
 
 # Python keywords cannot be used in dotted attribute access.  Coin retains
 # these native field names in its registry, while the generated SWIG module

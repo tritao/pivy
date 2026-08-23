@@ -37,6 +37,7 @@ from tools.pivy_stub_typing_policy import (
     FACTORY_CLASSES,
     ENGINE_FACTORY_CLASSES,
     FIELD_ATTRIBUTE_TYPE_POLICIES,
+    RUNTIME_FIELD_ATTRIBUTE_TYPE_POLICIES,
     FIELD_TYPE_POLICIES,
     INCOMPLETE_CATEGORIES,
     INCOMPLETE_CATEGORY_ACTIONS,
@@ -1007,7 +1008,10 @@ class PolicyBoundaryTests(unittest.TestCase):
 
     def test_runtime_field_attribute_policy_is_explicit(self):
         self.assertEqual(
-            sum(len(attributes) for attributes in FIELD_ATTRIBUTE_TYPE_POLICIES.values()),
+            sum(
+                len(attributes)
+                for attributes in RUNTIME_FIELD_ATTRIBUTE_TYPE_POLICIES.values()
+            ),
             25,
         )
         self.assertEqual(
