@@ -12,6 +12,14 @@ from .model import (
     render_stub,
 )
 from .boundaries import IncompleteBoundary, resolve_incomplete_boundaries
+from .callbacks import (
+    CALLBACK_CONTRACTS,
+    CallbackContract,
+    CallbackRemoval,
+    CallbackRetention,
+    callback_contracts_for_module,
+    callback_method_checks,
+)
 from .manifest import (
     MANIFEST_SCHEMA_VERSION,
     manifest_diff,
@@ -36,6 +44,12 @@ __all__ = [
     "run_pipeline",
     "IncompleteBoundary",
     "resolve_incomplete_boundaries",
+    "CallbackContract",
+    "CallbackRemoval",
+    "CallbackRetention",
+    "CALLBACK_CONTRACTS",
+    "callback_contracts_for_module",
+    "callback_method_checks",
     "MANIFEST_SCHEMA_VERSION",
     "manifest_diff",
     "manifest_from_stub",

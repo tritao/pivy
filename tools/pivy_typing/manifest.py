@@ -7,6 +7,8 @@ import json
 from pathlib import Path
 from typing import Any
 
+from .boundaries import resolve_incomplete_boundaries
+from .callbacks import callback_contracts_for_module
 from .model import Class, Module, Overload, Parameter, TypeExpr, parse_stub
 
 
@@ -67,10 +69,68 @@ def _class_manifest(class_: Class) -> dict[str, Any]:
     }
 
 
+def _boundary_manifest(boundary) -> dict[str, Any]:
+    return {
+        "category": boundary.category,
+        "class": boundary.class_name,
+        "kind": boundary.kind,
+        "method": boundary.method_name,
+        "name": boundary.name,
+        "reason": boundary.reason,
+        "source": boundary.source,
+    }
+
+
+def _callback_contract_manifest(contract) -> dict[str, Any]:
+    return {
+        "callback_parameters": [
+            {"name": name, "type": annotation}
+            for name, annotation in contract.callback_parameters
+        ],
+        "has_userdata": contract.has_userdata,
+        "nullable": contract.nullable,
+        "parameter_types": [
+            {"name": name, "type": annotation}
+            for name, annotation in contract.parameter_types
+        ],
+        "python_safe": contract.python_safe,
+        "reason": contract.reason,
+        "removal": contract.removal.value,
+        "retention": contract.retention.value,
+        "return": contract.return_type,
+        "source": contract.source,
+        "userdata_parameters": list(contract.userdata_parameters),
+    }
+
+
 def module_to_manifest(module: Module) -> dict[str, Any]:
     """Convert a semantic model into a deterministic JSON-compatible value."""
 
+    boundaries = sorted(
+        resolve_incomplete_boundaries(module),
+        key=lambda item: (
+            item.kind,
+            item.class_name,
+            item.method_name or "",
+            item.name,
+            item.category,
+        ),
+    )
+    class_names = {class_.name for class_ in module.classes}
+    contracts = sorted(
+        (
+            contract
+            for contract in callback_contracts_for_module(module.name)
+            if contract.class_name in class_names
+        ),
+        key=lambda item: item.key,
+    )
     return {
+        "boundaries": [_boundary_manifest(boundary) for boundary in boundaries],
+        "callback_contracts": {
+            "%s.%s" % (contract.class_name, contract.method_name): _callback_contract_manifest(contract)
+            for contract in contracts
+        },
         "classes": {
             class_.name: _class_manifest(class_)
             for class_ in module.classes
@@ -90,7 +150,16 @@ def manifest_from_stub(stub_path: Path) -> dict[str, Any]:
     """Parse a stub file and return its canonical manifest."""
 
     source = stub_path.read_text(encoding="utf-8")
-    return module_to_manifest(parse_stub(source, name=str(stub_path)))
+    parts = stub_path.with_suffix("").parts
+    try:
+        package_index = max(
+            index for index, part in enumerate(parts) if part == "pivy"
+        )
+    except ValueError:
+        module_name = stub_path.stem
+    else:
+        module_name = ".".join(parts[package_index:])
+    return module_to_manifest(parse_stub(source, name=module_name))
 
 
 def _diff_values(left: Any, right: Any, path: str) -> list[str]:

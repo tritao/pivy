@@ -5,7 +5,6 @@ from enum import Enum
 import os
 
 from tools.pivy_stub_typing_policy import (
-    callback_method_checks,
     multifield_component_sequence_types,
     multifield_iter_element_types,
     multifield_single_value_types,
@@ -15,6 +14,7 @@ from tools.pivy_stub_typing_policy import (
     SENSOR_CALLBACK_CONSTRUCTOR_TYPES,
     vector_iter_element_types,
 )
+from tools.pivy_typing.callbacks import callback_method_checks
 
 GENERATED_HEADER = (
     "# SPDX-License-Identifier: ISC\n"
@@ -94,7 +94,7 @@ ITER_CONTAINER_TYPES = {
 }
 ITER_CONTAINER_TYPES.update(multifield_iter_element_types())
 ITER_CONTAINER_TYPES.update(vector_iter_element_types())
-CALLBACK_METHOD_CHECKS = {
+_LEGACY_CALLBACK_METHOD_CHECKS = {
     "coin.pyi": callback_method_checks(
         excluded_classes={
             "SoQt",
@@ -431,6 +431,12 @@ CALLBACK_METHOD_CHECKS = {
             },
             "None",
         ),
+    ),
+}
+CALLBACK_METHOD_CHECKS = {
+    "coin.pyi": callback_method_checks(module="coin.pyi"),
+    os.path.join("gui", "soqt.pyi"): callback_method_checks(
+        module=os.path.join("gui", "soqt.pyi")
     ),
 }
 ARRAY_METHOD_CHECKS = {

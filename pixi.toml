@@ -64,6 +64,7 @@ test_typing_policy = { cmd = ["python", "-m", "unittest", "tests/test_pivy_typin
 test_typing_model = { cmd = ["python", "-m", "unittest", "tests/test_pivy_typing_model.py"]}
 test_typing_pipeline = { cmd = ["python", "-m", "unittest", "tests/test_pivy_typing_pipeline.py"]}
 test_typing_manifest = { cmd = ["python", "-m", "unittest", "tests/test_pivy_typing_manifest.py"]}
+test_typing_callbacks = { cmd = ["python", "-m", "unittest", "tests/test_pivy_typing_callbacks.py"]}
 check_typing_policy_coverage = { cmd = ["python", "-m", "tools.check_pivy_policy_coverage", "pivy/coin.pyi"]}
 check_typing_compatibility = { cmd = ["python", "-m", "tools.check_pivy_typing_compatibility"]}
 check_field_attribute_coverage = { cmd = ["python", "-m", "tools.check_pivy_field_coverage", "pivy/coin.pyi"], depends-on = ["typing_build"]}
@@ -83,4 +84,4 @@ typecheck_verifytypes_json = { cmd = ["python", "-m", "tools.report_pivy_verifyt
 typecheck_stubtest_coin = { cmd = ["python", "-m", "tools.check_pivy_stubtest", "--module", "pivy.coin"], depends-on = ["typing_build"]}
 typecheck_stubtest_soqt = { cmd = ["python", "-m", "tools.check_pivy_stubtest", "--module", "pivy.gui.soqt"], depends-on = ["typing_build"]}
 typecheck_stubtest = { depends-on = ["typecheck_stubtest_coin", "typecheck_stubtest_soqt"]}
-typecheck_quality = { depends-on = ["typecheck_stubs", "typecheck_negative", "typecheck_stubs_strict", "typecheck_stubs_matrix", "test_typing_policy", "test_typing_model", "test_typing_pipeline", "test_typing_manifest", "check_typing_policy_coverage", "check_typing_compatibility", "check_field_attribute_coverage", "typecheck_report", "typecheck_manifest", "typecheck_verifytypes", "test_stubs", "check_stub_drift", "check_stub_determinism", "typecheck_stubtest"]}
+typecheck_quality = { depends-on = ["typecheck_stubs", "typecheck_negative", "typecheck_stubs_strict", "typecheck_stubs_matrix", "test_typing_policy", "test_typing_model", "test_typing_pipeline", "test_typing_manifest", "test_typing_callbacks", "check_typing_policy_coverage", "check_typing_compatibility", "check_field_attribute_coverage", "typecheck_report", "typecheck_manifest", "typecheck_verifytypes", "test_stubs", "check_stub_drift", "check_stub_determinism", "typecheck_stubtest"]}

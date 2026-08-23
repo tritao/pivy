@@ -31,6 +31,8 @@ class Example:
         self.assertEqual(rendered, render_manifest(manifest))
         self.assertIn('"return": "str"', rendered)
         self.assertNotIn('"self"', rendered)
+        self.assertEqual(manifest["boundaries"], [])
+        self.assertEqual(manifest["callback_contracts"], {})
 
     def test_equivalent_annotation_spelling_has_no_semantic_diff(self):
         left = module_to_manifest(
@@ -61,6 +63,15 @@ class Example:
         self.assertIn(
             "getValues",
             manifest["classes"]["SoMFDouble"]["methods"],
+        )
+        self.assertEqual(len(manifest["boundaries"]), 436)
+        self.assertEqual(
+            manifest["boundaries"][0]["source"],
+            "tools/pivy_stub_typing_policy.py",
+        )
+        self.assertIn(
+            "SoSelection.addSelectionCallback",
+            manifest["callback_contracts"],
         )
 
 

@@ -364,11 +364,24 @@ quality report consumes those records while retaining its existing fallback
 for compatibility. The baseline remains exactly 436 sites, with zero
 uncategorized entries.
 
-Phase 8 has now started with the first backend-neutral API artifact:
+Phase 7 is now implemented with first-class callback contracts:
+
+- `tools/pivy_typing/callbacks.py` records callback shape, userdata,
+  nullability, retention, removal semantics, safety, provenance and rationale
+  for the adapted callback surface.
+- Existing manually enumerated callback validator expectations now flow
+  through that registry, with a compatibility assertion preserving the
+  previous Coin signatures and correcting one SoQt-only entry that had been
+  attached to the Coin checks.
+- Callback contracts are covered independently from static signatures so
+  runtime/lifetime validation remains a separate source of evidence.
+
+Phase 8 is now implemented with the first backend-neutral API artifact:
 
 - `tools/pivy_typing/manifest.py` projects the semantic model into a
   deterministic JSON-compatible manifest, excluding source locations and
-  formatting-only differences.
+  formatting-only differences while recording boundary categories,
+  provenance, reasons and callback contracts.
 - `tools/generate_pivy_typing_manifest.py` emits a manifest or compares two
   stub inputs structurally, providing the future SWIG-producer comparison
   seam.
@@ -377,7 +390,7 @@ Phase 8 has now started with the first backend-neutral API artifact:
 - Manifest tests cover deterministic output, normalized annotation spelling,
   structural self-comparison and the real Coin API surface.
 
-The next slice is callback contracts and independent runtime validation. The
-remaining later work is to derive more validator expectations from the model,
-reduce legacy policy tables, declare the backend-neutral baseline, and only
-then compare an experimental SWIG 4.5 producer against the manifest.
+The next slice is to remove the remaining duplicated structural expectation
+tables and make the current `.pyi` renderer purely a syntax backend. The later
+work is to declare the backend-neutral baseline and only then compare an
+experimental SWIG 4.5 producer against the manifest.

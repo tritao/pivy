@@ -5,9 +5,15 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 try:
-    from tools.pivy_stub_typing_policy import classify_incomplete
+    from tools.pivy_stub_typing_policy import (
+        INCOMPLETE_CATEGORY_POLICIES,
+        classify_incomplete,
+    )
 except ImportError:
-    from pivy_stub_typing_policy import classify_incomplete
+    from pivy_stub_typing_policy import (
+        INCOMPLETE_CATEGORY_POLICIES,
+        classify_incomplete,
+    )
 
 from .model import Module
 
@@ -22,6 +28,16 @@ class IncompleteBoundary:
     name: str
     line: int
     category: str
+    reason: str
+    source: str
+
+
+BOUNDARY_POLICY_SOURCE = "tools/pivy_stub_typing_policy.py"
+
+
+def _boundary_metadata(category: str) -> tuple[str, str]:
+    policy = INCOMPLETE_CATEGORY_POLICIES[category]
+    return policy.rationale, BOUNDARY_POLICY_SOURCE
 
 
 def _has_raw_pointer_note(lines: list[str], line: int) -> bool:
@@ -56,6 +72,7 @@ def resolve_incomplete_boundaries(module: Module) -> tuple[IncompleteBoundary, .
                 parameter_name=attribute.name,
                 has_raw_pointer_note=_has_raw_pointer_note(lines, attribute.line),
             )
+            reason, source = _boundary_metadata(category)
             boundaries.append(
                 IncompleteBoundary(
                     kind="attribute",
@@ -64,6 +81,8 @@ def resolve_incomplete_boundaries(module: Module) -> tuple[IncompleteBoundary, .
                     name=attribute.name,
                     line=attribute.line,
                     category=category,
+                    reason=reason,
+                    source=source,
                 )
             )
 
@@ -79,6 +98,7 @@ def resolve_incomplete_boundaries(module: Module) -> tuple[IncompleteBoundary, .
                             lines, overload.line
                         ),
                     )
+                    reason, source = _boundary_metadata(category)
                     boundaries.append(
                         IncompleteBoundary(
                             kind="return",
@@ -87,6 +107,8 @@ def resolve_incomplete_boundaries(module: Module) -> tuple[IncompleteBoundary, .
                             name="return",
                             line=overload.line,
                             category=category,
+                            reason=reason,
+                            source=source,
                         )
                     )
                 for parameter in overload.parameters:
@@ -101,6 +123,7 @@ def resolve_incomplete_boundaries(module: Module) -> tuple[IncompleteBoundary, .
                             lines, parameter.line
                         ),
                     )
+                    reason, source = _boundary_metadata(category)
                     boundaries.append(
                         IncompleteBoundary(
                             kind="parameter",
@@ -109,6 +132,8 @@ def resolve_incomplete_boundaries(module: Module) -> tuple[IncompleteBoundary, .
                             name=parameter.name,
                             line=parameter.line,
                             category=category,
+                            reason=reason,
+                            source=source,
                         )
                     )
     return tuple(boundaries)
