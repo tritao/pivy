@@ -1431,6 +1431,24 @@ class TypingSequenceAdapterTests(unittest.TestCase):
             [0, 1],
         )
 
+    def testNullableMultifieldElements(self):
+        cases = (
+            (SoMFNode, SoCube()),
+            (SoMFPath, SoPath()),
+            (SoMFEngine, SoTimeCounter()),
+        )
+        for field_type, value in cases:
+            with self.subTest(field_type=field_type.__name__):
+                field = field_type()
+                field.setValues([None, value])
+                field.setValue(None)
+                field.setValues([None, value])
+                self.assertIsNone(field[0])
+                self.assertIsInstance(field[1], type(value))
+                self.assertIsNone(field.getValues()[0])
+                self.assertIsNone(field.getValuesSnapshot()[0])
+                self.assertIsNone(list(field)[0])
+
 class OperatorTests(unittest.TestCase):
     """checks various operator overloaded methods"""
     def testEqNone(self):

@@ -1393,6 +1393,8 @@ def collect_container_element_types(lines):
             line,
         )
         if getitem_match:
+            if current_class in MULTIFIELD_TYPE_POLICIES:
+                continue
             element_type = getitem_match.group("type")
             if element_type == "Incomplete" and current_class == "SbPList":
                 element_type = "object"
@@ -1442,7 +1444,30 @@ def append_iter_method(lines, class_name, element_types):
     lines.append("")
 
 
-def rewrite_container_method(line, element_type):
+def rewrite_container_method(line, element_type, class_name=None):
+    if class_name in MULTIFIELD_TYPE_POLICIES:
+        getitem_match = re.match(
+            r"(?P<prefix>\s*def __getitem__\([^)]*\) -> )"
+            r"[^:]+(?P<suffix>: \.\.\.)$",
+            line,
+        )
+        if getitem_match:
+            return (
+                getitem_match.group("prefix")
+                + element_type
+                + getitem_match.group("suffix")
+            )
+
+        iter_match = re.match(
+            r"(?P<indent>\s*)def __iter__\(self\)(?: -> [^:]+)?: \.\.\.$",
+            line,
+        )
+        if iter_match:
+            return "%sdef __iter__(self) -> Iterator[%s]: ..." % (
+                iter_match.group("indent"),
+                element_type,
+            )
+
     item_methods = ("append", "find", "insert", "removeItem", "set", "__setitem__")
     for method_name in item_methods:
         pattern = (
@@ -1490,7 +1515,11 @@ def normalize_container_helpers(text):
             current_class = None
 
         if current_class in element_types:
-            line = rewrite_container_method(line, element_types[current_class])
+            line = rewrite_container_method(
+                line,
+                element_types[current_class],
+                class_name=current_class,
+            )
 
         updated.append(line)
 
@@ -1933,15 +1962,21 @@ def normalize_multifield_single_values(text):
         elif current_class and is_top_level_statement(line):
             current_class = None
 
-        multifield_policy = MULTIFIELD_TYPE_POLICIES.get(current_class)
-        value_type = (
-            multifield_policy.single_value_type if multifield_policy else None
-        )
         match = re.match(
-            r"(?P<indent>\s*)def (?P<method>find|set1Value|__setitem__)"
+            r"(?P<indent>\s*)def (?P<method>find|setValue|set1Value|__setitem__)"
             r"\((?P<args>[^)]*)\)(?P<suffix>.*)$",
             line,
         )
+        multifield_policy = MULTIFIELD_TYPE_POLICIES.get(current_class)
+        if multifield_policy and match:
+            method = match.group("method")
+            value_type = (
+                multifield_policy.set_value_type
+                if method == "setValue"
+                else multifield_policy.single_value_type
+            )
+        else:
+            value_type = None
         if value_type and match:
             args, replaced = re.subn(
                 r"\bvalue:\s*[^,)]*",

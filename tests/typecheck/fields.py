@@ -471,15 +471,15 @@ def check_string_name_and_multifield_contracts() -> None:
 
     nodes = coin.SoMFNode()
     nodes.setValues(0, 1, [coin.SoCone()])
-    assert_type(nodes[0], coin.SoNode)
-    assert_type(nodes.getValues(), list[coin.SoNode])
-    assert_type(iter(nodes), Iterator[coin.SoNode])
+    assert_type(nodes[0], coin.SoNode | None)
+    assert_type(nodes.getValues(), list[coin.SoNode | None])
+    assert_type(iter(nodes), Iterator[coin.SoNode | None])
 
     paths = coin.SoMFPath()
     paths.setValues(0, 1, [coin.SoPath()])
-    assert_type(paths[0], coin.SoPath)
-    assert_type(paths.getValues(), list[coin.SoPath])
-    assert_type(iter(paths), Iterator[coin.SoPath])
+    assert_type(paths[0], coin.SoPath | None)
+    assert_type(paths.getValues(), list[coin.SoPath | None])
+    assert_type(iter(paths), Iterator[coin.SoPath | None])
 
 
 def check_numeric_multifield_contracts() -> None:

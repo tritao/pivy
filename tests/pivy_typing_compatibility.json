@@ -219,6 +219,102 @@
             ]
           }
         },
+        "SoMFNode": {
+          "bases": ["SoMField"],
+          "methods": {
+            "setValue": [
+              {
+                "parameters": [{"name": "value", "type": "SoNode | None"}],
+                "return": "None"
+              },
+              {
+                "parameters": [{"name": "other", "type": "SoMFNode"}],
+                "return": "None"
+              }
+            ],
+            "set1Value": [
+              {
+                "parameters": [
+                  {"name": "idx", "type": "int"},
+                  {"name": "value", "type": "SoNode | None"}
+                ],
+                "return": "None"
+              }
+            ],
+            "__getitem__": [
+              {
+                "parameters": [{"name": "i", "type": "int"}],
+                "return": "SoNode | None"
+              }
+            ],
+            "__iter__": [
+              {"parameters": [], "return": "Iterator[SoNode | None]"}
+            ],
+            "getValues": [
+              {
+                "parameters": [{"name": "i", "type": "int"}],
+                "return": "list[SoNode | None]"
+              }
+            ],
+            "getValuesSnapshot": [
+              {"parameters": [], "return": "list[SoNode | None]"}
+            ]
+          }
+        },
+        "SoMFPath": {
+          "bases": ["SoMField"],
+          "methods": {
+            "setValue": [
+              {
+                "parameters": [{"name": "value", "type": "SoPath | None"}],
+                "return": "None"
+              },
+              {
+                "parameters": [{"name": "other", "type": "SoMFPath"}],
+                "return": "None"
+              }
+            ],
+            "__getitem__": [
+              {
+                "parameters": [{"name": "i", "type": "int"}],
+                "return": "SoPath | None"
+              }
+            ],
+            "__iter__": [
+              {"parameters": [], "return": "Iterator[SoPath | None]"}
+            ],
+            "getValuesSnapshot": [
+              {"parameters": [], "return": "list[SoPath | None]"}
+            ]
+          }
+        },
+        "SoMFEngine": {
+          "bases": ["SoMField"],
+          "methods": {
+            "setValue": [
+              {
+                "parameters": [{"name": "value", "type": "SoEngine | None"}],
+                "return": "None"
+              },
+              {
+                "parameters": [{"name": "other", "type": "SoMFEngine"}],
+                "return": "None"
+              }
+            ],
+            "__getitem__": [
+              {
+                "parameters": [{"name": "i", "type": "int"}],
+                "return": "SoEngine | None"
+              }
+            ],
+            "__iter__": [
+              {"parameters": [], "return": "Iterator[SoEngine | None]"}
+            ],
+            "getValuesSnapshot": [
+              {"parameters": [], "return": "list[SoEngine | None]"}
+            ]
+          }
+        },
         "SoCallbackList": {
           "bases": [],
           "methods": {

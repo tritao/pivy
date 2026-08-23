@@ -274,6 +274,20 @@ class FieldTypePolicyTests(unittest.TestCase):
                 policy_values,
             )
 
+    def test_nullable_object_multifield_policy(self):
+        for class_name, value_type in (
+            ("SoMFEngine", "SoEngine"),
+            ("SoMFNode", "SoNode"),
+            ("SoMFPath", "SoPath"),
+        ):
+            multifield = policy.MULTIFIELD_TYPE_POLICIES[class_name]
+            nullable_type = "%s | None" % value_type
+            self.assertEqual(multifield.element_type, nullable_type)
+            self.assertEqual(multifield.set_values_types, (nullable_type,))
+            self.assertEqual(multifield.get_values_type, nullable_type)
+            self.assertEqual(multifield.single_value_type, nullable_type)
+            self.assertEqual(multifield.set_value_type, nullable_type)
+
     def test_string_multifield_single_value_policy(self):
         single_value_types = multifield_single_value_types()
 
@@ -660,7 +674,7 @@ class MultifieldTypePolicyTests(unittest.TestCase):
 
         self.assertEqual(element_types["SoMFFloat"], "float")
         self.assertEqual(element_types["SoMFVec3f"], "SbVec3f")
-        self.assertEqual(element_types["SoMFNode"], "SoNode")
+        self.assertEqual(element_types["SoMFNode"], "SoNode | None")
         self.assertEqual(
             element_types,
             {

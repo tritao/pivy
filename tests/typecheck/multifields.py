@@ -138,9 +138,9 @@ def check_all_multifield_value_snapshots() -> None:
     assert_type(coin.SoMFTime().values, list[coin.SbTime])
     assert_type(coin.SoMFName().values, list[str])
     assert_type(coin.SoMFString().values, list[str])
-    assert_type(coin.SoMFNode().values, list[coin.SoNode])
-    assert_type(coin.SoMFPath().values, list[coin.SoPath])
-    assert_type(coin.SoMFEngine().values, list[coin.SoEngine])
+    assert_type(coin.SoMFNode().values, list[coin.SoNode | None])
+    assert_type(coin.SoMFPath().values, list[coin.SoPath | None])
+    assert_type(coin.SoMFEngine().values, list[coin.SoEngine | None])
     assert_type(coin.SoMFPlane().values, list[coin.SbPlane])
     assert_type(coin.SoMFColor().values, list[Sequence[float]])
     assert_type(coin.SoMFColorRGBA().values, list[Sequence[float]])
@@ -333,13 +333,16 @@ def check_color_rgba_multifield() -> None:
 
 def check_object_multifields() -> None:
     nodes = coin.SoMFNode()
-    node_values: Sequence[coin.SoNode] = [coin.SoCube()]
-    assert_type(nodes[0], coin.SoNode)
+    node_values: Sequence[coin.SoNode | None] = [coin.SoCube(), None]
+    assert_type(nodes[0], coin.SoNode | None)
     nodes.setValues(0, 1, node_values)
     nodes.setValues(node_values)
     nodes.setValues(1, node_values)
+    nodes.setValue(None)
+    nodes.set1Value(0, None)
     nodes[0] = coin.SoSphere()
-    assert_type(iter(nodes), Iterator[coin.SoNode])
+    assert_type(nodes.getValues(), list[coin.SoNode | None])
+    assert_type(iter(nodes), Iterator[coin.SoNode | None])
 
     strings = coin.SoMFString()
     string_values: Sequence[coin.SbString | str] = ["pivy", coin.SbString()]
@@ -351,16 +354,22 @@ def check_object_multifields() -> None:
     assert_type(strings.getValues(), list[str])
 
     engines = coin.SoMFEngine()
-    engines.set1Value(0, coin.SoTimeCounter())
-    assert_type(engines[0], coin.SoEngine)
-    assert_type(engines.getValuesSnapshot(), list[coin.SoEngine])
-    assert_type(iter(engines), Iterator[coin.SoEngine])
+    engines.setValues([None, coin.SoTimeCounter()])
+    engines.setValue(None)
+    engines.set1Value(0, None)
+    assert_type(engines[0], coin.SoEngine | None)
+    assert_type(engines.getValues(), list[coin.SoEngine | None])
+    assert_type(engines.getValuesSnapshot(), list[coin.SoEngine | None])
+    assert_type(iter(engines), Iterator[coin.SoEngine | None])
 
     paths = coin.SoMFPath()
-    paths.set1Value(0, coin.SoPath())
-    assert_type(paths[0], coin.SoPath)
-    assert_type(paths.getValuesSnapshot(), list[coin.SoPath])
-    assert_type(iter(paths), Iterator[coin.SoPath])
+    paths.setValues([None, coin.SoPath()])
+    paths.setValue(None)
+    paths.set1Value(0, None)
+    assert_type(paths[0], coin.SoPath | None)
+    assert_type(paths.getValues(), list[coin.SoPath | None])
+    assert_type(paths.getValuesSnapshot(), list[coin.SoPath | None])
+    assert_type(iter(paths), Iterator[coin.SoPath | None])
 
     planes = coin.SoMFPlane()
     planes.set1Value(0, coin.SbPlane())

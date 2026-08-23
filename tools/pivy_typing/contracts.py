@@ -561,7 +561,7 @@ def _multifield_method_rules():
         ),
         _method_rule(
             "SoMFNode", "setValues",
-            {"start": "int", "num": "int", "values": "Sequence[SoNode]"}, "None",
+            {"start": "int", "num": "int", "values": "Sequence[SoNode | None]"}, "None",
             "Multifield node values are accepted as Python sequences",
         ),
         _method_rule(
@@ -631,6 +631,17 @@ def _multifield_method_rules():
                     class_name, "__setitem__", {"i": "int", "value": value_type}, "None",
                     "Multifield scalar values are derived from field policy",
                 ),
+            )
+        )
+    for class_name in ("SoMFEngine", "SoMFNode", "SoMFPath"):
+        value_type = multifield_single_value_types()[class_name]
+        rules.append(
+            _method_rule(
+                class_name,
+                "setValue",
+                {"value": value_type},
+                "None",
+                "Nullable multifield values are accepted by setValue",
             )
         )
     return tuple(rules)

@@ -3727,7 +3727,10 @@ class MultifieldTypePolicy:
     element_type: str
     set_values_types: tuple[str, ...] = ()
     get_values_type: str | None = None
+    # Input type shared by find(), set1Value(), and indexed assignment.
     single_value_type: str | None = None
+    # Optional first setValue() overload when it differs from the raw stub.
+    set_value_type: str | None = None
     indexed_access: bool = True
     component_sequence_type: str | None = None
     component_width: int | None = None
@@ -3878,9 +3881,11 @@ MULTIFIELD_TYPE_POLICIES = {
         get_values_type="float",
     ),
     "SoMFEngine": MultifieldTypePolicy(
-        element_type="SoEngine",
-        set_values_types=("SoEngine",),
-        get_values_type="SoEngine",
+        element_type="SoEngine | None",
+        set_values_types=("SoEngine | None",),
+        get_values_type="SoEngine | None",
+        single_value_type="SoEngine | None",
+        set_value_type="SoEngine | None",
     ),
     "SoMFInt32": MultifieldTypePolicy(
         element_type="int",
@@ -3888,14 +3893,18 @@ MULTIFIELD_TYPE_POLICIES = {
         get_values_type="int",
     ),
     "SoMFNode": MultifieldTypePolicy(
-        element_type="SoNode",
-        set_values_types=("SoNode",),
-        get_values_type="SoNode",
+        element_type="SoNode | None",
+        set_values_types=("SoNode | None",),
+        get_values_type="SoNode | None",
+        single_value_type="SoNode | None",
+        set_value_type="SoNode | None",
     ),
     "SoMFPath": MultifieldTypePolicy(
-        element_type="SoPath",
-        set_values_types=("SoPath",),
-        get_values_type="SoPath",
+        element_type="SoPath | None",
+        set_values_types=("SoPath | None",),
+        get_values_type="SoPath | None",
+        single_value_type="SoPath | None",
+        set_value_type="SoPath | None",
     ),
     "SoMFPlane": MultifieldTypePolicy(
         element_type="SbPlane",
