@@ -2057,6 +2057,46 @@ def vector_multifield_type_policies():
 
 
 FIELD_TYPE_POLICIES = {
+    "SoSFBool": FieldTypePolicy(
+        value_type="bool",
+        setter_argument_type="bool",
+        setter_value_type="bool",
+    ),
+    "SoSFInt32": FieldTypePolicy(
+        value_type="int",
+        setter_argument_type="int",
+        setter_value_type="int",
+    ),
+    "SoSFShort": FieldTypePolicy(
+        value_type="int",
+        setter_argument_type="int",
+        setter_value_type="int",
+    ),
+    "SoSFUShort": FieldTypePolicy(
+        value_type="int",
+        setter_argument_type="int",
+        setter_value_type="int",
+    ),
+    "SoSFUInt32": FieldTypePolicy(
+        value_type="int",
+        setter_argument_type="int",
+        setter_value_type="int",
+    ),
+    "SoSFFloat": FieldTypePolicy(
+        value_type="float",
+        setter_argument_type="float",
+        setter_value_type="float",
+    ),
+    "SoSFDouble": FieldTypePolicy(
+        value_type="float",
+        setter_argument_type="float",
+        setter_value_type="float",
+    ),
+    "SoSFTime": FieldTypePolicy(
+        value_type="SbTime",
+        setter_argument_type="SbTime",
+        setter_value_type="SbTime",
+    ),
     "SoSFString": FieldTypePolicy(
         value_type="SbString",
         setter_argument_type="SbString",

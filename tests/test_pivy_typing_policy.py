@@ -167,6 +167,23 @@ class FieldTypePolicyTests(unittest.TestCase):
             "SbName | str",
         )
 
+    def test_scalar_single_value_field_family_policy(self):
+        expected = {
+            "SoSFBool": ("bool", "bool"),
+            "SoSFInt32": ("int", "int"),
+            "SoSFShort": ("int", "int"),
+            "SoSFUShort": ("int", "int"),
+            "SoSFUInt32": ("int", "int"),
+            "SoSFFloat": ("float", "float"),
+            "SoSFDouble": ("float", "float"),
+            "SoSFTime": ("SbTime", "SbTime"),
+        }
+        for class_name, (value_type, setter_type) in expected.items():
+            with self.subTest(class_name=class_name):
+                field = policy.FIELD_TYPE_POLICIES[class_name]
+                self.assertEqual(field.value_type, value_type)
+                self.assertEqual(field.setter_value_type, setter_type)
+
     def test_field_methods_are_derived_from_policy(self):
         overrides = field_method_type_overrides()
 

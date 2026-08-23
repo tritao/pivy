@@ -54,6 +54,18 @@
             ]
           }
         },
+        "SoSFDouble": {
+          "bases": ["SoSField"],
+          "methods": {
+            "getValue": [{"parameters": [], "return": "float"}],
+            "setValue": [
+              {
+                "parameters": [{"name": "newvalue", "type": "float"}],
+                "return": "None"
+              }
+            ]
+          }
+        },
         "SbVec3f": {
           "bases": [],
           "methods": {

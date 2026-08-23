@@ -19,6 +19,14 @@ def check_scalar_fields() -> None:
     assert_type(enabled.getValue(), bool)
     enabled.setValue(True)
 
+    integer = coin.SoSFInt32()
+    assert_type(integer.getValue(), int)
+    integer.setValue(10)
+
+    double = coin.SoSFDouble()
+    assert_type(double.getValue(), float)
+    double.setValue(10.5)
+
 
 def check_value_fields() -> None:
     material = coin.SoMaterial()
