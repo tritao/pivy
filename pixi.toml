@@ -50,8 +50,8 @@ configure = { cmd = ["cmake", "-G", "Ninja", "-B", "build", "-S", ".",
                      "-D", "QT_HOST_PATH=$CONDA_PREFIX" 
                      ], depends-on = []}
 
-build = { cmd = ["ninja", "-C", "build", "-j10", "install"], depends-on = ["configure"]}
-typing_build = { cmd = ["python", "-m", "tools.ensure_pivy_build"]}
+build = { cmd = ["python", "-m", "tools.ensure_pivy_build"]}
+typing_build = { depends-on = ["build"]}
 test = { cmd = ["python", "tests/coin_tests.py"], depends-on = ["build"]}
 test_soqt = { cmd = ["python", "tests/soqt_tests.py"], depends-on = ["build"]}
 test_quarter = { cmd = ["python", "tests/quarter_tests.py"], depends-on = ["build"]}
