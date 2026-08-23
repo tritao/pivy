@@ -39,6 +39,31 @@ class PythonMethodPolicy:
     return_type: str
 
 
+@dataclass(frozen=True)
+class PolicyTarget:
+    """A binding symbol addressed by a structured typing rule."""
+
+    class_name: str
+    method_name: str
+    parameter_name: str | None = None
+
+    @property
+    def key(self) -> tuple[str, ...]:
+        if self.parameter_name is None:
+            return (self.class_name, self.method_name)
+        return (self.class_name, self.method_name, self.parameter_name)
+
+
+@dataclass(frozen=True)
+class OverrideRule:
+    """One Python-facing override with reviewable provenance."""
+
+    target: PolicyTarget
+    python_type: object
+    reason: str
+    source: str = "tools/pivy_stub_typing_policy.py"
+
+
 VECTOR_TYPE_POLICIES = {
     "SbVec2b": VectorTypePolicy("int8_t", "int", 2),
     "SbVec2s": VectorTypePolicy("short", "int", 2),
@@ -295,7 +320,7 @@ PYTHON_HELPER_METHOD_POLICIES = {
         "name: SbName | str", "SoType"
     ),
 }
-METHOD_RETURN_TYPE_OVERRIDES = {
+_METHOD_RETURN_TYPE_OVERRIDES = {
     # The Python-level SbImage adapter snapshots the native pixel buffer, so
     # callers never receive a borrowed C pointer.  ``None`` represents an
     # image with no allocated pixel data.
@@ -359,7 +384,20 @@ METHOD_RETURN_TYPE_OVERRIDES = {
     ("SoQtViewer", "getCamera"): "SoCamera | None",
     ("SoQtViewer", "getSceneGraph"): "SoNode | None",
 }
-PYTHON_PARAMETER_TYPE_OVERRIDES = {
+
+METHOD_RETURN_RULES = tuple(
+    OverrideRule(
+        target=PolicyTarget(class_name, method_name),
+        python_type=python_type,
+        reason="Python-facing return type for a binding-specific API surface",
+    )
+    for (class_name, method_name), python_type in _METHOD_RETURN_TYPE_OVERRIDES.items()
+)
+METHOD_RETURN_TYPE_OVERRIDES = {
+    rule.target.key: rule.python_type for rule in METHOD_RETURN_RULES
+}
+
+_PYTHON_PARAMETER_TYPE_OVERRIDES = {
     ("SoSFImage", "setValue", "pixels"): "str | bytes",
     ("SoSFImage3", "setValue", "bytes"): "str | bytes",
     ("SoSFImage3", "setValue", "pixels"): "str | bytes",
@@ -369,6 +407,18 @@ PYTHON_PARAMETER_TYPE_OVERRIDES = {
     # SoSensor stores and returns an arbitrary Python callback payload.  The
     # getter is already object-valued; keep the setter symmetric.
     ("SoSensor", "setData", "callbackdata"): "object",
+}
+PYTHON_PARAMETER_RULES = tuple(
+    OverrideRule(
+        target=PolicyTarget(class_name, method_name, parameter_name),
+        python_type=python_type,
+        reason="Python-facing parameter type for a binding-specific API surface",
+    )
+    for (class_name, method_name, parameter_name), python_type
+    in _PYTHON_PARAMETER_TYPE_OVERRIDES.items()
+)
+PYTHON_PARAMETER_TYPE_OVERRIDES = {
+    rule.target.key: rule.python_type for rule in PYTHON_PARAMETER_RULES
 }
 
 # Coin's element, engine, and field header macros expose these class-specific

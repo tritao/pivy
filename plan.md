@@ -332,3 +332,14 @@ Phase 2 is also now in place as a mechanical pipeline boundary:
 
 The next implementation slice is Phase 3: replace the remaining unstructured
 policy tuples with typed rule objects carrying target and provenance metadata.
+
+Phase 3 has started with the highest-impact exceptional signature maps:
+
+- method-return overrides and Python parameter overrides now have structured
+  `PolicyTarget`/`OverrideRule` entries;
+- legacy dictionaries remain derived compatibility views for existing
+  generator consumers;
+- tests assert the structured rules and compatibility views cannot drift.
+
+The remaining Phase 3 work is to migrate the other exceptional parameter and
+factory/callback maps onto the same rule representation.

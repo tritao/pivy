@@ -60,6 +60,21 @@ from tools.pivy_stub_typing_policy import (
 
 
 class FieldTypePolicyTests(unittest.TestCase):
+    def test_structured_override_rules_reproduce_legacy_mappings(self):
+        return_rules = {
+            rule.target.key: rule.python_type
+            for rule in policy.METHOD_RETURN_RULES
+        }
+        parameter_rules = {
+            rule.target.key: rule.python_type
+            for rule in policy.PYTHON_PARAMETER_RULES
+        }
+
+        self.assertEqual(return_rules, policy.METHOD_RETURN_TYPE_OVERRIDES)
+        self.assertEqual(parameter_rules, policy.PYTHON_PARAMETER_TYPE_OVERRIDES)
+        self.assertTrue(all(rule.reason for rule in policy.METHOD_RETURN_RULES))
+        self.assertTrue(all(rule.source for rule in policy.PYTHON_PARAMETER_RULES))
+
     def test_coin_typing_policy_registry_is_complete(self):
         self.assertEqual(COIN_TYPING_POLICY.fields, policy.FIELD_TYPE_POLICIES)
         self.assertEqual(
