@@ -123,6 +123,47 @@ def check_string_multifield_values() -> None:
     assert_type(strings.values, list[str])
 
 
+def check_all_multifield_value_snapshots() -> None:
+    """Keep the inherited ``values`` property concrete for every MF family."""
+
+    assert_type(coin.SoMFBool().values, list[bool])
+    assert_type(coin.SoMFEnum().values, list[int])
+    assert_type(coin.SoMFBitMask().values, list[int])
+    assert_type(coin.SoMFFloat().values, list[float])
+    assert_type(coin.SoMFDouble().values, list[float])
+    assert_type(coin.SoMFShort().values, list[int])
+    assert_type(coin.SoMFUShort().values, list[int])
+    assert_type(coin.SoMFInt32().values, list[int])
+    assert_type(coin.SoMFUInt32().values, list[int])
+    assert_type(coin.SoMFTime().values, list[coin.SbTime])
+    assert_type(coin.SoMFName().values, list[str])
+    assert_type(coin.SoMFString().values, list[str])
+    assert_type(coin.SoMFNode().values, list[coin.SoNode])
+    assert_type(coin.SoMFPath().values, list[coin.SoPath])
+    assert_type(coin.SoMFEngine().values, list[coin.SoEngine])
+    assert_type(coin.SoMFPlane().values, list[coin.SbPlane])
+    assert_type(coin.SoMFColor().values, list[Sequence[float]])
+    assert_type(coin.SoMFColorRGBA().values, list[Sequence[float]])
+    assert_type(coin.SoMFRotation().values, list[coin.SbRotation])
+    assert_type(coin.SoMFMatrix().values, list[coin.SbMatrix])
+
+    assert_type(coin.SoMFVec2b().values, list[Sequence[int]])
+    assert_type(coin.SoMFVec2s().values, list[Sequence[int]])
+    assert_type(coin.SoMFVec2i32().values, list[Sequence[int]])
+    assert_type(coin.SoMFVec2d().values, list[Sequence[float]])
+    assert_type(coin.SoMFVec3b().values, list[Sequence[int]])
+    assert_type(coin.SoMFVec3s().values, list[Sequence[int]])
+    assert_type(coin.SoMFVec3i32().values, list[Sequence[int]])
+    assert_type(coin.SoMFVec3d().values, list[Sequence[float]])
+    assert_type(coin.SoMFVec4b().values, list[Sequence[int]])
+    assert_type(coin.SoMFVec4ub().values, list[Sequence[int]])
+    assert_type(coin.SoMFVec4s().values, list[Sequence[int]])
+    assert_type(coin.SoMFVec4us().values, list[Sequence[int]])
+    assert_type(coin.SoMFVec4i32().values, list[Sequence[int]])
+    assert_type(coin.SoMFVec4ui32().values, list[Sequence[int]])
+    assert_type(coin.SoMFVec4d().values, list[Sequence[float]])
+
+
 def check_numeric_vector_multifield_families() -> None:
     vec2b = coin.SoMFVec2b()
     vec2b.setValues([(1, 2)])

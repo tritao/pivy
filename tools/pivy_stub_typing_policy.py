@@ -142,7 +142,6 @@ VECTOR_TYPE_POLICIES = {
     "SbVec4d": VectorTypePolicy("double", "float", 4),
 }
 
-
 def vector_sequence_array_parameters():
     """Return constructor/setter sequence policies for Coin vectors."""
 
@@ -1586,6 +1585,42 @@ PYTHON_PROTOCOL_DEFINITIONS = (
         "    ) -> None: ...",
     ),
     (
+        "SoExtSelectionLassoFilterCallback",
+        ("SoPath",),
+        "class SoExtSelectionLassoFilterCallback(Protocol):\n"
+        "    def __call__(\n"
+        "        self, data: object, path: SoPath, /\n"
+        "    ) -> SoPath | None: ...",
+    ),
+    (
+        "SoExtSelectionTriangleFilterCallback",
+        ("SoCallbackAction", "SoPrimitiveVertex"),
+        "class SoExtSelectionTriangleFilterCallback(Protocol):\n"
+        "    def __call__(\n"
+        "        self, data: object, action: SoCallbackAction,\n"
+        "        first: SoPrimitiveVertex, second: SoPrimitiveVertex,\n"
+        "        third: SoPrimitiveVertex, /\n"
+        "    ) -> bool: ...",
+    ),
+    (
+        "SoExtSelectionLineSegmentFilterCallback",
+        ("SoCallbackAction", "SoPrimitiveVertex"),
+        "class SoExtSelectionLineSegmentFilterCallback(Protocol):\n"
+        "    def __call__(\n"
+        "        self, data: object, action: SoCallbackAction,\n"
+        "        first: SoPrimitiveVertex, second: SoPrimitiveVertex, /\n"
+        "    ) -> bool: ...",
+    ),
+    (
+        "SoExtSelectionPointFilterCallback",
+        ("SoCallbackAction", "SoPrimitiveVertex"),
+        "class SoExtSelectionPointFilterCallback(Protocol):\n"
+        "    def __call__(\n"
+        "        self, data: object, action: SoCallbackAction,\n"
+        "        vertex: SoPrimitiveVertex, /\n"
+        "    ) -> bool: ...",
+    ),
+    (
         "SoQtRenderAreaCallback",
         ("QEvent",),
         "class SoQtRenderAreaCallback(Protocol):\n"
@@ -2107,11 +2142,11 @@ for _dragger_callback_name in (
             )
         ] = CallbackMethodPolicy(
             (
-                ("pyfunc", "Callable[[object, SoDragger], None]"),
+                ("pyfunc", "SoDraggerCallback"),
                 ("data", "object | None"),
             ),
             (
-                "self, pyfunc: Callable[[object, SoDragger], None], "
+                "self, pyfunc: SoDraggerCallback, "
                 "data: object | None = ...",
                 "None",
             ),
@@ -2126,11 +2161,11 @@ for _selection_callback_name in (
     CALLBACK_METHOD_POLICIES[("SoSelection", _selection_callback_name)] = (
         CallbackMethodPolicy(
             (
-                ("pyfunc", "Callable[[object, SoPath], None]"),
+                ("pyfunc", "SoSelectionPathCallback"),
                 ("userdata", "object | None"),
             ),
             (
-                "self, pyfunc: Callable[[object, SoPath], None], "
+                "self, pyfunc: SoSelectionPathCallback, "
                 "userdata: object | None = ...",
                 "None",
             ),
@@ -2148,11 +2183,11 @@ for _selection_callback_name in (
     CALLBACK_METHOD_POLICIES[("SoSelection", _selection_callback_name)] = (
         CallbackMethodPolicy(
             (
-                ("pyfunc", "Callable[[object, SoSelection], None]"),
+                ("pyfunc", "SoSelectionClassCallback"),
                 ("userdata", "object | None"),
             ),
             (
-                "self, pyfunc: Callable[[object, SoSelection], None], "
+                "self, pyfunc: SoSelectionClassCallback, "
                 "userdata: object | None = ...",
                 "None",
             ),
@@ -2162,16 +2197,16 @@ for _selection_callback_name in (
 CALLBACK_METHOD_POLICIES[("SoSelection", "setPickFilterCallback")] = (
     CallbackMethodPolicy(
         (
-            ("pyfunc", "Callable[[object, SoPickedPoint], SoPath]"),
+            ("pyfunc", "SoSelectionPickCallback"),
             ("userdata", "object | None"),
         ),
         (
-            "self, pyfunc: Callable[[object, SoPickedPoint], SoPath], "
+            "self, pyfunc: SoSelectionPickCallback, "
             "userdata: object | None = ..., callOnlyIfSelectable: int = ...",
             "None",
         ),
         (
-            ("pyfunc", "Callable[[object, SoPickedPoint], SoPath]"),
+            ("pyfunc", "SoSelectionPickCallback"),
             ("userdata", "object | None"),
             ("callOnlyIfSelectable", "int"),
         ),
@@ -2184,13 +2219,13 @@ CALLBACK_METHOD_POLICIES.update(
             (
                 (
                     "f",
-                    "Callable[[object, SoPath], SoPath | None] | None",
+                    "SoExtSelectionLassoFilterCallback | None",
                 ),
                 ("userdata", "object | None"),
                 ("callonlyifselectable", "bool"),
             ),
             (
-                "self, f: Callable[[object, SoPath], SoPath | None] | None, "
+                "self, f: SoExtSelectionLassoFilterCallback | None, "
                 "userdata: object | None = ..., "
                 "callonlyifselectable: bool = ...",
                 "None",
@@ -2203,15 +2238,13 @@ CALLBACK_METHOD_POLICIES.update(
             (
                 (
                     "func",
-                    "Callable[[object, SoCallbackAction, SoPrimitiveVertex, "
-                    "SoPrimitiveVertex, SoPrimitiveVertex], bool] | None",
+                    "SoExtSelectionTriangleFilterCallback | None",
                 ),
                 ("userdata", "object | None"),
             ),
             (
-                "self, func: Callable[[object, SoCallbackAction, "
-                "SoPrimitiveVertex, SoPrimitiveVertex, SoPrimitiveVertex], "
-                "bool] | None, userdata: object | None = ...",
+                "self, func: SoExtSelectionTriangleFilterCallback | None, "
+                "userdata: object | None = ...",
                 "None",
             ),
         ),
@@ -2222,14 +2255,12 @@ CALLBACK_METHOD_POLICIES.update(
             (
                 (
                     "func",
-                    "Callable[[object, SoCallbackAction, SoPrimitiveVertex, "
-                    "SoPrimitiveVertex], bool] | None",
+                    "SoExtSelectionLineSegmentFilterCallback | None",
                 ),
                 ("userdata", "object | None"),
             ),
             (
-                "self, func: Callable[[object, SoCallbackAction, "
-                "SoPrimitiveVertex, SoPrimitiveVertex], bool] | None, "
+                "self, func: SoExtSelectionLineSegmentFilterCallback | None, "
                 "userdata: object | None = ...",
                 "None",
             ),
@@ -2238,14 +2269,12 @@ CALLBACK_METHOD_POLICIES.update(
             (
                 (
                     "func",
-                    "Callable[[object, SoCallbackAction, SoPrimitiveVertex], "
-                    "bool] | None",
+                    "SoExtSelectionPointFilterCallback | None",
                 ),
                 ("userdata", "object | None"),
             ),
             (
-                "self, func: Callable[[object, SoCallbackAction, "
-                "SoPrimitiveVertex], bool] | None, "
+                "self, func: SoExtSelectionPointFilterCallback | None, "
                 "userdata: object | None = ...",
                 "None",
             ),

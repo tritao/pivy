@@ -40,6 +40,7 @@ from tools.pivy_factory_registry import (
     ENGINE_FACTORY_CLASS_NAMES,
     SCXML_FACTORY_CLASS_NAMES,
 )
+from tools.pivy_stub_typing_policy import FIELD_FACTORY_CLASSES
 
 ENGINE_FACTORY_TYPES = tuple(
     globals()[class_name] for class_name in ENGINE_FACTORY_CLASS_NAMES
@@ -115,6 +116,15 @@ class FieldFactoryTests(unittest.TestCase):
         self.assertIsInstance(fields[2], SoSFBox3d)
         self.assertTrue(all(isinstance(field, SoField) for field in fields))
         self.assertTrue(all(field.thisown for field in fields))
+
+    def testAllFieldFactoriesAutocastAndOwnership(self):
+        for class_name in sorted(FIELD_FACTORY_CLASSES):
+            with self.subTest(class_name=class_name):
+                field_type = globals()[class_name]
+                field = field_type.createInstance()
+                self.assertIsInstance(field, field_type)
+                self.assertIsInstance(field, SoField)
+                self.assertTrue(field.thisown)
 
 
 class EngineFactoryTests(unittest.TestCase):

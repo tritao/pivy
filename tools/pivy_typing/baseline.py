@@ -10,12 +10,12 @@ from .manifest import render_manifest
 COIN_MANIFEST_BASELINE = {
     "module": "pivy.coin",
     "schema_version": 1,
-    "classes": 831,
-    "methods": 9587,
+    "classes": 835,
+    "methods": 9591,
     "attributes": 2738,
     "boundaries": 417,
     "callback_contracts": 78,
-    "sha256": "2fd6959baebe65969faa01530dd6203f59e400b9c451185705e0a54b2b055648",
+    "sha256": "4159c3166e3e54217a33f262b5613364357546e666d00aa61917cc2e4e59097d",
 }
 
 

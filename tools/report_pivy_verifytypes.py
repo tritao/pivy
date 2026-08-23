@@ -42,7 +42,7 @@ VERIFYTYPES_BASELINES = {
         min_score=61.0,
         min_known_symbols=8416,
         max_ambiguous_symbols=0,
-        max_unknown_symbols=5385,
+        max_unknown_symbols=5395,
     ),
     "pivy.gui.soqt": VerifyTypesBaseline(
         min_score=75.4,

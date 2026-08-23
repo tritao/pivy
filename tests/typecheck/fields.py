@@ -305,6 +305,28 @@ def check_runtime_registry_field_contracts() -> None:
     assert_type(viewpoint.isBound, coin.SoSFBool)
 
 
+def check_extended_attribute_policy_contracts() -> None:
+    compose = coin.SoComposeRotationFromTo()
+    assert_type(compose.srcFrom, coin.SoMFVec3f)
+    assert_type(compose.destTo, coin.SoMFVec3f)
+
+    search = coin.SoSearchAction()
+    assert_type(search.duringSearchAll, bool)
+
+    primitive = coin.SoIntersectingPrimitive()
+    assert_type(primitive.path, coin.SoPath | None)
+    assert_type(primitive.vertex, coin.SbVec3f)
+    assert_type(primitive.xf_vertex, coin.SbVec3f)
+
+    volume = coin.SbViewVolume()
+    assert_type(volume.projPoint, coin.SbVec3f)
+    assert_type(volume.projDir, coin.SbVec3f)
+    assert_type(volume.nearDist, float)
+
+    bundle = coin.SoNormalBundle()
+    assert_type(bundle.generator, coin.SoNormalGenerator | None)
+
+
 def check_nullable_fields() -> None:
     node = coin.SoSFNode()
     assert_type(node.getValue(), coin.SoNode | None)

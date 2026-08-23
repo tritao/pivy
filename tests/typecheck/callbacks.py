@@ -280,6 +280,10 @@ def check_event_and_selection_callbacks() -> None:
     ) -> coin.SoPath:
         return coin.SoPath()
 
+    selection_path_contract: coin.SoSelectionPathCallback = selection_callback
+    selection_class_contract: coin.SoSelectionClassCallback = selection_class_callback
+    selection_pick_contract: coin.SoSelectionPickCallback = pick_filter_callback
+
     selection = coin.SoSelection()
     selection.addSelectionCallback(selection_callback, None)
     selection.removeSelectionCallback(selection_callback, None)
@@ -322,6 +326,11 @@ def check_event_and_selection_callbacks() -> None:
         vertex: coin.SoPrimitiveVertex,
     ) -> bool:
         return True
+
+    lasso_contract: coin.SoExtSelectionLassoFilterCallback = lasso_filter_callback
+    triangle_contract: coin.SoExtSelectionTriangleFilterCallback = triangle_filter_callback
+    line_contract: coin.SoExtSelectionLineSegmentFilterCallback = line_filter_callback
+    point_contract: coin.SoExtSelectionPointFilterCallback = point_filter_callback
 
     extended_selection = coin.SoExtSelection()
     extended_selection.setLassoFilterCallback(
@@ -396,6 +405,8 @@ def check_render_and_scene_callbacks() -> None:
 def check_other_callback_domains() -> None:
     def dragger_callback(data: object, dragger: coin.SoDragger) -> None:
         pass
+
+    dragger_contract: coin.SoDraggerCallback = dragger_callback
 
     dragger = coin.SoDragger()
     dragger.addStartCallback(dragger_callback)
