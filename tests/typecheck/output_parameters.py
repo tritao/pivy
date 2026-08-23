@@ -22,6 +22,45 @@ def check_scalar_output_helpers() -> None:
     )
 
 
+def check_existing_scalar_reference_families() -> None:
+    reader = coin.SoInput()
+    assert_type(reader.read(coin.uintp()), bool)
+    assert_type(reader.read(coin.shortp()), bool)
+    assert_type(reader.read(coin.ushortp()), bool)
+    assert_type(reader.readHex(coin.uint32p()), bool)
+    assert_type(reader.readByte(coin.int8p()), bool)
+    assert_type(reader.readByte(coin.uint8p()), bool)
+
+    stamp = coin.SbTime(1.25)
+    assert_type(stamp.getValue(coin.timep(), coin.longp()), None)
+
+    sizes = coin.SoCube()
+    assert_type(sizes.getFieldsMemorySize(coin.sizep(), coin.sizep()), None)
+
+    state = coin.SoGetBoundingBoxAction(coin.SbViewportRegion()).getState()
+    assert_type(coin.SoShapeHintsElement.get(state), tuple[int, int, int])
+
+
+def check_convex_cache_sequence_adapter() -> None:
+    state = coin.SoGetBoundingBoxAction(coin.SbViewportRegion()).getState()
+    coords = coin.SoCoordinateElement.createInstance()
+    cache = coin.SoConvexDataCache(state)
+    assert_type(
+        cache.generate(
+            coords,
+            [0, 1, 2],
+            3,
+            [0, 0, 0],
+            [0, 0, 0],
+            [0, 0, 0],
+            coin.SoConvexDataCache.NONE,
+            coin.SoConvexDataCache.NONE,
+            coin.SoConvexDataCache.NONE,
+        ),
+        coin.SbMatrix,
+    )
+
+
 def check_numeric_sequence_inputs() -> None:
     state = coin.SoState(coin.SoCallbackAction(), coin.SoTypeList())
     node = coin.SoCube()

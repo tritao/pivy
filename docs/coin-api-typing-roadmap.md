@@ -26,6 +26,14 @@ provisional until it receives the same source-level review. This distinction
 prevents a heuristic classification from being mistaken for a Coin design
 decision.
 
+The five reviewed Pivy-binding entries have now been addressed without adding
+Coin APIs: `SoConvexDataCache.generate`, `SoShapeHintsElement.get`,
+`SoFieldContainer.getFieldsMemorySize` and the scalar `SoInput` readers are
+closed in the typing model; `SbTime.getValue` is partial because its scalar
+outputs are typed while the platform-specific `timeval *` overload remains an
+intentional native boundary. The registry keeps these statuses as review
+history, so completed work is not mistaken for an open Coin queue item.
+
 ## Reviewed queue
 
 | Rank | Symbol | Owner | Native evidence | Coin 4.x action | Coin 5.x direction |
@@ -55,9 +63,10 @@ decision.
 
 The reviewed decisions imply three additive workstreams:
 
-1. **Pivy adapters first:** implement and test the five B entries. These are
-   low-risk because the native signatures already provide enough extent and
-   scalar type information.
+1. **Pivy adapters first:** the five low-risk B entries in this slice are now
+   implemented and tested. Continue with the remaining existing Pivy APIs,
+   especially safe scalar/output and ownership-preserving adapters, before
+   proposing any Coin API changes.
 2. **Coin proposals:** prototype the two C result objects without removing
    the old methods. Validate ownership, copying cost and behavior in native
    Coin tests before exposing them through Pivy.

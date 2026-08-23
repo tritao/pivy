@@ -9,6 +9,8 @@ from pivy import coin
 def check_scalar_multifield() -> None:
     values = coin.SoMFFloat()
 
+    assert_type(values.values, list[float])
+    values.values = [1.0, 2.0]
     assert_type(len(values), int)
     assert_type(iter(values), Iterator[float])
     assert_type(values.getValues(), list[float])
@@ -99,6 +101,7 @@ def check_vector_multifield() -> None:
     coordinates: Sequence[Sequence[float]] = [(1.0, 2.0, 3.0)]
 
     assert_type(iter(values), Iterator[coin.SbVec3f])
+    assert_type(values.values, list[coin.SbVec3f])
     assert_type(values[0], coin.SbVec3f)
     assert_type(values.getValues(), list[coin.SbVec3f])
     values.setValues(0, 1, vectors)

@@ -1091,8 +1091,8 @@ class PolicyBoundaryTests(unittest.TestCase):
     def test_raw_pointer_audit_is_complete(self):
         report = collect_report(Path("pivy/coin.pyi"))
         self.assertEqual(raw_pointer_audit_issues(report), ())
-        self.assertEqual(len(policy.RAW_POINTER_AUDIT), 97)
-        self.assertEqual(raw_pointer_audit_summary(report)["observed"], 97)
+        self.assertEqual(len(policy.RAW_POINTER_AUDIT), 96)
+        self.assertEqual(raw_pointer_audit_summary(report)["observed"], 96)
 
     def test_policy_managed_fields_are_covered(self):
         self.assertEqual(policy_coverage_errors(Path("pivy/coin.pyi")), ())
@@ -1145,7 +1145,7 @@ class PolicyBoundaryTests(unittest.TestCase):
         baseline = replace(
             TYPING_QUALITY_BASELINE,
             max_incomplete_by_category=(
-                ("dynamic/runtime API", 266),
+                ("dynamic/runtime API", 248),
             ),
         )
         violations = quality_regressions(report, baseline)
@@ -1166,8 +1166,8 @@ class PolicyBoundaryTests(unittest.TestCase):
             {
                 "runtime factory returns": 0,
                 "opaque pointer/object returns": 40,
-                "opaque parameter boundaries": 226,
-                "opaque field storage": 1,
+                "opaque parameter boundaries": 209,
+                "opaque field storage": 0,
             },
         )
 

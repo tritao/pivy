@@ -89,6 +89,7 @@ def _coin_api_review_manifest(review) -> dict[str, object]:
         "evidence": review.evidence,
         "coin4_action": review.coin4_action,
         "coin5_direction": review.coin5_direction,
+        "status": review.status,
         "source": review.source,
     }
 
@@ -350,6 +351,7 @@ def main() -> int:
         missing_reviews = [
             "%s.%s" % (item["class"], item["method"])
             for item in report["coin_api_reviews"]
+            if item["status"] != "resolved"
             if (item["class"], item["method"]) not in boundary_symbols
         ]
         if missing_reviews:

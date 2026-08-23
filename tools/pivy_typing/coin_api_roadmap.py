@@ -27,6 +27,7 @@ class CoinApiCandidateReview:
     evidence: str
     coin4_action: str
     coin5_direction: str
+    status: str = "open"
 
     @property
     def key(self) -> tuple[str, str]:
@@ -46,6 +47,8 @@ def _review(
     evidence: str,
     coin4_action: str,
     coin5_direction: str,
+    *,
+    status: str = "open",
 ) -> CoinApiCandidateReview:
     return CoinApiCandidateReview(
         class_name=class_name,
@@ -56,13 +59,15 @@ def _review(
         evidence=evidence,
         coin4_action=coin4_action,
         coin5_direction=coin5_direction,
+        status=status,
     )
 
 
-# These are the first twenty entries of the ranked queue produced by
+# These are the reviewed entries from the ranked queue produced by
 # report_pivy_binding_friendliness.py.  The review is method-level: all
-# incomplete boundaries on a method inherit the same owner unless a future
-# boundary-specific exception is added explicitly.
+# incomplete boundaries on an open method inherit the same owner unless a
+# future boundary-specific exception is added explicitly.  Resolved entries
+# remain here as an auditable record of the binding work that closed them.
 COIN_API_CANDIDATE_REVIEWS: tuple[CoinApiCandidateReview, ...] = (
     _review(
         "SoMultiTextureImageElement",
@@ -93,6 +98,7 @@ COIN_API_CANDIDATE_REVIEWS: tuple[CoinApiCandidateReview, ...] = (
         "All input arrays carry an explicit count and are consumed by the call. A Pivy wrapper can marshal integer sequences into temporary contiguous buffers without changing Coin ownership semantics.",
         "Add a typed Pivy overload accepting Sequence[int] for each optional index array, with count validation and runtime coverage.",
         "If other bindings need the same conversion, standardize a span/vector overload in Coin while retaining the pointer ABI.",
+        status="resolved",
     ),
     _review(
         "SoDB",
@@ -123,6 +129,7 @@ COIN_API_CANDIDATE_REVIEWS: tuple[CoinApiCandidateReview, ...] = (
         "The outputs are three closed enum values and the class already exposes separate typed scalar getters. Pivy can safely provide a tuple or use the scalar getters; no Coin ownership change is required.",
         "Add a Pivy tuple-returning helper and type the three enum outputs from the existing enum policy.",
         "A future Coin convenience overload may return a small value struct, but it is not required for a safe binding.",
+        status="resolved",
     ),
     _review(
         "SoWindowElement",
@@ -223,6 +230,7 @@ COIN_API_CANDIDATE_REVIEWS: tuple[CoinApiCandidateReview, ...] = (
         "The scalar result is a pair of ordinary time values and the timeval overload is a platform struct. Pivy can expose a typed (seconds, microseconds) result without changing Coin.",
         "Add a Pivy helper returning tuple[int, int] and keep the timeval overload explicitly native.",
         "If Coin adds a value-returning duration/timestamp type, prefer it for new code while retaining the ABI overloads.",
+        status="partial",
     ),
     _review(
         "SoFieldContainer",
@@ -233,6 +241,7 @@ COIN_API_CANDIDATE_REVIEWS: tuple[CoinApiCandidateReview, ...] = (
         "Both outputs are scalar sizes with no borrowed storage or ownership issue. The missing Python shape is a binding output-tuple adapter.",
         "Expose a typed Pivy helper returning tuple[int, int] and retain the native output-reference method for compatibility.",
         "A Coin value struct would be a convenience only; it is not necessary to make this API bindable.",
+        status="resolved",
     ),
     _review(
         "SoGLMultiTextureImageElement",
@@ -253,6 +262,7 @@ COIN_API_CANDIDATE_REVIEWS: tuple[CoinApiCandidateReview, ...] = (
         "The selected overloads write scalar or SbString values and return success. Pivy can wrap them as typed value-returning operations; no native pointer lifetime is involved.",
         "Add typed Pivy read helpers or overload policies returning (ok, value), while leaving binary-array and char-pointer APIs native.",
         "A Coin value-returning parser API would improve all bindings, but is an additive convenience rather than a prerequisite.",
+        status="resolved",
     ),
     _review(
         "SoLinearProfile",

@@ -93,7 +93,27 @@ if (init_file_emulator() < 0) {
 /* include the typemaps common to all pivy modules */
 %include pivy_common_typemaps.i
 %ignore SoDepthBufferElement::get;
+%ignore SoShapeHintsElement::get;
 %include coin_header_includes.h
+
+/* Coin exposes the three shape-hint values through enum output references.
+   Those references are not useful Python arguments, so keep the existing
+   method name and return an owned tuple from the three scalar accessors. */
+%extend SoShapeHintsElement {
+  static PyObject *_pivy_getShapeHintsTuple(SoState * state) {
+    return Py_BuildValue(
+      "(iii)",
+      static_cast<int>(SoShapeHintsElement::getVertexOrdering(state)),
+      static_cast<int>(SoShapeHintsElement::getShapeType(state)),
+      static_cast<int>(SoShapeHintsElement::getFaceType(state)));
+  }
+}
+
+%pythoncode %{
+SoShapeHintsElement.get = staticmethod(
+    SoShapeHintsElement._pivy_getShapeHintsTuple
+)
+%}
 
 /* Return scalar box output parameters as owned Python tuples.  The native
    short-reference overloads have no usable Python proxy type, while the

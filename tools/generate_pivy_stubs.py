@@ -1811,6 +1811,82 @@ def normalize_multifield_snapshots(text):
     return "\n".join(updated) + "\n"
 
 
+def normalize_multifield_values(text):
+    """Type the Python-owned ``SoMField.values`` property.
+
+    The property is implemented once on ``SoMField`` but is inherited by
+    every concrete multifield.  Concrete annotations preserve the element
+    type already used by iteration and ``getValuesSnapshot``.
+    """
+
+    lines = text.splitlines()
+    updated = []
+    current_class = None
+    current_lines = []
+
+    def flush_class():
+        if current_class is None:
+            return
+
+        if current_class == "SoMField":
+            value_type = "object"
+        else:
+            multifield_policy = MULTIFIELD_TYPE_POLICIES.get(current_class)
+            value_type = (
+                multifield_policy.element_type if multifield_policy else None
+            )
+        if value_type is None:
+            updated.extend(current_lines)
+            return
+
+        annotation = "list[%s]" % value_type
+        normalized = []
+        found = False
+        for line in current_lines:
+            match = re.match(
+                r"(?P<indent>\s*)values:\s*Incomplete\s*$", line
+            )
+            if match:
+                normalized.append(
+                    "%svalues: %s" % (match.group("indent"), annotation)
+                )
+                found = True
+            else:
+                found = found or bool(
+                    re.match(r"\s*values:\s*[^#]+$", line)
+                )
+                normalized.append(line)
+
+        if not found:
+            insertion_index = len(normalized)
+            for line_index, line in enumerate(normalized[1:], 1):
+                if re.match(r"\s*(?:@|def\s)", line):
+                    insertion_index = line_index
+                    break
+            normalized.insert(insertion_index, "    values: %s" % annotation)
+
+        updated.extend(normalized)
+
+    for line in lines:
+        class_match = re.match(r"^class\s+([A-Za-z_]\w*)", line)
+        if class_match:
+            flush_class()
+            current_class = class_match.group(1)
+            current_lines = [line]
+            continue
+        if current_class and is_top_level_statement(line):
+            flush_class()
+            current_class = None
+            current_lines = []
+        if current_class:
+            current_lines.append(line)
+        else:
+            updated.append(line)
+
+    flush_class()
+    return "\n".join(updated) + "\n"
+
+
 def normalize_multifield_single_values(text):
     """Apply Python string coercion to supported single-value MF operations."""
 
@@ -1958,15 +2034,62 @@ def normalize_extend_helpers(text):
                 if match
                 else None
             )
+        if (
+            signature is None
+            and current_class == "SoShapeHintsElement"
+            and match
+            and match.group("name") == "_pivy_getShapeHintsTuple"
+        ):
+            signature = ("state: SoState", "tuple[int, int, int]")
+            method_name = "get"
+        else:
+            method_name = match.group("name") if match else None
         if signature is not None:
             args, return_type = signature
             updated.append(
                 "%sdef %s(%s) -> %s: ..."
-                % (match.group("indent"), match.group("name"), args, return_type)
+                % (match.group("indent"), method_name, args, return_type)
             )
             continue
 
         updated.append(line)
+
+    return "\n".join(updated) + "\n"
+
+
+def normalize_shape_hints_tuple_helper(text):
+    """Render the private native tuple helper as the public static method."""
+
+    lines = text.splitlines()
+    updated = []
+    current_class = None
+    index = 0
+    while index < len(lines):
+        line = lines[index]
+        class_match = re.match(r"^class\s+([A-Za-z_]\w*)", line)
+        if class_match:
+            current_class = class_match.group(1)
+        elif current_class and is_top_level_statement(line):
+            current_class = None
+        match = re.match(
+            r"(?P<indent>\s*)def (?:get|_pivy_getShapeHintsTuple)\(state\):\s*$",
+            line,
+        )
+        if match and current_class == "SoShapeHintsElement":
+            updated.append(
+                "%sdef get(state: SoState) -> tuple[int, int, int]: ..."
+                % match.group("indent")
+            )
+            index += 1
+            if index < len(lines) and lines[index].strip().startswith('"""'):
+                while index < len(lines):
+                    if lines[index].count('"""') >= 2:
+                        index += 1
+                        break
+                    index += 1
+            continue
+        updated.append(line)
+        index += 1
 
     return "\n".join(updated) + "\n"
 
@@ -2159,6 +2282,7 @@ def postprocess_stub(path, module, output_dir):
             Stage("normalize multifield helpers", normalize_multifield_helpers),
             Stage("normalize multifield getValues", normalize_multifield_getvalues),
             Stage("normalize multifield snapshots", normalize_multifield_snapshots),
+            Stage("normalize multifield values", normalize_multifield_values),
             Stage(
                 "normalize multifield single values",
                 normalize_multifield_single_values,
@@ -2166,6 +2290,10 @@ def postprocess_stub(path, module, output_dir):
             Stage("normalize vector getValue helpers", normalize_vector_getvalue_helpers),
             Stage("normalize Python helpers", normalize_python_helpers),
             Stage("normalize extend helpers", normalize_extend_helpers),
+            Stage(
+                "normalize shape-hints tuple helper",
+                normalize_shape_hints_tuple_helper,
+            ),
             Stage("normalize property attributes", add_property_attributes),
             Stage("normalize field attribute policies", normalize_field_attribute_policies),
             Stage("add overload import", add_overload_import),

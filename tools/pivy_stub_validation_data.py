@@ -134,30 +134,6 @@ POINTER_HELPER_METHOD_CHECKS = {
 UNSUPPORTED_REFERENCE_METHOD_CHECKS = {
     "coin.pyi": (
         (
-            "SbTime",
-            "getValue",
-            {"sec": "Incomplete", "usec": "longp"},
-            "None",
-        ),
-        (
-            "SoInput",
-            "readHex",
-            {"l": "Incomplete"},
-            "bool",
-        ),
-        (
-            "SoInput",
-            "read",
-            {"i": "Incomplete"},
-            "bool",
-        ),
-        (
-            "SoInput",
-            "read",
-            {"s": "Incomplete"},
-            "bool",
-        ),
-        (
             "SoOutput",
             "getAvailableCompressionMethods",
             {"num": "uintp"},

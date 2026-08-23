@@ -16,8 +16,8 @@ class BindingFriendlinessTests(unittest.TestCase):
         cls.report = build_report(PROJECT_ROOT / "pivy" / "coin.pyi")
 
     def test_all_boundaries_and_special_contracts_are_classified(self):
-        self.assertEqual(self.report["summary"]["boundaries"], 436)
-        self.assertEqual(self.report["summary"]["special_contracts"], 405)
+        self.assertEqual(self.report["summary"]["boundaries"], 417)
+        self.assertEqual(self.report["summary"]["special_contracts"], 415)
         self.assertTrue(
             all("remediation" in item for item in self.report["boundaries"])
         )
@@ -85,21 +85,24 @@ class BindingFriendlinessTests(unittest.TestCase):
                 if item["class"] == review["class"]
                 and item["method"] == review["method"]
             ]
-            self.assertTrue(matching)
-            self.assertTrue(
-                all(
-                    item["remediation"]["confidence"] == "reviewed"
-                    and item["remediation"]["code"] == review["decision"]
-                    for item in matching
+            if review["status"] == "resolved":
+                self.assertFalse(matching)
+            else:
+                self.assertTrue(matching)
+                self.assertTrue(
+                    all(
+                        item["remediation"]["confidence"] == "reviewed"
+                        and item["remediation"]["code"] == review["decision"]
+                        for item in matching
+                    )
                 )
-            )
 
     def test_special_contract_kinds_are_preserved(self):
         kinds = {item["kind"] for item in self.report["special_contracts"]}
         self.assertEqual(kinds, {"method", "callback"})
         self.assertEqual(
             sum(item["kind"] == "method" for item in self.report["special_contracts"]),
-            327,
+            337,
         )
         self.assertEqual(
             sum(item["kind"] == "callback" for item in self.report["special_contracts"]),

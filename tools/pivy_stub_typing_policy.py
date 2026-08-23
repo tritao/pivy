@@ -237,9 +237,16 @@ COMPARISON_METHODS = {
 }
 POINTER_HELPER_TYPES = {
     "charp": "str",
+    "shortp": "int",
+    "ushortp": "int",
     "intp": "int",
     "uintp": "int",
+    "int8p": "int",
+    "uint8p": "int",
+    "uint32p": "int",
     "longp": "int",
+    "sizep": "int",
+    "timep": "int",
     "floatp": "float",
     "doublep": "float",
 }
@@ -260,6 +267,14 @@ SCALAR_REFERENCE_HELPER_TYPES = {
     "int": "intp",
     "int32_t": "intp",
     "long": "longp",
+    "short": "shortp",
+    "unsigned short": "ushortp",
+    "unsigned int": "uintp",
+    "int8_t": "int8p",
+    "uint8_t": "uint8p",
+    "uint32_t": "uint32p",
+    "size_t": "sizep",
+    "time_t": "timep",
 }
 _SEQUENCE_POINTER_PARAMETERS = {
     ("SbColor", "__init__", "rgb"): "Sequence[float]",
@@ -272,6 +287,10 @@ _SEQUENCE_POINTER_PARAMETERS = {
     ("SoShininessElement", "set", "values"): "Sequence[float]",
     ("SoTransparencyElement", "set", "values"): "Sequence[float]",
     ("SoQt", "init", "argv"): "Sequence[str]",
+    ("SoConvexDataCache", "generate", "coordindices"): "Sequence[int]",
+    ("SoConvexDataCache", "generate", "matindices"): "Sequence[int]",
+    ("SoConvexDataCache", "generate", "normindices"): "Sequence[int]",
+    ("SoConvexDataCache", "generate", "texindices"): "Sequence[int]",
 }
 SEQUENCE_ARRAY_PARAMETERS = {
     **vector_sequence_array_parameters(),
@@ -452,6 +471,18 @@ def _sequence_method_rules():
                 ),
                 "None",
                 "Color arrays exposed as nested Python sequences",
+            ),
+            _method_signature_rule(
+                "SoConvexDataCache",
+                "generate",
+                (
+                    ("coordindices", "Sequence[int]"),
+                    ("matindices", "Sequence[int]"),
+                    ("normindices", "Sequence[int]"),
+                    ("texindices", "Sequence[int]"),
+                ),
+                "SbMatrix",
+                "Convex-cache index arrays are copied from Python sequences",
             ),
         )
     )
@@ -728,6 +759,13 @@ PYTHON_HELPER_METHOD_POLICIES = {
         "self, name: str, value: object",
         "None",
     ),
+    # The native enum-reference overload is replaced by a Pivy-owned tuple
+    # adapter.  Keeping the contract here makes the generated stub and the
+    # structural validator agree on the Python-facing API.
+    ("SoShapeHintsElement", "get"): PythonMethodPolicy(
+        "state: SoState",
+        "tuple[int, int, int]",
+    ),
     ("SoGroup", "__iadd__"): PythonMethodPolicy(
         "self, other: SoNode | Sequence[SoNode]", "SoGroup"
     ),
@@ -766,6 +804,9 @@ _METHOD_RETURN_TYPE_OVERRIDES = {
     ("SoSFImage", "startEditing"): "tuple[bytes, SbVec2s, int]",
     ("SoSFImage3", "getValue"): "tuple[bytes, SbVec3s, int]",
     ("SoSFImage3", "startEditing"): "tuple[bytes, SbVec3s, int]",
+    # SWIG materializes Coin's const-reference matrix parameter as an owned
+    # Python result for this existing binding method.
+    ("SoConvexDataCache", "generate"): "SbMatrix",
     ("SoAction", "getNodeAppliedTo"): "SoNode | None",
     ("SoAction", "getPathAppliedTo"): "SoPath | None",
     ("SoAction", "getPathListAppliedTo"): "SoPathList | None",
@@ -3135,7 +3176,6 @@ INCOMPLETE_RULES = (
 # work rather than unknown typing holes. New sites must be added deliberately.
 TRIAGED_INCOMPLETE_SITES = frozenset(
     {
-        ('attribute', 'SoMField', None, 'values'),
         ('parameter', 'SbBSPTree', 'addPoint', 'userdata'),
         ('parameter', 'SbBSPTree', 'findClosest', 'array'),
         ('parameter', 'SbBSPTree', 'findPoints', 'array'),
@@ -3235,7 +3275,6 @@ TRIAGED_INCOMPLETE_SITES = frozenset(
         ('parameter', 'SbThread', 'create', 'func'),
         ('parameter', 'SbThread', 'join', 'retval'),
         ('parameter', 'SbTime', '__init__', 'tv'),
-        ('parameter', 'SbTime', 'getValue', 'sec'),
         ('parameter', 'SbTime', 'getValue', 'tv'),
         ('parameter', 'SbTime', 'setValue', 'tv'),
         ('parameter', 'ScXMLDocument', 'readXMLData', 'xmldoc'),
@@ -3251,18 +3290,12 @@ TRIAGED_INCOMPLETE_SITES = frozenset(
         ('parameter', 'SoBase', 'removeAuditor', 'auditor'),
         ('parameter', 'SoByteStream', 'copy', 'd'),
         ('parameter', 'SoChildList', 'traverseInPath', 'indices'),
-        ('parameter', 'SoConvexDataCache', 'generate', 'coordindices'),
-        ('parameter', 'SoConvexDataCache', 'generate', 'matindices'),
-        ('parameter', 'SoConvexDataCache', 'generate', 'normindices'),
-        ('parameter', 'SoConvexDataCache', 'generate', 'texindices'),
         ('parameter', 'SoDB', 'doSelect', 'exceptfds'),
         ('parameter', 'SoDB', 'doSelect', 'readfds'),
         ('parameter', 'SoDB', 'doSelect', 'writefds'),
         ('parameter', 'SoDB', 'getHeaderData', 'userdata'),
         ('parameter', 'SoField', 'addAuditor', 'f'),
         ('parameter', 'SoField', 'removeAuditor', 'f'),
-        ('parameter', 'SoFieldContainer', 'getFieldsMemorySize', 'managed'),
-        ('parameter', 'SoFieldContainer', 'getFieldsMemorySize', 'unmanaged'),
         ('parameter', 'SoFieldContainer', 'setUserData', 'userdata'),
         ('parameter', 'SoFieldContainer', 'validateNewFieldValue', 'newval'),
         ('parameter', 'SoGLImage', 'setPBuffer', 'context'),
@@ -3278,10 +3311,6 @@ TRIAGED_INCOMPLETE_SITES = frozenset(
         ('parameter', 'SoGLVBOElement', 'setTexCoordVBO', 'vbo'),
         ('parameter', 'SoGLVBOElement', 'setVertexVBO', 'vbo'),
         ('parameter', 'SoHeightMapToNormalMap', 'convert', 'srcptr'),
-        ('parameter', 'SoInput', 'read', 'i'),
-        ('parameter', 'SoInput', 'read', 's'),
-        ('parameter', 'SoInput', 'readByte', 'b'),
-        ('parameter', 'SoInput', 'readHex', 'l'),
         ('parameter', 'SoLazyElement', 'setMaterials', 'transp'),
         ('parameter', 'SoLazyElement', 'setTransparency', 'transparency'),
         ('parameter', 'SoLinearProfile', 'getTrimCurve', 'knotvector'),
@@ -3403,9 +3432,6 @@ TRIAGED_INCOMPLETE_SITES = frozenset(
         ('parameter', 'SoShaderParameterMatrix', 'updateParameter', 'shaderObject'),
         ('parameter', 'SoShaderParameterMatrixArray', 'updateParameter', 'shaderObject'),
         ('parameter', 'SoShaderStateMatrixParameter', 'updateParameter', 'shaderObject'),
-        ('parameter', 'SoShapeHintsElement', 'get', 'faceType'),
-        ('parameter', 'SoShapeHintsElement', 'get', 'shapeType'),
-        ('parameter', 'SoShapeHintsElement', 'get', 'vertexOrdering'),
         ('parameter', 'SoTextureCombineElement', 'get', 'alphaoperation'),
         ('parameter', 'SoTextureCombineElement', 'get', 'rgboperation'),
         ('parameter', 'SoUniformShaderParameter', 'updateParameter', 'shaderObject'),
@@ -3703,7 +3729,6 @@ RAW_POINTER_AUDIT = {
             ("parameter", "SoInput", "setFilePointer", "newFP"),
             ("parameter", "SoInput", "setStringArray", "strings"),
             ("parameter", "SoOutput", "getBuffer", "bufPointer"),
-            ("parameter", "SoOutput", "getBuffer", "nBytes"),
             ("parameter", "SoOutput", "setBuffer", "bufPointer"),
             ("parameter", "SoOutput", "setFilePointer", "newFP"),
             ("parameter", "SoOutput", "writeBinaryArray", "c"),

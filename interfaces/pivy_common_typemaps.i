@@ -17,6 +17,8 @@
 /* header include needed to let nodekit extensions find the SbTime header */
 %{
 #include <Inventor/SbTime.h>
+#include <stddef.h>
+#include <time.h>
 #include <limits.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -304,10 +306,62 @@ autocast_scxml_object(ScXMLObject * object, int own = 0)
 %include "typemaps.i"
 %include "cpointer.i"
 
+/* ``cpointer.i`` does not provide Python scalar conversions for these
+ * platform typedefs.  Define them before creating the pointer helper
+ * classes so ``sizep.value()`` and ``timep.value()`` remain ordinary Python
+ * integers instead of leaking an opaque SWIG pointer value. */
+%typemap(in) size_t {
+  unsigned long long value = PyLong_AsUnsignedLongLong($input);
+  if (PyErr_Occurred()) {
+    SWIG_fail;
+  }
+  if (sizeof(size_t) < sizeof(unsigned long long) &&
+      value > (unsigned long long)SIZE_MAX) {
+    PyErr_SetString(PyExc_OverflowError, "size_t value is out of range");
+    SWIG_fail;
+  }
+  $1 = (size_t)value;
+}
+
+%typemap(out) size_t {
+  $result = PyLong_FromUnsignedLongLong((unsigned long long)$1);
+}
+
+%typemap(typecheck) size_t {
+  $1 = PyLong_Check($input) ? 1 : 0;
+}
+
+%typemap(in) time_t {
+  long long value = PyLong_AsLongLong($input);
+  if (PyErr_Occurred()) {
+    SWIG_fail;
+  }
+  $1 = (time_t)value;
+  if ((long long)$1 != value) {
+    PyErr_SetString(PyExc_OverflowError, "time_t value is out of range");
+    SWIG_fail;
+  }
+}
+
+%typemap(out) time_t {
+  $result = PyLong_FromLongLong((long long)$1);
+}
+
+%typemap(typecheck) time_t {
+  $1 = PyLong_Check($input) ? 1 : 0;
+}
+
 %pointer_class(char, charp);
+%pointer_class(short, shortp);
+%pointer_class(unsigned short, ushortp);
 %pointer_class(int, intp);
 %pointer_class(unsigned int, uintp);
+%pointer_class(signed char, int8p);
+%pointer_class(unsigned char, uint8p);
+%pointer_class(unsigned int, uint32p);
 %pointer_class(long, longp);
+%pointer_class(size_t, sizep);
+%pointer_class(time_t, timep);
 %pointer_class(float, floatp);
 %pointer_class(double, doublep);
 
@@ -398,6 +452,28 @@ pivy_convert_numeric_sequence(PyObject * input, int kind, void ** output)
 PIVY_CONST_NUMERIC_SEQUENCE_POINTER(int, 0, values)
 PIVY_CONST_NUMERIC_SEQUENCE_POINTER(int32_t, 1, indices)
 PIVY_CONST_NUMERIC_SEQUENCE_POINTER(float, 2, values)
+
+%define PIVY_CONST_NUMERIC_SEQUENCE_POINTER_NAMED(_type_, _kind_, _name_)
+%typemap(in) const _type_ * _name_ ( _type_ * temp ) {
+  if (pivy_convert_numeric_sequence($input, _kind_, (void **)&temp) < 0) {
+    SWIG_fail;
+  }
+  $1 = temp;
+}
+
+%typemap(freearg) const _type_ * _name_ {
+  free((void *)$1);
+}
+
+%typemap(typecheck) const _type_ * _name_ {
+  $1 = PySequence_Check($input) ? 1 : 0;
+}
+%enddef
+
+PIVY_CONST_NUMERIC_SEQUENCE_POINTER_NAMED(int32_t, 1, coordindices)
+PIVY_CONST_NUMERIC_SEQUENCE_POINTER_NAMED(int32_t, 1, matindices)
+PIVY_CONST_NUMERIC_SEQUENCE_POINTER_NAMED(int32_t, 1, normindices)
+PIVY_CONST_NUMERIC_SEQUENCE_POINTER_NAMED(int32_t, 1, texindices)
 
 /* if SWIG determines the class abstract it doesn't generate
  * constructors of any kind. the following %feature

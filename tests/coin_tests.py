@@ -1288,6 +1288,15 @@ class SoFieldMethods(unittest.TestCase):
         s = SoMFInt32()
         s.setValues([1,2,3])
         self.assertTrue(s.get1(1) == '2', 'get1(1) failed')
+
+    def testValuesSnapshotProperty(self):
+        scalar = SoMFFloat()
+        scalar.values = [1.0, 2.0]
+        self.assertEqual(scalar.values, [1.0, 2.0])
+
+        vector = SoMFVec3f()
+        vector.values = [[1.0, 2.0, 3.0]]
+        self.assertEqual(vector.values, [[1.0, 2.0, 3.0]])
         
 class SbTimeMethods(unittest.TestCase):
     """test SbTime methods"""
@@ -1306,6 +1315,13 @@ class SbTimeMethods(unittest.TestCase):
         self.assertEqual(t1, t2)
         t2.setValue(12, 5000)
         self.assertEqual(t1, t2)
+
+    def testScalarOutputHelpers(self):
+        seconds = timep()
+        microseconds = longp()
+        self.assertIsNone(SbTime(12.005).getValue(seconds, microseconds))
+        self.assertEqual(seconds.value(), 12)
+        self.assertEqual(microseconds.value(), 5000)
 
 class OperatorTests(unittest.TestCase):
     """checks various operator overloaded methods"""
@@ -1646,6 +1662,70 @@ class SoInputTests(unittest.TestCase):
         self.input.setBuffer(self.text)
         self.assertTrue(self.input.isValidBuffer())
         self.assertIsNone(self.input.getCurFileName())
+
+    def testScalarOutputReaders(self):
+        self.input.setBuffer("42")
+        integer = uintp()
+        self.assertTrue(self.input.read(integer))
+        self.assertEqual(integer.value(), 42)
+
+        self.input = SoInput()
+        self.input.setBuffer("42")
+        short = shortp()
+        self.assertTrue(self.input.read(short))
+        self.assertEqual(short.value(), 42)
+
+        self.input = SoInput()
+        self.input.setBuffer("0xff")
+        hexadecimal = uint32p()
+        self.assertTrue(self.input.readHex(hexadecimal))
+        self.assertEqual(hexadecimal.value(), 255)
+
+        self.input = SoInput()
+        self.input.setBuffer("127")
+        signed_byte = int8p()
+        self.assertTrue(self.input.readByte(signed_byte))
+        self.assertEqual(signed_byte.value(), 127)
+
+        self.input = SoInput()
+        self.input.setBuffer("255")
+        unsigned_byte = uint8p()
+        self.assertTrue(self.input.readByte(unsigned_byte))
+        self.assertEqual(unsigned_byte.value(), 255)
+
+
+class BindingOutputAdapterTests(unittest.TestCase):
+    def testShapeHintsTupleAdapter(self):
+        action = SoGetBoundingBoxAction(SbViewportRegion())
+        values = SoShapeHintsElement.get(action.getState())
+        self.assertIsInstance(values, tuple)
+        self.assertEqual(len(values), 3)
+
+    def testFieldMemorySizeAdapter(self):
+        managed = sizep()
+        unmanaged = sizep()
+        self.assertIsNone(SoCube().getFieldsMemorySize(managed, unmanaged))
+        self.assertGreaterEqual(managed.value(), 0)
+        self.assertGreaterEqual(unmanaged.value(), 0)
+
+    def testConvexCacheSequenceAdapter(self):
+        action = SoGetBoundingBoxAction(SbViewportRegion())
+        state = action.getState()
+        coordinates = SoCoordinateElement.createInstance()
+        coordinates.init(state)
+        cache = SoConvexDataCache(state)
+        result = cache.generate(
+            coordinates,
+            [],
+            0,
+            [],
+            [],
+            [],
+            SoConvexDataCache.NONE,
+            SoConvexDataCache.NONE,
+            SoConvexDataCache.NONE,
+        )
+        self.assertIsInstance(result, SbMatrix)
 
 
 class SoOutputTests(unittest.TestCase):

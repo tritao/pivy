@@ -123,6 +123,41 @@ POINTER_HELPER_METHOD_RULES = (
         "Native double output helper represented by a Python pointer value",
     ),
     _method_rule(
+        "SoInput", "read", {"i": "uintp"}, "bool",
+        "Native unsigned integer output helper represented by a Python pointer value",
+    ),
+    _method_rule(
+        "SoInput", "read", {"s": "shortp"}, "bool",
+        "Native short output helper represented by a Python pointer value",
+    ),
+    _method_rule(
+        "SoInput", "read", {"s": "ushortp"}, "bool",
+        "Native unsigned short output helper represented by a Python pointer value",
+    ),
+    _method_rule(
+        "SoInput", "readHex", {"l": "uint32p"}, "bool",
+        "Native hexadecimal output helper represented by a Python pointer value",
+    ),
+    _method_rule(
+        "SoInput", "readByte", {"b": "int8p"}, "bool",
+        "Native byte output helper represented by a Python pointer value",
+    ),
+    _method_rule(
+        "SoInput", "readByte", {"b": "uint8p"}, "bool",
+        "Native byte output helper represented by a Python pointer value",
+    ),
+    _method_rule(
+        "SbTime", "getValue", {"sec": "timep", "usec": "longp"}, "None",
+        "Native time output helpers represented by Python pointer values",
+    ),
+    _method_rule(
+        "SoFieldContainer",
+        "getFieldsMemorySize",
+        {"managed": "sizep", "unmanaged": "sizep"},
+        "None",
+        "Native size output helpers represented by Python pointer values",
+    ),
+    _method_rule(
         "SbColor",
         "setPackedValue",
         {"rgba": "int", "transparency": "floatp"},
@@ -402,7 +437,7 @@ RAW_BOUNDARY_METHOD_RULES = (
     ),
     _method_rule(
         "SoOutput", "getBuffer",
-        {"bufPointer": "Incomplete", "nBytes": "Incomplete"}, "bool",
+        {"bufPointer": "Incomplete", "nBytes": "sizep"}, "bool",
         "Native output buffers remain an explicit raw boundary",
     ),
     _method_rule(
@@ -487,7 +522,6 @@ def raw_boundary_method_checks(module):
 
 RAW_BOUNDARY_ATTRIBUTE_CHECKS = {
     "coin.pyi": (
-        ("SoMField", "values", "Incomplete"),
         ("SbHeapFuncs", "eval_func", "Incomplete"),
         ("SbHeapFuncs", "get_index_func", "Incomplete"),
         ("SbHeapFuncs", "set_index_func", "Incomplete"),

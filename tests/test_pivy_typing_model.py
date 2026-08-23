@@ -72,16 +72,16 @@ class Example:
         )
         categories = Counter(boundary.category for boundary in boundaries)
 
-        self.assertEqual(len(boundaries), 436)
+        self.assertEqual(len(boundaries), 417)
         self.assertEqual(categories["uncategorized"], 0)
-        self.assertEqual(categories["raw C pointers"], 103)
-        self.assertEqual(categories["dynamic/runtime API"], 267)
+        self.assertEqual(categories["raw C pointers"], 102)
+        self.assertEqual(categories["dynamic/runtime API"], 249)
 
     def test_resolved_model_contains_policy_evidence(self):
         source = (PROJECT_ROOT / "pivy" / "coin.pyi").read_text(encoding="utf-8")
         resolved = resolve_module(parse_stub(source, name="pivy.coin"))
 
-        self.assertEqual(len(resolved.incomplete_boundaries), 436)
+        self.assertEqual(len(resolved.incomplete_boundaries), 417)
         self.assertGreaterEqual(len(resolved.callback_contracts), 70)
         self.assertGreaterEqual(len(resolved.method_contracts), 100)
         self.assertEqual(resolved.source, source)

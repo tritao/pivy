@@ -154,7 +154,19 @@ def assert_swig_thisown_annotations(path, tree):
 
 def assert_pointer_helper_classes(path, tree):
     classes = class_map(tree)
-    for class_name, value_type in POINTER_HELPER_TYPES.items():
+    # Coin owns the complete helper family.  SoQt has its own historical
+    # subset because its stub is a separate module; validate every helper it
+    # emits without requiring Coin-only helpers to be duplicated there.
+    required_helpers = (
+        POINTER_HELPER_TYPES
+        if path.endswith("coin.pyi")
+        else {
+            class_name: value_type
+            for class_name, value_type in POINTER_HELPER_TYPES.items()
+            if class_name in classes
+        }
+    )
+    for class_name, value_type in required_helpers.items():
         node = classes.get(class_name)
         if node is None:
             raise AssertionError("%s is missing %s" % (path, class_name))
