@@ -377,6 +377,14 @@ def check_numeric_multifield_contracts() -> None:
     assert_type(floats.getValues(), list[float])
     assert_type(iter(floats), Iterator[float])
 
+    doubles = coin.SoMFDouble()
+    doubles.setValues([1.0, 2.0])
+    assert_type(doubles[0], float)
+    doubles[-1] = 3.0
+    assert_type(doubles.getValues(), list[float])
+    assert_type(doubles.getValues(1), list[float])
+    assert_type(iter(doubles), Iterator[float])
+
     colors = coin.SoMFColor()
     colors.setValues(0, 1, [[0.1, 0.2, 0.3]])
     assert_type(colors[0], coin.SbColor)

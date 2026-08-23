@@ -587,16 +587,7 @@ UNSUPPORTED_ARRAY_METHOD_CHECKS = {
         ("SoSFVec3s", "setValue", "xyz", "Sequence[int]"),
     ),
 }
-RUNTIME_UNSUPPORTED_METHOD_CHECKS = {
-    "coin.pyi": (
-        (
-            "SoMFDouble",
-            "getValues",
-            {"start": "int"},
-            "Incomplete",
-        ),
-    ),
-}
+RUNTIME_UNSUPPORTED_METHOD_CHECKS = {}
 DEFERRED_RAW_METHOD_CHECKS = {
     "coin.pyi": (
         (

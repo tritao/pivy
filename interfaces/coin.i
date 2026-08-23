@@ -276,14 +276,22 @@ SoColorPacker.getPackedColors = (
     Py_RETURN_NONE;
   }
 
-  PyObject *_pivy_getValuesSnapshot() const {
+  PyObject *_pivy_getValuesSnapshot(int start) const {
     const int count = self->getNum();
-    PyObject *snapshot = PyList_New(count);
-    if (snapshot == NULL) return NULL;
-    if (count == 0) return snapshot;
+    if (start < 0 || start > count) {
+      PyErr_SetString(
+          PyExc_IndexError,
+          "SoMFDouble.getValues start is outside the field");
+      return NULL;
+    }
 
-    const double *values = self->getValues(0);
-    for (int index = 0; index < count; ++index) {
+    const int snapshot_count = count - start;
+    PyObject *snapshot = PyList_New(snapshot_count);
+    if (snapshot == NULL) return NULL;
+    if (snapshot_count == 0) return snapshot;
+
+    const double *values = self->getValues(start);
+    for (int index = 0; index < snapshot_count; ++index) {
       PyObject *value = PyFloat_FromDouble(values[index]);
       if (value == NULL) {
         Py_DECREF(snapshot);
@@ -293,10 +301,35 @@ SoColorPacker.getPackedColors = (
     }
     return snapshot;
   }
+
+  PyObject *__getitem__(int index) const {
+    const int count = self->getNum();
+    if (index < 0) index += count;
+    if (index < 0 || index >= count) {
+      PyErr_SetString(PyExc_IndexError, "SoMFDouble index is out of range");
+      return NULL;
+    }
+    return PyFloat_FromDouble(self->getValues(0)[index]);
+  }
+
+  PyObject *__setitem__(int index, double value) {
+    const int count = self->getNum();
+    if (index < 0) index += count;
+    if (index < 0 || index >= count) {
+      PyErr_SetString(PyExc_IndexError, "SoMFDouble index is out of range");
+      return NULL;
+    }
+    self->set1Value(index, value);
+    Py_RETURN_NONE;
+  }
 }
 
 %pythoncode %{
-SoMFDouble.getValuesSnapshot = lambda self: self._pivy_getValuesSnapshot()
+def _pivy_getValues(self, start=0):
+  return self._pivy_getValuesSnapshot(start)
+
+SoMFDouble.getValuesSnapshot = lambda self: self._pivy_getValuesSnapshot(0)
+SoMFDouble.getValues = _pivy_getValues
 
 SoMFDouble._pivy_setValuesRaw = SoMFDouble.setValues
 SoMFDouble.setValues = lambda self, *args: self._pivy_setValuesArguments(args)

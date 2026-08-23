@@ -1742,6 +1742,14 @@ PYTHON_SHADOW_METHOD_TYPES[("SoSFEnum", "setEnums")] = (
     "None",
 )
 PYTHON_SHADOW_METHOD_TYPES[("SbByteBuffer", "data")] = ("self", "bytes")
+PYTHON_SHADOW_METHOD_TYPES[("SoMFDouble", "getValues")] = (
+    "self, start: int = ...",
+    "list[float]",
+)
+PYTHON_SHADOW_METHOD_TYPES[("SoMFDouble", "getValuesSnapshot")] = (
+    "self",
+    "list[float]",
+)
 for _box_class, _bounds_type, _origin_type in (
     ("SbBox2s", "tuple[int, int, int, int]", "tuple[int, int]"),
     ("SbBox3s", "tuple[int, int, int, int, int, int]", "tuple[int, int, int]"),
@@ -1817,11 +1825,7 @@ RUNTIME_UNSUPPORTED_NOTE = (
     "NOTE: SWIG exposes raw C pointers here; keep Incomplete until a "
     "Python-level wrapper exists."
 )
-RUNTIME_UNSUPPORTED_METHOD_NOTES = {
-    "pivy.coin": {
-        ("SoMFDouble", "getValues"),
-    },
-}
+RUNTIME_UNSUPPORTED_METHOD_NOTES = {}
 GENERATED_HEADER = (
     "# SPDX-License-Identifier: ISC\n"
     "# Generated from local Pivy stubgen output; lightly normalized for checker use.\n"
@@ -2175,13 +2179,10 @@ MULTIFIELD_TYPE_POLICIES = {
         component_width=4,
         component_parameter_name="rgba",
     ),
-    # Coin exposes SoMFDouble's bulk and indexed storage only through raw
-    # pointers on this SWIG build.  Keep the safe scalar setter, iterator,
-    # and owned snapshot, but do not claim Python sequence/index operations.
     "SoMFDouble": MultifieldTypePolicy(
         element_type="float",
         set_values_types=("float",),
-        indexed_access=False,
+        get_values_type="float",
     ),
     "SoMFEngine": MultifieldTypePolicy(
         element_type="SoEngine",
@@ -3103,7 +3104,6 @@ RAW_POINTER_AUDIT = {
             ("return", "SoLazyElement", "getColorIndexPointer", "return"),
             ("return", "SoLazyElement", "getPackedColors", "return"),
             ("return", "SoLazyElement", "getTransparencyPointer", "return"),
-            ("return", "SoMFDouble", "getValues", "return"),
             ("return", "SoMultiTextureImageElement", "get", "return"),
             ("return", "SoMultiTextureImageElement", "getDefault", "return"),
             ("return", "SoMultiTextureImageElement", "getImage", "return"),

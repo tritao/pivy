@@ -1037,6 +1037,19 @@ class FieldSetValue(unittest.TestCase):
         self.assertEqual(double_field.getValuesSnapshot(), [3.0, 6.25])
         double_field.setValues(0, 2, [7, 8])
         self.assertEqual(double_field.getValuesSnapshot(), [7.0, 8.0])
+        self.assertEqual(double_field.getValues(), [7.0, 8.0])
+        self.assertEqual(double_field.getValues(1), [8.0])
+        self.assertEqual(double_field[0], 7.0)
+        self.assertEqual(double_field[-1], 8.0)
+        double_field[0] = 9.5
+        self.assertEqual(double_field.getValues(), [9.5, 8.0])
+        self.assertEqual(list(double_field), [9.5, 8.0])
+        with self.assertRaises(IndexError):
+            double_field.getValues(3)
+        with self.assertRaises(IndexError):
+            _ = double_field[2]
+        with self.assertRaises(IndexError):
+            double_field[2] = 1.0
         with self.assertRaises(ValueError):
             double_field.setValues(0, 1, [1, 2])
 
