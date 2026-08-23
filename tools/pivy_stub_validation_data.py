@@ -11,6 +11,7 @@ from tools.pivy_stub_typing_policy import (
     multifield_single_value_types,
     multifield_setvalues_types,
     MULTIFIELD_TYPE_POLICIES,
+    documented_method_checks,
     operator_method_checks,
     sequence_method_checks,
     SENSOR_CALLBACK_CLASSES,
@@ -323,50 +324,9 @@ TYPEDEF_AND_STRING_METHOD_CHECKS = {
     "coin.pyi": typedef_and_string_method_checks(),
 }
 DOC_TYPED_METHOD_CHECKS = {
-    "coin.pyi": (
-        (
-            "SoType",
-            "getInstantiationMethod",
-            {},
-            "int",
-        ),
-        (
-            "SoVectorizeAction",
-            "setColorTranslationMethod",
-            {"method": "int"},
-            "None",
-        ),
-        (
-            "SoVectorizeAction",
-            "getColorTranslationMethod",
-            {},
-            "int",
-        ),
-        (
-            "SoDepthBufferElement",
-            "getFunction",
-            {"state": "SoState"},
-            "int",
-        ),
-    ),
-    os.path.join("gui", "soqt.pyi"): (
-        (
-            "SoQt",
-            "init",
-            {
-                "argc": "intp",
-                "argv": "Sequence[str]",
-                "appname": "str",
-                "classname": "str",
-            },
-            "QWidget",
-        ),
-        (
-            "SoQtViewer",
-            "setAnaglyphStereoColorMasks",
-            {"left": "Sequence[bool]", "right": "Sequence[bool]"},
-            "None",
-        ),
+    "coin.pyi": documented_method_checks("coin.pyi"),
+    os.path.join("gui", "soqt.pyi"): documented_method_checks(
+        os.path.join("gui", "soqt.pyi")
     ),
 }
 POINTER_HELPER_METHOD_CHECKS = {

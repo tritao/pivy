@@ -417,6 +417,11 @@ The small typedef/string and operator tables now follow the same path:
   operator policy rather than handwritten validator tuples;
 - the legacy validator shapes remain only as compatibility projections.
 
+The documentation-backed method checks are now policy-owned as well. Coin and
+SoQt module views are derived from the same contracts, including enum values,
+SoQt initialization and stereo-mask sequences; their parameter overrides also
+feed the generator.
+
 The next slice is to migrate the remaining duplicated positive structural
 tables—pointer helpers, typedef/string adapters, documented typed methods,
 operators and deferred raw boundaries—into the resolved model or policy

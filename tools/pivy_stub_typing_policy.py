@@ -604,6 +604,83 @@ OPERATOR_METHOD_RULES = _operator_method_rules()
 
 def operator_method_checks():
     return method_signature_checks(OPERATOR_METHOD_RULES)
+
+
+DOCUMENTED_METHOD_RULES = (
+    _method_signature_rule(
+        "SoType",
+        "getInstantiationMethod",
+        (),
+        "int",
+        "Coin documentation identifies the instantiation method enum",
+    ),
+    _method_signature_rule(
+        "SoVectorizeAction",
+        "setColorTranslationMethod",
+        (("method", "int"),),
+        "None",
+        "Coin documentation identifies the color translation enum",
+    ),
+    _method_signature_rule(
+        "SoVectorizeAction",
+        "getColorTranslationMethod",
+        (),
+        "int",
+        "Coin documentation identifies the color translation enum",
+    ),
+    _method_signature_rule(
+        "SoDepthBufferElement",
+        "getFunction",
+        (("state", "SoState"),),
+        "int",
+        "Coin documentation identifies the depth function enum",
+    ),
+    _method_signature_rule(
+        "SoQt",
+        "init",
+        (
+            ("argc", "intp"),
+            ("argv", "Sequence[str]"),
+            ("appname", "str"),
+            ("classname", "str"),
+        ),
+        "QWidget",
+        "SoQt documentation defines the application initialization contract",
+    ),
+    _method_signature_rule(
+        "SoQtViewer",
+        "setAnaglyphStereoColorMasks",
+        (("left", "Sequence[bool]"), ("right", "Sequence[bool]")),
+        "None",
+        "SoQt documentation defines fixed-width stereo color masks",
+    ),
+)
+
+
+def documented_method_checks(module=None):
+    rules = DOCUMENTED_METHOD_RULES
+    if module == "coin.pyi":
+        rules = tuple(
+            rule for rule in rules if not rule.target.class_name.startswith("SoQt")
+        )
+    elif module and module.endswith("soqt.pyi"):
+        rules = tuple(
+            rule for rule in rules if rule.target.class_name.startswith("SoQt")
+        )
+    return method_signature_checks(rules)
+
+
+def _parameter_overrides_from_method_rules(rules):
+    return {
+        (rule.target.class_name, rule.target.method_name, parameter_name): parameter_type
+        for rule in rules
+        for parameter_name, parameter_type in rule.parameter_types
+    }
+
+
+DOCUMENTED_PARAMETER_TYPE_OVERRIDES = _parameter_overrides_from_method_rules(
+    DOCUMENTED_METHOD_RULES
+)
 PYTHON_HELPER_METHOD_POLICIES = {
     ("_SwigNonDynamicMeta", "__setattr__"): PythonMethodPolicy(
         "cls, name: str, value: object",
@@ -782,6 +859,7 @@ _PYTHON_PARAMETER_TYPE_OVERRIDES = {
     # getter is already object-valued; keep the setter symmetric.
     ("SoSensor", "setData", "callbackdata"): "object",
     **SEQUENCE_PARAMETER_TYPE_OVERRIDES,
+    **DOCUMENTED_PARAMETER_TYPE_OVERRIDES,
 }
 PYTHON_PARAMETER_RULES = tuple(
     OverrideRule(

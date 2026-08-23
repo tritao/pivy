@@ -146,6 +146,24 @@ class FieldTypePolicyTests(unittest.TestCase):
             policy.typedef_and_string_method_checks(),
         )
 
+    def test_documented_rules_split_coin_and_soqt_views(self):
+        coin_checks = policy.documented_method_checks("coin.pyi")
+        soqt_checks = policy.documented_method_checks("gui/soqt.pyi")
+
+        self.assertTrue(coin_checks)
+        self.assertTrue(soqt_checks)
+        self.assertTrue(all(not check[0].startswith("SoQt") for check in coin_checks))
+        self.assertTrue(all(check[0].startswith("SoQt") for check in soqt_checks))
+        self.assertIn(
+            (
+                "SoQtViewer",
+                "setAnaglyphStereoColorMasks",
+                {"left": "Sequence[bool]", "right": "Sequence[bool]"},
+                "None",
+            ),
+            soqt_checks,
+        )
+
     def test_coin_typing_policy_registry_is_complete(self):
         self.assertEqual(COIN_TYPING_POLICY.fields, policy.FIELD_TYPE_POLICIES)
         self.assertEqual(
