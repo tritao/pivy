@@ -1173,10 +1173,10 @@ class PolicyBoundaryTests(unittest.TestCase):
 
     def test_verifytypes_summary_parser(self):
         output = """
-Symbols exported by "pivy.coin": 13809
-  With known type: 8417
+Symbols exported by "pivy.coin": 13801
+  With known type: 8416
   With ambiguous type: 0
-  With unknown type: 5392
+  With unknown type: 5385
 
 Other symbols referenced but not exported by "pivy.coin": 0
   With known type: 0
@@ -1191,10 +1191,10 @@ Type completeness score: 61%
             report,
             VerifyTypesReport(
                 module="pivy.coin",
-                exported_symbols=13809,
-                known_symbols=8417,
+                exported_symbols=13801,
+                known_symbols=8416,
                 ambiguous_symbols=0,
-                unknown_symbols=5392,
+                unknown_symbols=5385,
                 completeness_score=61.0,
                 pyright_returncode=1,
             ),
