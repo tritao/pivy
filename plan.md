@@ -483,3 +483,20 @@ Existing audit records are marked `reviewed`; category-derived ownership is
 marked `provisional` and becomes the next review queue. The report also ranks
 Coin API candidates by boundary impact so follow-up work can become an
 additive Coin 4.x or Coin 5.x modernization proposal where appropriate.
+
+The first ranked queue review is now source-backed in
+`tools/pivy_typing/coin_api_roadmap.py` and documented in
+`docs/coin-api-typing-roadmap.md`. It covers the first 20 ranked methods with
+the exact native declaration, header provenance, ownership decision and
+additive next action:
+
+- 5 Pivy binding adapters (counted input sequences or scalar output tuples)
+- 2 Coin API proposals (owning image and trim-curve results)
+- 13 intentionally native boundaries (platform handles, thread ABIs and
+  untyped native utilities)
+
+The report now retains both the complete provisional Coin queue and the
+reviewed queue. `--check-coverage` fails if a reviewed roadmap entry no longer
+exists in the resolved boundary model. This is the evidence-backed starting
+point for Coin 4.x/Coin 5.x design discussion; the remaining queue is still
+explicitly provisional and should be reviewed in descending impact order.

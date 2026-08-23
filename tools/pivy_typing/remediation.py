@@ -178,6 +178,23 @@ def remediation_for_boundary(boundary) -> RemediationRecord:
     """Classify one boundary using reviewed audits and conservative defaults."""
 
     key = boundary_key(boundary)
+    # Candidate reviews are intentionally method-level and live in a separate
+    # registry so the general boundary policy remains reusable.  Import lazily
+    # to keep the roadmap module free to use RemediationClass.
+    from tools.pivy_typing.coin_api_roadmap import coin_api_candidate_review
+
+    candidate_review = coin_api_candidate_review(
+        boundary.class_name,
+        boundary.method_name,
+    )
+    if candidate_review is not None:
+        return _record(
+            candidate_review.classification,
+            confidence="reviewed",
+            rationale=candidate_review.evidence,
+            next_action=candidate_review.coin4_action,
+            source=candidate_review.source,
+        )
     if key in RAW_POINTER_AUDIT:
         return _raw_pointer_remediation(key, RAW_POINTER_AUDIT[key])
     if key in OPAQUE_RETURN_AUDIT:

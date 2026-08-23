@@ -3,6 +3,7 @@
 from pathlib import Path
 import unittest
 
+from tools.pivy_typing.coin_api_roadmap import COIN_API_CANDIDATE_REVIEWS
 from tools.report_pivy_binding_friendliness import build_report
 
 
@@ -52,6 +53,46 @@ class BindingFriendlinessTests(unittest.TestCase):
         self.assertEqual(candidates[0]["class"], "SoMultiTextureImageElement")
         self.assertEqual(candidates[0]["method"], "get")
         self.assertGreater(candidates[0]["score"], 1)
+
+    def test_reviewed_coin_api_queue_has_source_backed_decisions(self):
+        reviews = self.report["coin_api_reviews"]
+        self.assertEqual(len(reviews), 20)
+        self.assertEqual(len(reviews), len(COIN_API_CANDIDATE_REVIEWS))
+        self.assertEqual(
+            self.report["summary"]["reviewed_coin_api_owners"],
+            {"A": 0, "B": 5, "C": 2, "D": 13},
+        )
+        self.assertTrue(
+            all(
+                item["confidence"] == "reviewed"
+                and item["source_headers"]
+                and item["native_signatures"]
+                for item in reviews
+            )
+        )
+        reviewed_keys = {(item["class"], item["method"]) for item in reviews}
+        self.assertEqual(
+            reviewed_keys,
+            {(item.class_name, item.method_name) for item in COIN_API_CANDIDATE_REVIEWS},
+        )
+
+    def test_reviewed_queue_entries_override_provisional_defaults(self):
+        boundaries = self.report["boundaries"]
+        for review in self.report["coin_api_reviews"]:
+            matching = [
+                item
+                for item in boundaries
+                if item["class"] == review["class"]
+                and item["method"] == review["method"]
+            ]
+            self.assertTrue(matching)
+            self.assertTrue(
+                all(
+                    item["remediation"]["confidence"] == "reviewed"
+                    and item["remediation"]["code"] == review["decision"]
+                    for item in matching
+                )
+            )
 
     def test_special_contract_kinds_are_preserved(self):
         kinds = {item["kind"] for item in self.report["special_contracts"]}

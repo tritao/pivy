@@ -15,6 +15,7 @@ from tools.pivy_typing.remediation import (
     remediation_for_callback_contract,
     remediation_for_method_contract,
 )
+from tools.pivy_typing.coin_api_roadmap import COIN_API_CANDIDATE_REVIEWS
 from tools.pivy_typing.resolved import resolve_stub
 
 
@@ -76,6 +77,22 @@ def _callback_contract_manifest(contract, record: RemediationRecord) -> dict[str
     }
 
 
+def _coin_api_review_manifest(review) -> dict[str, object]:
+    return {
+        "class": review.class_name,
+        "method": review.method_name,
+        "decision": review.classification.value,
+        "owner": REMEDIATION_CLASS_LABELS[review.classification],
+        "confidence": "reviewed",
+        "native_signatures": list(review.native_signatures),
+        "source_headers": list(review.source_headers),
+        "evidence": review.evidence,
+        "coin4_action": review.coin4_action,
+        "coin5_direction": review.coin5_direction,
+        "source": review.source,
+    }
+
+
 def _count_records(records: list[dict[str, object]]) -> dict[str, int]:
     counts = Counter(
         record["remediation"]["code"]
@@ -103,7 +120,10 @@ def _code_confidence_counts(records: list[dict[str, object]]) -> dict[str, dict[
     return counts
 
 
-def _coin_candidates(boundaries: list[dict[str, object]], limit: int) -> list[dict[str, object]]:
+def _coin_candidates(
+    boundaries: list[dict[str, object]],
+    limit: int | None = None,
+) -> list[dict[str, object]]:
     grouped: dict[tuple[str, str], list[dict[str, object]]] = defaultdict(list)
     for boundary in boundaries:
         if boundary["remediation"]["code"] != "C":
@@ -133,7 +153,7 @@ def _coin_candidates(boundaries: list[dict[str, object]], limit: int) -> list[di
             }
         )
     candidates.sort(key=lambda item: (-item["score"], item["class"], item["method"]))
-    return candidates[:limit]
+    return candidates if limit is None else candidates[:limit]
 
 
 def build_report(stub_path: Path, *, candidate_limit: int = 20) -> dict[str, object]:
@@ -172,6 +192,12 @@ def build_report(stub_path: Path, *, candidate_limit: int = 20) -> dict[str, obj
 
     special_contracts = [*method_contracts, *callback_contracts]
     boundary_categories = Counter(item["category"] for item in boundaries)
+    coin_api_queue = _coin_candidates(boundaries)
+    coin_api_reviews = [
+        _coin_api_review_manifest(review)
+        for review in COIN_API_CANDIDATE_REVIEWS
+    ]
+    reviewed_owner_counts = Counter(item["decision"] for item in coin_api_reviews)
     return {
         "schema_version": REPORT_SCHEMA_VERSION,
         "module": resolved.name,
@@ -186,8 +212,15 @@ def build_report(stub_path: Path, *, candidate_limit: int = 20) -> dict[str, obj
             "special_contract_remediation": _count_records(special_contracts),
             "special_contract_confidence": _confidence_counts(special_contracts),
             "special_contract_confidence_by_class": _code_confidence_counts(special_contracts),
+            "reviewed_coin_api_candidates": len(coin_api_reviews),
+            "reviewed_coin_api_owners": {
+                code: reviewed_owner_counts[code]
+                for code in REMEDIATION_CODES
+            },
         },
-        "coin_api_candidates": _coin_candidates(boundaries, candidate_limit),
+        "coin_api_candidates": coin_api_queue[:candidate_limit],
+        "coin_api_queue": coin_api_queue,
+        "coin_api_reviews": coin_api_reviews,
         "boundaries": boundaries,
         "special_contracts": special_contracts,
     }
@@ -202,6 +235,8 @@ def format_report(report: dict[str, object], candidate_limit: int) -> str:
         "Module                           %s" % report["module"],
         "Boundaries                       %d" % summary["boundaries"],
         "Special contracts               %d" % summary["special_contracts"],
+        "Reviewed Coin API candidates     %d" % summary["reviewed_coin_api_candidates"],
+        "Complete Coin API queue          %d" % len(report["coin_api_queue"]),
         "",
         "Boundary remediation ownership",
         "------------------------------",
@@ -251,6 +286,15 @@ def format_report(report: dict[str, object], candidate_limit: int) -> str:
     lines.extend(
         [
             "",
+            "Reviewed Coin API ownership",
+            "---------------------------",
+            "A=%d  B=%d  C=%d  D=%d"
+            % tuple(
+                summary["reviewed_coin_api_owners"][code]
+                for code in REMEDIATION_CODES
+            ),
+            "See docs/coin-api-typing-roadmap.md for declarations, evidence and actions.",
+            "",
             "Special contracts",
             "-----------------",
             "Method contracts                 %d"
@@ -259,7 +303,7 @@ def format_report(report: dict[str, object], candidate_limit: int) -> str:
             % sum(item["kind"] == "callback" for item in report["special_contracts"]),
             "",
             "Classification is complete for all boundaries and special contracts.",
-            "Reviewed entries are backed by existing policy/audit records;",
+            "Reviewed entries are backed by policy, audit or roadmap records;",
             "provisional entries are the next review queue.",
         ]
     )
@@ -298,6 +342,22 @@ def main() -> int:
             return 1
         if set(summary["boundary_remediation"]) != set(REMEDIATION_CODES):
             print("error: binding-friendliness remediation classes are incomplete", file=sys.stderr)
+            return 1
+        boundary_symbols = {
+            (item["class"], item["method"])
+            for item in report["boundaries"]
+        }
+        missing_reviews = [
+            "%s.%s" % (item["class"], item["method"])
+            for item in report["coin_api_reviews"]
+            if (item["class"], item["method"]) not in boundary_symbols
+        ]
+        if missing_reviews:
+            print(
+                "error: Coin API roadmap entries are absent from the resolved boundary model: %s"
+                % ", ".join(missing_reviews),
+                file=sys.stderr,
+            )
             return 1
     return 0
 
